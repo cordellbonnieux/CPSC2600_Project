@@ -8,6 +8,18 @@ import Navbar from "./components/navbar";
 import RecordList from "./components/recordList";
 import Edit from "./components/edit";
 import Create from "./components/create";
+
+//
+import io from 'socket.io-client'
+const socket = io('http://localhost:5000')
+
+socket.on('message', text => {
+  console.log(`recieved message: ${text}`)
+})
+/*
+ add event to trigger
+  socket.emit('message', text)
+*/
  
 const App = () => {
  return (
