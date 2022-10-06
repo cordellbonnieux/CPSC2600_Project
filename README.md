@@ -1,4 +1,5 @@
-CPSC 2600 - Project
+CPSC 2600 - Term Project
+"Deathmachines" Strategy Game Prototype
 Cordell Bonnieux
 
-The plan for this project is to create a live 1vs1 turn based strategy game using the MERN stack, and possible web sockets.
+1 vs 1 turn based strategy game under development using React.js and Konva.js for the client and MongoDB, Express.js, Socket.io in the Node.js environment for the server/backend. This project is to prototype an idea for a larger game, in addition will serve as my term project submission for CPSC 2600 at Langara.
