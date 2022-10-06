@@ -23,6 +23,7 @@ const server = app.listen(port, () => {
 const io = socketIO(server)
 
 // web socket - on connection
+// work on this more
 io.on('connection', socket => {
   console.log('a user connected')
   socket.on('message', message => {

@@ -9,29 +9,32 @@ import RecordList from "./components/recordList";
 import Edit from "./components/edit";
 import Create from "./components/create";
 
-//
+// this stuff should be passed into a component
 import io from 'socket.io-client'
 const socket = io('http://localhost:5000')
 
 socket.on('message', text => {
   console.log(`recieved message: ${text}`)
 })
-/*
- add event to trigger
-  socket.emit('message', text)
-*/
+//
+
+const starterContent = (
+  <div>
+    <Navbar />
+    <Routes>
+      <Route exact path="/" element={<RecordList />} />
+      <Route path="/edit/:id" element={<Edit />} />
+      <Route path="/create" element={<Create />} />
+    </Routes>
+  </div>
+)
  
 const App = () => {
- return (
-   <div>
-     <Navbar />
-     <Routes>
-       <Route exact path="/" element={<RecordList />} />
-       <Route path="/edit/:id" element={<Edit />} />
-       <Route path="/create" element={<Create />} />
-     </Routes>
-   </div>
- );
-};
+  return (
+    <Routes>
+      <Route exact path='/' element={<h1>hello world</h1>} />
+    </Routes>
+  )
+}
  
-export default App;
+export default App
