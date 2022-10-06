@@ -1,17 +1,56 @@
+// enviroment vars
+require('dotenv').config({ path: './config.env' })
+const port = process.env.PORT || 5000
+
+// packages
 const express = require('express')
 const app = express()
 const cors = require('cors')
-require('dotenv').config({ path: './config.env' })
-const port = process.env.PORT || 5000
+
+/*
+// socket stuff
+const { createServer } = require('http')
+const { Server } = require('socket.io')
+*/
+
+// app & get driver connection
 app.use(cors())
 app.use(express.json())
 app.use(require('./routes/record'))
-
-// web socket
-const socketIO = require('socket.io')
-// get driver connection
 const dbo = require('./db/conn')
- 
+
+// make server & socket conn
+const server = require('http').createServer(app)
+const io = require('socket.io')(server/*, { cors: { origin: '*' } }*/)
+
+// listen for reqs
+server.listen(port, () => {
+  // db atlas reqs
+  dbo.connectToServer(function(err) {
+    if (err) console.log(err)
+  })
+  console.log(`Server is running on port ${port}`)
+})
+
+// web socket, on connection
+io.on('connection', socket => {
+  console.log(`user connected: ${socket.id}`)
+})
+
+
+
+/*
+// init server
+const httpServer = createServer(app)
+const io = new Server(httpServer, {})
+io.on('connection', socket => {
+  //...
+  console.log('server online')
+})
+
+httpServer.listen((port+1))
+
+// server
 const server = app.listen(port, () => {
   // perform a database connection when server starts
   dbo.connectToServer(function (err) {
@@ -19,15 +58,4 @@ const server = app.listen(port, () => {
   })
   console.log(`Server is running on port: ${port}`)
 })
-
-const io = socketIO(server)
-
-// web socket - on connection
-// work on this more
-io.on('connection', socket => {
-  console.log('a user connected')
-  socket.on('message', message => {
-    console.log(message)
-    io.emit('message', `${socket.id.substr(0,2)} said ${message}`)
-  })
-})
+*/
