@@ -20,15 +20,15 @@ export default function LoginScreen() {
 
     const handleSubmit = e => {
         e.preventDefault()
-        console.log('form submitted!')
+        console.log(loginForm ? 'login' : 'new account','form submitted!')
         // check state to determine what to submit
     }
 
     return (
         <div>
             <h1>DeathMachines Prototype</h1>
+            <button onClick={() => handleClick()}>{buttonText}</button>
             <form onSubmit={e => handleSubmit(e)}>
-                <button onClick={() => handleClick()}>{buttonText}</button>
                 {loginForm ? <LoginForm /> : <CreateAccountForm />}
                 <input type='submit' value='Enter'></input>
             </form>

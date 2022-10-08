@@ -12,7 +12,7 @@ module.exports = {
         client.connect(function(err, db) {
             // verify we have a good db obj
             if (db) {
-                _db = db.db('users') // make users table
+                _db = db.db('users') // access users table
                 console.log('Successfully connected to mongodb')
             }
             return callback(err)
