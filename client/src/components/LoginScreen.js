@@ -2,16 +2,16 @@ import { useState } from 'react'
 import LoginForm from './LoginForm'
 import CreateAccountForm from './CreateAccountForm'
 
+const txt = [
+    'Create an Account',
+    'Login to Account'
+]
+
 export default function LoginScreen() {
     // login - username or email, password - google, facebook etc
     // create new account
     const [ loginForm, setLoginForm ] = useState(true)
-    const [ buttonText, setButtonText ] = useState('')
-
-    const txt = [
-        'No account? Click here to create one!',
-        'Already have an account? Click here to login!'
-    ]
+    const [ buttonText, setButtonText ] = useState(txt[0])
 
     const handleClick = () => {
         loginForm ? setButtonText(txt[1]) : setButtonText(txt[0])
@@ -21,6 +21,7 @@ export default function LoginScreen() {
     const handleSubmit = e => {
         e.preventDefault()
         console.log('form submitted!')
+        // check state to determine what to submit
     }
 
     return (
@@ -29,6 +30,7 @@ export default function LoginScreen() {
             <form onSubmit={e => handleSubmit(e)}>
                 <button onClick={() => handleClick()}>{buttonText}</button>
                 {loginForm ? <LoginForm /> : <CreateAccountForm />}
+                <input type='submit' value='Enter'></input>
             </form>
         </div>
     )
