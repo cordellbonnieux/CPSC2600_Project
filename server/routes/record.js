@@ -1,12 +1,6 @@
 const express = require('express')
-
-// record routes is an instance of express router
-// router will be added as middleware controlling requests at /record
 const recordRoutes = express.Router()
-
-// connects us to db
 const dbo = require('../db/conn')
-
 // convert id from string to objectid or _id
 const ObjectId = require('mongodb').ObjectId
 

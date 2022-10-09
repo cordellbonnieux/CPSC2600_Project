@@ -17,16 +17,26 @@ const dbo = require('./db/conn')
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 
+// mongoose conn
+const { connectViaMongoose, createUser, findUser } = require('./db/mongoose')
+
 // listen for reqs
+// main server func
 server.listen(port, () => {
-  // db atlas reqs
+
+  // mongoose connection
+  connectViaMongoose().then(() => console.log('yes, mongoose worked.'))
+
+  // mongodb connection
   dbo.connectToServer(function(err) {
     if (err) console.log(err)
   })
+
   console.log(`Server is running on port ${port}`)
 })
 
 // web socket, on connection
+// need to come back to this
 io.on('connection', socket => {
   console.log(`user connected: ${socket.id}`)
 })
