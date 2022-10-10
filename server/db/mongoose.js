@@ -4,6 +4,7 @@ const User = require('../models/userModel')
 
 // connect to mongo db atlas via mongoose
 const connectViaMongoose = () => mongoose.connect(atlas)
+
 // on connect
 mongoose.connection.once('open', () => {
     console.log('DB connected.')
@@ -11,14 +12,18 @@ mongoose.connection.once('open', () => {
 
 // func to create a new user
 async function createUser(username, email, password) {
-    return new User({
-        username,
-        email,
-        password,
-        created: Date.now()
-    }).save().then(() => {
-        console.log('user:',username,'created.')
-    })
+    try {
+        return new User({
+            username,
+            email,
+            password,
+            created: Date.now()
+        }).save().then(() => {
+            console.log('user:',username,'created.')
+        })
+    } catch (e) {
+        console.log('createUser error:', e.message)
+    }
 }
 // func to find a user
 async function findUser(username) {
