@@ -7,7 +7,7 @@ const connectViaMongoose = () => mongoose.connect(atlas)
 
 // on connect
 mongoose.connection.once('open', () => {
-    console.log('DB connected.')
+    console.log('connected via mongoose.')
 })
 
 // func to create a new user
@@ -30,4 +30,10 @@ async function findUser(username) {
     return await User.findOne({username})
 }
 
+// update username
+/*
+async function updateName(username, newusername) {
+    return await User.where('username').equals(username)
+}
+*/
 module.exports = { connectViaMongoose, createUser, findUser}

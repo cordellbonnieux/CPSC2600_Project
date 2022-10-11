@@ -18,49 +18,11 @@ export default function LoginScreen() {
         setLoginForm(!loginForm)
     }
 
-    const handleSubmit = e => {
-        e.preventDefault()
-        console.log(loginForm ? 'login' : 'new account','form submitted!')
-        // check state to determine what to submit
-    }
-
     return (
         <div>
             <h1>DeathMachines Prototype</h1>
             <button onClick={() => handleClick()}>{buttonText}</button>
-            <form onSubmit={e => handleSubmit(e)}>
-                {loginForm ? <LoginForm /> : <CreateAccountForm />}
-                <input type='submit' value='Enter'></input>
-            </form>
+            {loginForm ? <LoginForm /> : <CreateAccountForm />}
         </div>
     )
 } 
-/*
-
-    // handle submission
-    async function onSubmit(e) {
-        e.preventDefault()
-
-        // create a new record
-        const newPerson = { ...form }
-
-        // something is not working here
-        
-        await fetch('http://localhost:5000/record/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newPerson),
-        })
-        .catch(error => {
-            window.alert(error)
-            return
-        })
-
-        setForm({ name: '', position: '', level: ''})
-        navigate('/')
-    }
-
-
-*/

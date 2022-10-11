@@ -20,19 +20,17 @@ const userSchema = new mongoose.Schema({
         validate: {
             validator: val => {
                 if (!(/[A-Z]/.test(val))) {
-                    console.log('password has no capital letters')
                     return false
                 }
                 if (!(/\d/.test(val))) {
-                    console.log('password has no numbers')
                     return false
                 }
                 if (!(/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(val))) {
-                    console.log('password has no special chars')
                     return false
                 }
                 return true
-            }
+            },
+            message: val => `password ${val.value} does not meet schema requirements`
         }
     },
     created: {

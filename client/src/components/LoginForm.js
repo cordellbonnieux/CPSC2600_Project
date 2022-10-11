@@ -1,7 +1,7 @@
 export default function LoginForm() {
     // I LEFT OFF HERE!
     return (
-        <div>
+        <form>
             <h2>Login</h2>
             <label htmlFor='userName'>
                 username or email:
@@ -13,6 +13,7 @@ export default function LoginForm() {
                 <input type='password' name='password' id='password'></input>
                 <span></span>
             </label>
-        </div>
+            <input type='submit' value='Enter'></input>
+        </form>
     )
 }

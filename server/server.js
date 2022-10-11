@@ -10,7 +10,8 @@ const cors = require('cors')
 // app & get driver connection
 app.use(cors())
 app.use(express.json())
-app.use(require('./routes/record'))
+//app.use(require('./routes/record'))
+app.use(require('./routes/accountRoutes'))
 const dbo = require('./db/conn')
 
 // make server & socket conn
@@ -18,14 +19,14 @@ const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 
 // mongoose conn
-const { connectViaMongoose, createUser, findUser } = require('./db/mongoose')
+const { connectViaMongoose } = require('./db/mongoose')
 
 // listen for reqs
 // main server func
 server.listen(port, () => {
 
   // mongoose connection
-  connectViaMongoose().then(() => console.log('yes, mongoose worked.'))
+  connectViaMongoose()
 
   // mongodb connection
   dbo.connectToServer(function(err) {
