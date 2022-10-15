@@ -1,13 +1,18 @@
-const userModel = require('../models/userModel')
+const User = require('../models/userModel')
 
-// login
-const userLogin = async (req, res) => {
-    res.json({msg: 'user login'})
+async function createUser(username, email, password) {
+    try {
+        return new User({
+            username,
+            email,
+            password,
+            created: Date.now()
+        }).save().then(() => {
+            console.log('user:',username,'created.')
+        })
+    } catch (e) {
+        console.log('createUser error:', e.message)
+    }
 }
 
-// create account
-const createAccount = async (req, res) => {
-    res.json({msg: 'create account'})
-}
-
-module.exports = { userLogin, createAccount }
+module.exports = { createUser }
