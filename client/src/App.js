@@ -1,43 +1,39 @@
-//
-import React from "react";
- 
-// We use Route in order to define the different routes of our application
-import { Route, Routes } from "react-router-dom";
+import React from 'react'
+import { useState } from 'react'
+import { Route, Routes } from 'react-router-dom'
 import { io } from 'socket.io-client'
- 
-// starter components
-import Navbar from "./components/navbar";
-import RecordList from "./components/recordList";
-import Edit from "./components/edit";
-import Create from "./components/create";
 
-// my components
-import Main from './components/Main'
-//
-const starterContent = (  
-    <Routes>
-      <Route exact path="/" element={<RecordList />} />
-      <Route path="/edit/:id" element={<Edit />} />
-      <Route path="/create" element={<Create />} />
-    </Routes>
-)
-// note to self: please rename this
-// Main's attributes need to be dynamic too
-const newStuff = (
-  <Routes>
-    <Route exact path='/' element={<Main loggedIn={false} inGame={false} />} />
-  </Routes>
-)
+// components
+import Match from './pages/Match'
+import MainMenu from './pages/MainMenu'
+import LoginScreen from "./pages/LoginScreen"
 
 // web sockets
 const socket = io('http://localhost:5000')
-socket.on('connection')
+socket.on('connection', () => console.log('web socket connected.'))
+
+// logged in
+const loggedInTemplate = (
+  <div id="loggedInWrapper">
+    <Routes>
+      <Route exact path='/' element={<MainMenu />} />
+      <Route exact path='/match' element={<Match />} />
+    </Routes>
+  </div>
+)
+
+const loggedOutTemplate = (
+  <div id="loggedOutWrapper">
+    <LoginScreen />
+  </div>
+)
 
 //
 const App = () => {
+  const [ loggedIn, setLoggedIn ] = useState(false)
   return (
     <div id='wrapper'>
-      {newStuff}
+      {loggedIn ? loggedInTemplate : loggedOutTemplate}
     </div>
   )
 }

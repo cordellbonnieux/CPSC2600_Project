@@ -16,7 +16,7 @@ const server = require('http').createServer(app)
 const mongoose = require('mongoose')
 mongoose.connect(process.env.ATLAS_URI) //async
 const connection = mongoose.connection
-connection.once('open', () => console.log('connected with mongoose'))
+connection.once('open', () => console.log('connected to mongodb atlas'))
 
 // server
 server.listen(port, () => {

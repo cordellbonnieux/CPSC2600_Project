@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import LoginForm from './LoginForm'
-import CreateAccountForm from './CreateAccountForm'
+import LoginForm from '../components/LoginForm'
+import CreateAccountForm from '../components/CreateAccountForm'
 
 const txt = [
     'Create an Account',

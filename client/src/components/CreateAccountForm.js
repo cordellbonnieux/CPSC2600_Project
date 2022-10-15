@@ -12,6 +12,8 @@ export default function CreateAccountForm() {
     async function handleSubmit(e) {
         e.preventDefault()
 
+        // replace with axios req
+
         await fetch('http://localhost:5000/createuser', {
             method: 'POST',
             headers: {
