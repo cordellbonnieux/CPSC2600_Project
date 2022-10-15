@@ -1,7 +1,22 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from 'react-router'
 import axios from 'axios'
-const serverURL = 'http://localhost:5000/createuser'
+
+const serverURL = 'http://localhost:5000/'
+const error = {
+    user: [
+        'username is too short',
+        'username taken'
+    ],
+    email: [
+        'email format incorrect',
+        'email is already in use'
+    ],
+    password: [
+        'password must include one capital letter, a number and a special character',
+        'passwords do not match'
+    ]
+}
 
 export default function CreateAccountForm() {
     const [ user, setUser ] = useState('')
@@ -9,6 +24,11 @@ export default function CreateAccountForm() {
     const [ password1, setPassword1 ] = useState('')
     const [ password2, setPassword2 ] = useState('')
     const [ isLoading, setLoading ] = useState(false)
+    const [ warningUser, setWarningUser ] = useState(<></>)
+    const [ warningEmail, setWarningEmail ] = useState(<></>)
+    const [ warningPassword1, setWarningPassword1 ] = useState(<></>)
+    const [ warningPassword2, setWarningPassword2 ] = useState(<></>)
+    const [ userList, setUserList ] = useState([])
 
     const navigate = useNavigate()
 
@@ -23,9 +43,8 @@ export default function CreateAccountForm() {
 
     function createAccount() {
         setLoading(true)
-        // axios
         axios
-        .post(serverURL, {
+        .post(serverURL+'createuser', {
             username: user,
             email: email,
             password: password1
@@ -37,30 +56,6 @@ export default function CreateAccountForm() {
             console.log(response.data)
             navigate('/')
         })
-        /*
-        await fetch('http://localhost:5000/createuser', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: user,
-                email: email,
-                password: password1
-            })
-        })
-        .catch(e => {
-            console.log(e.message)
-            return
-        })
-        .then(() => {
-            setUser('')
-            setEmail('')
-            setPassword1('')
-            setPassword2('')
-            navigate('/')
-        })
-        */
     }
 
     function resetForm() {
@@ -69,6 +64,33 @@ export default function CreateAccountForm() {
         setPassword1('')
         setPassword2('')
     }
+
+    function checkUserName() {
+        if (user.value.length < 3) {
+            setWarningUser(error.user[0])
+        } else {
+            // if user is in the response array
+            // then display error.user[1]
+            // else, no error
+        }
+    }
+
+    function checkEmail() {
+
+    }
+
+    function checkPasswords() {
+
+    }
+
+    useEffect(() => {
+        // get the userlist
+        axios
+        .get(serverURL+'userlist')
+        .then(res => {
+            setUserList(res.data)
+        })
+    })
 
     // add a conditional statement which returns a loading spinner or similar
     return (

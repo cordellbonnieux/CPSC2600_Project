@@ -9,4 +9,9 @@ accountRoutes.route('/createuser').post(function(req,res) {
     res.status(200)
 })
 
+accountRoutes.route('/userlist').get(function(req,res) {
+    // send a list of all usernames only, in an array
+    res.send('from here gather all user names and send em here')
+})
+
 module.exports = accountRoutes
