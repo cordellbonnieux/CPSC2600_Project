@@ -1,9 +1,10 @@
 const express = require('express')
 const accountRoutes = express.Router()
-const { createUser, findUser } = require('../db/mongoose')
+const { connectViaMongoose, createUser, findUser } = require('../db/mongoose')
 
-accountRoutes.route('/createuser').get(function(req,res) {
+accountRoutes.route('/createuser').post(function(req,res) {
     const { username, email, password } = req.body
+    connectViaMongoose()
     createUser(username, email, password)
 })
 
