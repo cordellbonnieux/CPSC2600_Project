@@ -1,41 +1,25 @@
 import React from 'react'
 import { useState } from 'react'
-import { Route, Routes } from 'react-router-dom'
 import { io } from 'socket.io-client'
 
-// components
-import Match from './pages/Match'
-import MainMenu from './pages/MainMenu'
-import LoginScreen from "./pages/LoginScreen"
+// templates
+import LoggedOutTemplate from './templates/LoggedOut'
+import LoggedInTemplate from './templates/LoggedIn'
 
 // web sockets
 const socket = io('http://localhost:5000')
 socket.on('connection', () => console.log('web socket connected.'))
 
-// logged in
-const loggedInTemplate = (
-  <div id="loggedInWrapper">
-    <Routes>
-      <Route exact path='/' element={<MainMenu />} />
-      <Route exact path='/match' element={<Match />} />
-    </Routes>
-  </div>
-)
-
-const loggedOutTemplate = (
-  <div id="loggedOutWrapper">
-    <LoginScreen />
-  </div>
-)
-
-//
+/*
+* App Component
+*/
 const App = () => {
   const [ loggedIn, setLoggedIn ] = useState(false)
   return (
     <div id='wrapper'>
-      {loggedIn ? loggedInTemplate : loggedOutTemplate}
+      {loggedIn ? <LoggedInTemplate /> : <LoggedOutTemplate />}
     </div>
   )
 }
- 
+
 export default App

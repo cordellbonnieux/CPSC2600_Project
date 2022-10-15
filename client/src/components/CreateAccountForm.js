@@ -1,19 +1,43 @@
 import { useState } from "react"
 import { useNavigate } from 'react-router'
+import axios from 'axios'
+const serverURL = 'http://localhost:5000/createuser'
 
 export default function CreateAccountForm() {
     const [ user, setUser ] = useState('')
     const [ email, setEmail ] = useState('')
     const [ password1, setPassword1 ] = useState('')
     const [ password2, setPassword2 ] = useState('')
+    const [ isLoading, setLoading ] = useState(false)
 
     const navigate = useNavigate()
 
     async function handleSubmit(e) {
         e.preventDefault()
 
-        // replace with axios req
+        // validate state
 
+        // create account
+        createAccount()
+    }
+
+    function createAccount() {
+        setLoading(true)
+        // axios
+        axios
+        .post(serverURL, {
+            username: user,
+            email: email,
+            password: password1
+        })
+        .then(response => {
+            // it never gets here
+            resetForm()
+            setLoading(false)
+            console.log(response.data)
+            navigate('/')
+        })
+        /*
         await fetch('http://localhost:5000/createuser', {
             method: 'POST',
             headers: {
@@ -36,8 +60,17 @@ export default function CreateAccountForm() {
             setPassword2('')
             navigate('/')
         })
+        */
     }
 
+    function resetForm() {
+        setUser('')
+        setEmail('')
+        setPassword1('')
+        setPassword2('')
+    }
+
+    // add a conditional statement which returns a loading spinner or similar
     return (
         <form onSubmit={e => handleSubmit(e)}>
             <h2>Create Account</h2>
