@@ -1,17 +1,50 @@
 const express = require('express')
 const accountRoutes = express.Router()
-const { createUser } = require('../controllers/userController')
+const User = require('../models/userModel')
 
+/*
+* Create a new user
+*/
 accountRoutes.route('/createuser').post(function(req,res) {
     const { username, email, password } = req.body
-    createUser(username, email, password)
-    res.send(`user ${username}, created.`)
-    res.status(200)
+    try {
+        return new User({
+            username,
+            email,
+            password,
+            created: Date.now()
+        }).save().then(() => {
+            console.log('user:',username,'created.')
+            res.send(`you've created user: ${username}.`)
+            res.status(200)
+        })
+    } catch (e) {
+        console.log('createUser server error:', e.message)
+        res.status(500)
+    }
 })
 
-accountRoutes.route('/userlist').get(function(req,res) {
-    // send a list of all usernames only, in an array
-    res.send('from here gather all user names and send em here')
+/*
+* Check if user exists
+*/
+accountRoutes.route('/checkifuserexists').post(function(req,res) {
+    const { user } = req.body
+    User.find({}, function(err,result) {
+        if (err) {
+            console.log('checkifuserexists route error:', e.message)
+            res.status(500)
+        } else {
+            for (let i = 0; i < result.length; i++) {
+                if (result[i].username === user) {
+                    res.send(true)
+                    res.status(200)
+                    return
+                }
+            }
+            res.send(false)
+            res.status(200)        
+        }
+    })
 })
 
 module.exports = accountRoutes

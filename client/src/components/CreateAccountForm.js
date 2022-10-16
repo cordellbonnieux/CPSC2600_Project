@@ -6,6 +6,8 @@ const serverURL = 'http://localhost:5000/'
 const error = {
     user: [
         'username is too short',
+        'username cannot contain special characters',
+        'username cannot contain spaces',
         'username taken'
     ],
     email: [
@@ -24,21 +26,19 @@ export default function CreateAccountForm() {
     const [ password1, setPassword1 ] = useState('')
     const [ password2, setPassword2 ] = useState('')
     const [ isLoading, setLoading ] = useState(false)
-    const [ warningUser, setWarningUser ] = useState(<></>)
-    const [ warningEmail, setWarningEmail ] = useState(<></>)
-    const [ warningPassword1, setWarningPassword1 ] = useState(<></>)
-    const [ warningPassword2, setWarningPassword2 ] = useState(<></>)
-    const [ userList, setUserList ] = useState([])
+    const [ warningUser, setWarningUser ] = useState('')
+    const [ warningEmail, setWarningEmail ] = useState('')
+    const [ warningPassword1, setWarningPassword1 ] = useState('')
+    const [ warningPassword2, setWarningPassword2 ] = useState('')
 
     const navigate = useNavigate()
 
     async function handleSubmit(e) {
         e.preventDefault()
-
         // validate state
-
-        // create account
-        createAccount()
+        if (checkUserName() && checkEmail() && checkPasswords()) {
+            createAccount()
+        }
     }
 
     function createAccount() {
@@ -50,7 +50,6 @@ export default function CreateAccountForm() {
             password: password1
         })
         .then(response => {
-            // it never gets here
             resetForm()
             setLoading(false)
             console.log(response.data)
@@ -66,30 +65,47 @@ export default function CreateAccountForm() {
     }
 
     function checkUserName() {
-        if (user.value.length < 3) {
+        if (user.length < 3) {
             setWarningUser(error.user[0])
+            return false
+        } else if (/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(user)) {
+            setWarningUser(error.user[1])
+            return false
+        } else if (/^\s*$/.test(user)) {
+            setWarningUser(error.user[2])
+            return false
         } else {
-            // if user is in the response array
-            // then display error.user[1]
-            // else, no error
+            axios
+            .post(serverURL+'checkifuserexists', {user:user})
+            .then(response => {
+                if (response.data) {
+                    setWarningUser(error.user[3])
+                    return false
+                } else {
+                    setWarningUser('')
+                    return true
+                }
+            })
         }
     }
 
     function checkEmail() {
-
+        return true
     }
 
     function checkPasswords() {
-
+        return true
     }
 
     useEffect(() => {
         // get the userlist
+        /*
         axios
         .get(serverURL+'userlist')
         .then(res => {
             setUserList(res.data)
         })
+        */
     })
 
     // add a conditional statement which returns a loading spinner or similar
@@ -103,9 +119,10 @@ export default function CreateAccountForm() {
                     name='userName' 
                     id='userName'
                     onChange={e => setUser(e.target.value)}
+                    onBlur={() => checkUserName()}
                     value={user}
                 ></input>
-                <span></span>
+                <span>{warningUser}</span>
             </label>
             <label htmlFor='email'>
                 email:
