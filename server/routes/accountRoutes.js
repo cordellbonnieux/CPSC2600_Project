@@ -71,3 +71,7 @@ accountRoutes.route('/checkifemailexists').post(function(req,res) {
 })
 
 module.exports = accountRoutes
+
+/*
+* create session token
+*/

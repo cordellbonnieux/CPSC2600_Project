@@ -1,3 +1,3 @@
 export default function MainMenu() {
-    return <></>
+    return <>main menu</>
 }

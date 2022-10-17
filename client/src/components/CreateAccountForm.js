@@ -32,7 +32,6 @@ export default function CreateAccountForm() {
     let [ isLoading, setLoading ] = useState(false)
     let [ validUser, setUserValid ] = useState(false)
     let [ validEmail, setEmailValid ] = useState(false)
-    let [ password1Checked, setPassword1Checked ] = useState(false)
     let [ validPassword, setPasswordValid ] = useState(false)
     let [ readyToSubmit, setReadyToSubmit ] = useState(false)
 
@@ -81,6 +80,7 @@ export default function CreateAccountForm() {
             setWarningUser(error.user[2])
             setUserValid(false)
         } else {
+            setLoading(true)
             axios
             .post(serverURL+'checkifuserexists', {user:user})
             .then(response => {
@@ -91,16 +91,17 @@ export default function CreateAccountForm() {
                     setWarningUser('')
                     setUserValid(true)
                 }
+                setLoading(false)
             })
         }
     }
 
     function checkEmail() {
-        // does this first condition work?
         if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))) {
             setWarningEmail(error.email[0])
             setEmailValid(false)
         } else {
+            setLoading(true)
             axios
             .post(serverURL+'checkifemailexists', {email:email})
             .then(response => {
@@ -111,16 +112,12 @@ export default function CreateAccountForm() {
                     setWarningEmail('')
                     setEmailValid(true)
                 }
+                setLoading(false)
             })
         }
     }
 
     function checkPasswords() {
-        // if password 1 has bad format
-        // display error - not ready
-        // else if password 2 is not empty AND does not match
-        // display error - not ready
-        // else - is ready
         if (
             !(/[A-Z]/.test(password1)) || 
             !(/\d/.test(password1)) ||
