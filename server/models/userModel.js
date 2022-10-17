@@ -11,12 +11,12 @@ const userSchema = new mongoose.Schema({
       type: String,
       required: [true, 'email must be unique'],
       unique: true,
-      minlength: 7
+      minlength: 5
     },
     password: {
         type: String,
         required: true,
-        minlength: 7,
+        minlength: 6,
         validate: {
             validator: val => {
                 if (!(/[A-Z]/.test(val))) {

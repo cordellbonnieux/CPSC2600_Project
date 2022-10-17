@@ -121,10 +121,31 @@ export default function CreateAccountForm() {
         // else if password 2 is not empty AND does not match
         // display error - not ready
         // else - is ready
+        if (
+            !(/[A-Z]/.test(password1)) || 
+            !(/\d/.test(password1)) ||
+            !(/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(password1))
+            ) {
+            setPasswordValid(false)
+            setWarningPassword1(error.password[0])
+            setWarningPassword2('')
+        } else if (password1 !== password2) {
+            setWarningPassword1('')
+            setPasswordValid(false)
+            if (password2.length > 0) {
+                setWarningPassword2(error.password[1])
+            } else {
+                setWarningPassword2('')
+            }
+        } else {
+            setPasswordValid(true)
+            setWarningPassword1('')
+            setWarningPassword2('')
+        }
+
     }
 
     useEffect(() => {
-        console.log('current state:',validEmail,validPassword,validUser) // test
         if (validEmail && validPassword & validUser) {
             setReadyToSubmit(true)
         } else {
@@ -142,11 +163,16 @@ export default function CreateAccountForm() {
                     type='text' 
                     name='userName' 
                     id='userName'
-                    onChange={e => setUser(e.target.value)}
+                    onChange={e => {
+                        setUser(e.target.value)
+                        if (validUser) {
+                            checkUserName()
+                        }
+                    }}
                     onBlur={() => checkUserName()}
                     value={user}
                 ></input>
-                <span>{warningUser}</span>
+                <span className='inputFormWarning'>{warningUser}</span>
             </label>
             <label htmlFor='email'>
                 email:
@@ -154,11 +180,16 @@ export default function CreateAccountForm() {
                     type='email' 
                     name='email' 
                     id='email'
-                    onChange={e => setEmail(e.target.value)}
+                    onChange={e => {
+                        setEmail(e.target.value)
+                        if (validEmail) {
+                            checkEmail()
+                        }
+                    }}
                     onBlur={() => checkEmail()}
                     value={email}
                 ></input>
-                <span>{warningEmail}</span>
+                <span className='inputFormWarning'>{warningEmail}</span>
             </label>
             <label htmlFor='password1'>
                 password:
@@ -166,11 +197,16 @@ export default function CreateAccountForm() {
                     type='password' 
                     name='password1' 
                     id='password1'
-                    onChange={e => setPassword1(e.target.value)}
+                    onChange={e => {
+                        setPassword1(e.target.value)
+                        if (validPassword) {
+                            checkPasswords()
+                        }
+                    }}
                     onBlur={() => checkPasswords()}
                     value={password1}
                 ></input>
-                <span>{warningPassword1}</span>
+                <span className='inputFormWarning'>{warningPassword1}</span>
             </label>
             <label htmlFor='password2'>
                 password, again:
@@ -178,13 +214,18 @@ export default function CreateAccountForm() {
                     type='password' 
                     name='password2' 
                     id='password2'
-                    onChange={e => setPassword2(e.target.value)}
+                    onChange={e => {
+                        setPassword2(e.target.value)
+                        if (validPassword) {
+                            checkPasswords()
+                        }
+                    }}
                     onBlur={e => checkPasswords()}
                     value={password2}
                 ></input>
-                <span>{warningPassword2}</span>
+                <span className='inputFormWarning'>{warningPassword2}</span>
             </label>
-            <button type='submit' disabled={readyToSubmit}>Enter credentials</button>
+            <button type='submit' disabled={!readyToSubmit}>Enter credentials</button>
         </form>
     )
 }
