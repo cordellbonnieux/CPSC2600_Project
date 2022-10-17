@@ -2,6 +2,8 @@ const express = require('express')
 const accountRoutes = express.Router()
 const User = require('../models/userModel')
 
+// need to seriously re work the rout names
+
 /*
 * Create a new user
 */
@@ -31,7 +33,7 @@ accountRoutes.route('/checkifuserexists').post(function(req,res) {
     const { user } = req.body
     User.find({}, function(err,result) {
         if (err) {
-            console.log('checkifuserexists route error:', e.message)
+            console.log('checkifuserexists route error:', err.message)
             res.status(500)
         } else {
             for (let i = 0; i < result.length; i++) {
@@ -54,7 +56,7 @@ accountRoutes.route('/checkifemailexists').post(function(req,res) {
     const { email } = req.body
     User.find({}, function(err,result) {
         if (err) {
-            console.log('checkifemailexists route error:', e.message)
+            console.log('checkifemailexists route error:', err.message)
             res.status(500)
         } else {
             for (let i = 0; i < result.length; i++) {

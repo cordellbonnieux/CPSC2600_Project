@@ -8,6 +8,7 @@ app.use(cors())
 app.use(express.json())
 
 app.use(require('./routes/accountRoutes'))
+app.use(require('./routes/sessionRoutes'))
 
 // make server
 const server = require('http').createServer(app)
