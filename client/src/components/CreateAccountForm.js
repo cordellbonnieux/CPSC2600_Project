@@ -25,19 +25,25 @@ export default function CreateAccountForm() {
     const [ email, setEmail ] = useState('')
     const [ password1, setPassword1 ] = useState('')
     const [ password2, setPassword2 ] = useState('')
-    const [ isLoading, setLoading ] = useState(false)
     const [ warningUser, setWarningUser ] = useState('')
     const [ warningEmail, setWarningEmail ] = useState('')
     const [ warningPassword1, setWarningPassword1 ] = useState('')
     const [ warningPassword2, setWarningPassword2 ] = useState('')
+    let [ isLoading, setLoading ] = useState(false)
+    let [ validUser, setUserValid ] = useState(false)
+    let [ validEmail, setEmailValid ] = useState(false)
+    let [ password1Checked, setPassword1Checked ] = useState(false)
+    let [ validPassword, setPasswordValid ] = useState(false)
+    let [ readyToSubmit, setReadyToSubmit ] = useState(false)
 
     const navigate = useNavigate()
 
     async function handleSubmit(e) {
         e.preventDefault()
-        // validate state
-        if (checkUserName() && checkEmail() && checkPasswords()) {
+        if (readyToSubmit) {
             createAccount()
+        } else {
+            alert('should not be able to submit right now')
         }
     }
 
@@ -67,45 +73,63 @@ export default function CreateAccountForm() {
     function checkUserName() {
         if (user.length < 3) {
             setWarningUser(error.user[0])
-            return false
+            setUserValid(false)
         } else if (/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(user)) {
             setWarningUser(error.user[1])
-            return false
+            setUserValid(false)
         } else if (/^\s*$/.test(user)) {
             setWarningUser(error.user[2])
-            return false
+            setUserValid(false)
         } else {
             axios
             .post(serverURL+'checkifuserexists', {user:user})
             .then(response => {
                 if (response.data) {
                     setWarningUser(error.user[3])
-                    return false
+                    setUserValid(false)
                 } else {
                     setWarningUser('')
-                    return true
+                    setUserValid(true)
                 }
             })
         }
     }
 
     function checkEmail() {
-        return true
+        // does this first condition work?
+        if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))) {
+            setWarningEmail(error.email[0])
+            setEmailValid(false)
+        } else {
+            axios
+            .post(serverURL+'checkifemailexists', {email:email})
+            .then(response => {
+                if (response.data) {
+                    setWarningEmail(error.email[1])
+                    setEmailValid(false)
+                } else {
+                    setWarningEmail('')
+                    setEmailValid(true)
+                }
+            })
+        }
     }
 
     function checkPasswords() {
-        return true
+        // if password 1 has bad format
+        // display error - not ready
+        // else if password 2 is not empty AND does not match
+        // display error - not ready
+        // else - is ready
     }
 
     useEffect(() => {
-        // get the userlist
-        /*
-        axios
-        .get(serverURL+'userlist')
-        .then(res => {
-            setUserList(res.data)
-        })
-        */
+        console.log('current state:',validEmail,validPassword,validUser) // test
+        if (validEmail && validPassword & validUser) {
+            setReadyToSubmit(true)
+        } else {
+            setReadyToSubmit(false)
+        }
     })
 
     // add a conditional statement which returns a loading spinner or similar
@@ -131,9 +155,10 @@ export default function CreateAccountForm() {
                     name='email' 
                     id='email'
                     onChange={e => setEmail(e.target.value)}
+                    onBlur={() => checkEmail()}
                     value={email}
                 ></input>
-                <span></span>
+                <span>{warningEmail}</span>
             </label>
             <label htmlFor='password1'>
                 password:
@@ -142,9 +167,10 @@ export default function CreateAccountForm() {
                     name='password1' 
                     id='password1'
                     onChange={e => setPassword1(e.target.value)}
+                    onBlur={() => checkPasswords()}
                     value={password1}
                 ></input>
-                <span></span>
+                <span>{warningPassword1}</span>
             </label>
             <label htmlFor='password2'>
                 password, again:
@@ -153,11 +179,12 @@ export default function CreateAccountForm() {
                     name='password2' 
                     id='password2'
                     onChange={e => setPassword2(e.target.value)}
+                    onBlur={e => checkPasswords()}
                     value={password2}
                 ></input>
-                <span></span>
+                <span>{warningPassword2}</span>
             </label>
-            <input type='submit' value='Enter'></input>
+            <button type='submit' disabled={readyToSubmit}>Enter credentials</button>
         </form>
     )
 }

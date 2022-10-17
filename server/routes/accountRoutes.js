@@ -47,4 +47,27 @@ accountRoutes.route('/checkifuserexists').post(function(req,res) {
     })
 })
 
+/*
+* Check if email exists
+*/
+accountRoutes.route('/checkifemailexists').post(function(req,res) {
+    const { email } = req.body
+    User.find({}, function(err,result) {
+        if (err) {
+            console.log('checkifemailexists route error:', e.message)
+            res.status(500)
+        } else {
+            for (let i = 0; i < result.length; i++) {
+                if (result[i].email === email) {
+                    res.send(true)
+                    res.status(200)
+                    return
+                }
+            }
+            res.send(false)
+            res.status(200)        
+        }
+    })
+})
+
 module.exports = accountRoutes
