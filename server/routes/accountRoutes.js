@@ -2,7 +2,7 @@ const express = require('express')
 const accountRoutes = express.Router()
 const User = require('../models/userModel')
 
-// need to seriously re work the rout names
+// need to seriously re work the route names
 
 /*
 * Create a new user
@@ -17,7 +17,7 @@ accountRoutes.route('/createuser').post(function(req,res) {
             created: Date.now()
         }).save().then(() => {
             console.log('user:',username,'created.')
-            res.send(`you've created user: ${username}.`)
+            res.send(username)
             res.status(200)
         })
     } catch (e) {

@@ -1,4 +1,3 @@
-import nanoid from 'nanoid'
 const mongoose = require('mongoose')
 
 const sessionModel = new mongoose.Schema({
@@ -6,6 +5,11 @@ const sessionModel = new mongoose.Schema({
         type: String,
         required: true,
         immutable: true
+    },
+    sessionid: {
+        type: String,
+        required: true,
+        immutable: true,
     },
     lastActivity: {
         type: Date,
@@ -17,12 +21,6 @@ const sessionModel = new mongoose.Schema({
         default: () => Date.now(),
         required: true,
         immutable: true
-    },
-    sessionid: {
-        type: String,
-        required: true,
-        immutable: true,
-        default: () => nanoid()
     }
 })
 

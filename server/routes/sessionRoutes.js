@@ -1,12 +1,12 @@
-import express from 'express'
-import Session from '../models/sessionModel'
-import User from '../models/userModel'
-
+const express = require('express')
 const sessionRoutes = express.Router()
+const Session = require('../models/sessionModel')
+const User = require('../models/userModel')
+const { nanoid } = require('nanoid')
 
 /*
 * create new session
-* for given user
+* for given user and return a sessionid
 */
 sessionRoutes.route('routes/session/create').post(function(req,res) {
     const { user } = req.body
@@ -25,11 +25,14 @@ sessionRoutes.route('routes/session/create').post(function(req,res) {
     }).then(id => {
         console.log('.then id read as:', id)
         if (id !== null) {
+            const sessionid = nanoid()
             // create new session
-            const session = new Session({userid:id})
+            const session = new Session({userid:id, sessionid:sessionid})
             // return session id in response
             res.send(session.sessionid)
             res.status(200)
         }
     })
 })
+
+module.exports = sessionRoutes
