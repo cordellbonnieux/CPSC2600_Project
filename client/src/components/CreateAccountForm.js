@@ -42,15 +42,13 @@ export default function CreateAccountForm() {
         e.preventDefault()
         if (readyToSubmit) {
             createAccount()
-        } else {
-            alert('should not be able to submit right now')
         }
     }
 
     function createAccount() {
         setLoading(true)
         axios
-        .post(serverURL+'routes/user/create', {
+        .post(serverURL+'account/create', {
             username: user,
             email: email,
             password: password1
@@ -83,7 +81,7 @@ export default function CreateAccountForm() {
         } else {
             setLoading(true)
             axios
-            .post(serverURL+'routes/user/username/exists', {user:user})
+            .post(serverURL+'account/userexists', {user:user})
             .then(response => {
                 if (response.data) {
                     setWarningUser(error.user[3])
@@ -104,7 +102,7 @@ export default function CreateAccountForm() {
         } else {
             setLoading(true)
             axios
-            .post(serverURL+'routes/user/email/exists', {email:email})
+            .post(serverURL+'account/emailexists', {email:email})
             .then(response => {
                 if (response.data) {
                     setWarningEmail(error.email[1])

@@ -1,9 +1,12 @@
 import axios from 'axios'
+const server = 'https://localhost:5000'
 
-async function create(user) {
+// this wont work
+
+async function createSession(user) {
     axios
-    .post()
-    .then()
+    .post(server+'routes/session/create',{user:user})
+    .then(res => {
+        console.log(res)
+    })
 }
-
-module.exports = {}

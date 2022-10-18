@@ -5,7 +5,7 @@ const User = require('../models/userModel')
 /*
 * Create a new user
 */
-accountRoutes.route('/routes/user/create').post(function(req,res) {
+accountRoutes.route('/create').post(function(req,res) {
     const { username, email, password } = req.body
     try {
         return new User({
@@ -27,7 +27,7 @@ accountRoutes.route('/routes/user/create').post(function(req,res) {
 /*
 * Check if user name exists
 */
-accountRoutes.route('/routes/user/usernamename/exists').post(function(req,res) {
+accountRoutes.route('/userexists').post(function(req,res) {
     const { user } = req.body
     User.find({}, function(err,result) {
         if (err) {
@@ -50,7 +50,7 @@ accountRoutes.route('/routes/user/usernamename/exists').post(function(req,res) {
 /*
 * Check if email exists
 */
-accountRoutes.route('/routes/user/email/exists').post(function(req,res) {
+accountRoutes.route('/emailexists').post(function(req,res) {
     const { email } = req.body
     User.find({}, function(err,result) {
         if (err) {
@@ -71,7 +71,3 @@ accountRoutes.route('/routes/user/email/exists').post(function(req,res) {
 })
 
 module.exports = accountRoutes
-
-/*
-* create session token
-*/
