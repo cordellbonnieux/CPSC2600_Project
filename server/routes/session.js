@@ -10,33 +10,28 @@ const { nanoid } = require('nanoid')
 */
 sessionRoutes.route('/create').post(function(req,res) {
     const { user } = req.body
-    // find userid
-    res.send('all good!')
-    res.status(200)
-    /*
-    User.find({username:user}, function(err,res) {
-        if (err) {
-            console.log('sessionRoutes create error:', err.message)
-            res.status(500)
-            return null
-        } else {
-            console.log(res)
-            //return res.userid // is this it???
-            // make sure you get the id right
-            return res // for now
-        }
-    }).then(id => {
-        console.log('.then id read as:', id)
-        if (id !== null) {
-            const sessionid = nanoid()
-            // create new session
-            //const session = new Session({userid:id, sessionid:sessionid})
-            // return session id in response
-            res.send(id)
-            res.status(200)
-        }
-    })
-    */
+    try {
+        User.find({username:user})
+        .then(data => {
+            let userid = data[0]._id
+            let sessionid = nanoid()
+            if (data.length > 0) {
+                return new Session({
+                    userid,
+                    sessionid
+                }).save()
+                .then(() => {
+                    res.send(sessionid)
+                    res.status(200)
+                })
+            } else {
+                console.log('session routes create error')
+                return
+            }
+        })
+    } catch (e) {
+        console.log('session routes create error:', e)
+    }
 })
 
 module.exports = sessionRoutes
