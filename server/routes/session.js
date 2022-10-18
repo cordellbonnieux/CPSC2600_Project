@@ -25,12 +25,14 @@ sessionRoutes.route('/create').post(function(req,res) {
                     res.status(200)
                 })
             } else {
-                console.log('session routes create error')
+                console.log('session routes create error: no Users can be found.')
+                res.status(500)
                 return
             }
         })
     } catch (e) {
         console.log('session routes create error:', e)
+        res.status(500)
     }
 })
 

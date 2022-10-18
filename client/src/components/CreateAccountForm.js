@@ -42,6 +42,7 @@ export default function CreateAccountForm() {
         e.preventDefault()
         if (readyToSubmit) {
             createAccount()
+            createSession()
         }
     }
 
@@ -56,8 +57,17 @@ export default function CreateAccountForm() {
         .then(response => {
             resetForm()
             setLoading(false)
-            console.log(response.data)
             navigate('/')
+        })
+    }
+
+    function createSession() {
+        axios
+        .post(serverURL+'session/create', {
+            user
+        })
+        .then(session => {
+            localStorage.setItem('sessionid',session.data)
         })
     }
 
