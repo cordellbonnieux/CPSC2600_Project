@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { useNavigate } from 'react-router'
 import axios from 'axios'
 
 const serverURL = 'http://localhost:5000/'
+
 const error = {
     user: [
         'username is too short',
@@ -49,7 +50,7 @@ export default function CreateAccountForm() {
     function createAccount() {
         setLoading(true)
         axios
-        .post(serverURL+'createuser', {
+        .post(serverURL+'routes/user/create', {
             username: user,
             email: email,
             password: password1
@@ -82,7 +83,7 @@ export default function CreateAccountForm() {
         } else {
             setLoading(true)
             axios
-            .post(serverURL+'checkifuserexists', {user:user})
+            .post(serverURL+'routes/user/username/exists', {user:user})
             .then(response => {
                 if (response.data) {
                     setWarningUser(error.user[3])
@@ -103,7 +104,7 @@ export default function CreateAccountForm() {
         } else {
             setLoading(true)
             axios
-            .post(serverURL+'checkifemailexists', {email:email})
+            .post(serverURL+'routes/user/email/exists', {email:email})
             .then(response => {
                 if (response.data) {
                     setWarningEmail(error.email[1])
@@ -143,12 +144,13 @@ export default function CreateAccountForm() {
     }
 
     useEffect(() => {
+        console.log(serverURL)
         if (validEmail && validPassword & validUser) {
             setReadyToSubmit(true)
         } else {
             setReadyToSubmit(false)
         }
-    })
+    },[validEmail, validUser, validPassword])
 
     // add a conditional statement which returns a loading spinner or similar
     return (
