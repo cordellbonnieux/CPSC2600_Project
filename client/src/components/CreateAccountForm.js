@@ -43,6 +43,7 @@ export default function CreateAccountForm() {
         if (readyToSubmit) {
             createAccount()
             createSession()
+            navigate('/')
         }
     }
 
@@ -57,7 +58,6 @@ export default function CreateAccountForm() {
         .then(response => {
             resetForm()
             setLoading(false)
-            navigate('/')
         })
     }
 
