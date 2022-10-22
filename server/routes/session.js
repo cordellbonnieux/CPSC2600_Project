@@ -45,4 +45,36 @@ sessionRoutes.route('/create').post(function(req,res) {
     }
 })
 
+sessionRoutes.route('/getUser').post(function(req,res) {
+    const { sessionid } = req.body
+    try {
+        Session.find({sessionid: sessionid})
+        .then(sessionRes => {
+            if (sessionRes) {
+                User.find({_id: sessionRes[0].userid}) // userid as _id
+                .then(userRes => {
+                    if (userRes) {
+                    const { email, username } = userRes[0]
+                        res.send({
+                            status:'valid',
+                            email,
+                            username
+                        })
+                        res.status(200)
+                    } else {
+                        res.send({status:'user not found'})
+                        res.status(200)
+                    }
+                })
+            } else {
+                res.send({status:'session not found'})
+                res.status(200)
+            }
+        })
+    } catch (e) {
+        console.log('error in session/getuser:', e)
+        res.status(500)
+    }
+})
+
 module.exports = sessionRoutes

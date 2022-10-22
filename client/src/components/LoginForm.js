@@ -28,7 +28,7 @@ export default function LoginForm() {
             e.preventDefault()
             login()
             if (userFound) {
-                createSession() // create or renew session?
+                createSession()
                 resetForm()
                 navigate('/')
             } else {
