@@ -1,6 +1,5 @@
 //import React from 'react'
 import { useEffect, useState } from 'react'
-import { io } from 'socket.io-client'
 
 // templates
 import LoggedOutTemplate from './templates/LoggedOut'
@@ -11,10 +10,6 @@ import axios from 'axios'
 const SERVER_URI = 'http://localhost:5000'
 // add a context which holds server uri, session info etc?
 
-// web sockets
-const socket = io(SERVER_URI)
-socket.on('connection', () => console.log('web socket connected.'))
-
 /*
 * App Component
 */
@@ -22,8 +17,7 @@ const App = () => {
   const [ loggedIn, setLoggedIn ] = useState(false)
   const [ user, setUser ] = useState({
     username: '',
-    email: '',
-    userid: ''
+    email: ''
   })
 
   useEffect(() => {
@@ -32,9 +26,16 @@ const App = () => {
       axios
       .post(SERVER_URI+'/session/getUser', {sessionid: sessionid})
       .then(response => {
-        // if user is returned set current user
-        // if null is returned set logged in false and clear local storage
-        console.log(response)
+        if (response.data.status === 'valid') {
+          setLoggedIn(true)
+          setUser({
+            username: response.data.username,
+            email: response.data.email
+          })
+        } else {
+          setLoggedIn(false)
+          localStorage.clear()
+        }
       })
     } else {
       setLoggedIn(false)
@@ -44,7 +45,7 @@ const App = () => {
 
   return (
     <div id='wrapper'>
-      {loggedIn ? <LoggedInTemplate /> : <LoggedOutTemplate />}
+      {loggedIn ? <LoggedInTemplate user={user}/> : <LoggedOutTemplate />}
     </div>
   )
 }

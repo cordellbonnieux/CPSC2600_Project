@@ -45,12 +45,19 @@ sessionRoutes.route('/create').post(function(req,res) {
     }
 })
 
+/*
+* Get User 
+* retrives the user details (sans password) for any given session id
+*/
 sessionRoutes.route('/getUser').post(function(req,res) {
     const { sessionid } = req.body
     try {
         Session.find({sessionid: sessionid})
         .then(sessionRes => {
             if (sessionRes) {
+
+                // here also update the last login field
+
                 User.find({_id: sessionRes[0].userid}) // userid as _id
                 .then(userRes => {
                     if (userRes) {
