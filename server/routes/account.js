@@ -5,7 +5,7 @@ const User = require('../models/userModel')
 /*
 * Create a new user
 */
-accountRoutes.route('/create').post(function(req,res) {
+accountRoutes.route('/create').post(function(req, res) {
     const { username, email, password } = req.body
     try {
         return new User({
@@ -27,7 +27,7 @@ accountRoutes.route('/create').post(function(req,res) {
 /*
 * Check if user name exists
 */
-accountRoutes.route('/userexists').post(function(req,res) {
+accountRoutes.route('/userexists').post(function(req, res) {
     const { user } = req.body
     User.find({}, function(err,result) {
         if (err) {
@@ -50,7 +50,7 @@ accountRoutes.route('/userexists').post(function(req,res) {
 /*
 * Check if email exists
 */
-accountRoutes.route('/emailexists').post(function(req,res) {
+accountRoutes.route('/emailexists').post(function(req, res) {
     const { email } = req.body
     User.find({}, function(err,result) {
         if (err) {
@@ -69,5 +69,34 @@ accountRoutes.route('/emailexists').post(function(req,res) {
         }
     })
 })
+
+/*
+* Login
+* Check if username matches password
+*/
+accountRoutes.route('/login').post(function(request, response) {
+    const { username, password } = request.body
+    User.find({ username: username }, function(error, result) {
+        if (error) {
+            console.log('login to user error:', error.message)
+            response.send(false)
+            response.status(500)
+        } else {
+            if (result[0] !== undefined && result[0] !== null) {
+                if (result[0].password === password) {
+                    response.send({ result: 'valid' })
+                } else {
+                    // password does not match
+                    response.send({ result: 'invalid password' })
+                }
+            } else {
+                // user not found
+                response.send({ result: 'invalid user' })
+            }
+            response.status(200)
+        }
+    })
+})
+
 
 module.exports = accountRoutes
