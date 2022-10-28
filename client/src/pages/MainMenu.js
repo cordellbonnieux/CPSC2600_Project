@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { io } from 'socket.io-client'
 import MenuButton from '../components/MenuButton'
 
@@ -21,13 +21,15 @@ export default function MainMenu(props) {
     })
 
     return (
-        <div>
-            <h1>main menu</h1>
-            <p>username: {username}</p>
-            <p>email: {email}</p>
-            <div>
-                <MenuButton text={logout.text} action={logout.action} />
+        <main>
+            <div className='screenWrapper'>
+                <h1>main menu</h1>
+                <p>Welcome {username}, how would you like to proceed?</p>
             </div>
-        </div>
+            <menu>
+                <MenuButton text={'Find Match'} action={null} />
+                <MenuButton text={logout.text} action={logout.action} />
+            </menu>
+        </main>
     )
 }
