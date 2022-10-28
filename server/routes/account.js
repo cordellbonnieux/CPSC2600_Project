@@ -71,6 +71,29 @@ accountRoutes.route('/emailexists').post(function(req, res) {
 })
 
 /*
+* Get email from username
+*/
+accountRoutes.route('/getemail').post(function(req, res) {
+    const { username } = req.body
+    User.find({}, function(err,result) {
+        if (err) {
+            console.log('getemail route error:', err.message)
+            res.status(500)
+        } else {
+            for (let i = 0; i < result.length; i++) {
+                if (result[i].username === username) {
+                    res.send(result[i].email)
+                    res.status(200)
+                    return
+                }
+            }
+            res.send(`email for user "${username}" could not be found`)
+            res.status(200)
+        }
+    })
+})
+
+/*
 * Login
 * Check if username matches password
 */

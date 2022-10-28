@@ -41,6 +41,7 @@ export default function CreateAccountForm(props) {
         if (readyToSubmit) {
             await createAccount().then(async function() {
                 await createSession().then(() => {
+                    props.setUser({username: user, email: email})
                     props.setLoggedIn(true)
                 })
             })
@@ -173,9 +174,7 @@ export default function CreateAccountForm(props) {
                     id='userName'
                     onChange={e => {
                         setUser(e.target.value)
-                        //if (validUser) {
                             checkUserName()
-                        //}
                     }}
                     onBlur={() => checkUserName()}
                     value={user}
@@ -190,9 +189,7 @@ export default function CreateAccountForm(props) {
                     id='email'
                     onChange={e => {
                         setEmail(e.target.value)
-                        //if (validEmail) {
                             checkEmail()
-                        //}
                     }}
                     onBlur={() => checkEmail()}
                     value={email}
@@ -207,9 +204,7 @@ export default function CreateAccountForm(props) {
                     id='password1'
                     onChange={e => {
                         setPassword1(e.target.value)
-                        //if (validPassword) {
                             checkPasswords()
-                        //}
                     }}
                     onBlur={() => checkPasswords()}
                     value={password1}
@@ -224,9 +219,7 @@ export default function CreateAccountForm(props) {
                     id='password2'
                     onChange={e => {
                         setPassword2(e.target.value)
-                        //if (validPassword) {
                             checkPasswords()
-                        //}
                     }}
                     onBlur={e => checkPasswords()}
                     value={password2}

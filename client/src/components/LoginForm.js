@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router'
 const server = 'http://localhost:5000/'
 
 const submissionErrorWarnings = [
@@ -26,9 +25,15 @@ export default function LoginForm(props) {
             await login().then(async function(loginResponse){
                 if(loginResponse === 'valid') {
                     await createSession()
-                    .then(res => {
-                        props.setLoggedIn(true)
-                        resetForm()
+                    .then(async function() {
+                        setLoading(true)
+                        return await axios.post(server+'account/getemail', {username: user})
+                        .then(email => {
+                            setLoading(false)
+                            props.setUser({username: user, email: email.data})
+                            props.setLoggedIn(true)
+                            resetForm()
+                        })
                     })
                 } else {
                     setWarnings({server: loginResponse})
