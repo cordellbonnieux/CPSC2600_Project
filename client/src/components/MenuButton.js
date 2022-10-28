@@ -1,7 +1,8 @@
-
-
 export default function MenuButton(props) {
-    const [ link, text, handleClick ] = props
-    // do something here?
-    return <></>
+    const { text, action } = props
+    return (
+        <div>
+            <button onClick={() => action()}>{text}</button>
+        </div>
+    )
 }

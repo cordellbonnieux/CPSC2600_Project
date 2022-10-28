@@ -1,8 +1,8 @@
 import LoginScreen from '../pages/LoginScreen'
-export default function LoggedOutTemplate() {
+export default function LoggedOutTemplate(props) {
   return (
     <div id='loggedOutWrapper'>
-      <LoginScreen />
+      <LoginScreen setLoggedIn={props.setLoggedIn} />
     </div>
   )
 }

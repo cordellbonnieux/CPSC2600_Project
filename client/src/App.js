@@ -51,7 +51,7 @@ const App = () => {
 
   return (
     <div id='wrapper'>
-      {loggedIn ? <LoggedInTemplate user={user} logout={logout}/> : <LoggedOutTemplate />}
+      {loggedIn ? <LoggedInTemplate user={user} logout={{text:'logout', action: () => logout()}}/> : <LoggedOutTemplate setLoggedIn={setLoggedIn} />}
     </div>
   )
 }

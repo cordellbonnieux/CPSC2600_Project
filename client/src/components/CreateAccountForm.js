@@ -152,7 +152,6 @@ export default function CreateAccountForm() {
     }
 
     useEffect(() => {
-        console.log(serverURL)
         if (validEmail && validPassword & validUser) {
             setReadyToSubmit(true)
         } else {
@@ -172,9 +171,9 @@ export default function CreateAccountForm() {
                     id='userName'
                     onChange={e => {
                         setUser(e.target.value)
-                        if (validUser) {
+                        //if (validUser) {
                             checkUserName()
-                        }
+                        //}
                     }}
                     onBlur={() => checkUserName()}
                     value={user}
@@ -189,9 +188,9 @@ export default function CreateAccountForm() {
                     id='email'
                     onChange={e => {
                         setEmail(e.target.value)
-                        if (validEmail) {
+                        //if (validEmail) {
                             checkEmail()
-                        }
+                        //}
                     }}
                     onBlur={() => checkEmail()}
                     value={email}
@@ -206,9 +205,9 @@ export default function CreateAccountForm() {
                     id='password1'
                     onChange={e => {
                         setPassword1(e.target.value)
-                        if (validPassword) {
+                        //if (validPassword) {
                             checkPasswords()
-                        }
+                        //}
                     }}
                     onBlur={() => checkPasswords()}
                     value={password1}
@@ -223,9 +222,9 @@ export default function CreateAccountForm() {
                     id='password2'
                     onChange={e => {
                         setPassword2(e.target.value)
-                        if (validPassword) {
+                        //if (validPassword) {
                             checkPasswords()
-                        }
+                        //}
                     }}
                     onBlur={e => checkPasswords()}
                     value={password2}

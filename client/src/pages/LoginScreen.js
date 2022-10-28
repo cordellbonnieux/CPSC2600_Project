@@ -7,11 +7,12 @@ const txt = [
     'Login to Account'
 ]
 
-export default function LoginScreen() {
+export default function LoginScreen(props) {
     // login - username or email, password - google, facebook etc
     // create new account
     const [ loginForm, setLoginForm ] = useState(true)
     const [ buttonText, setButtonText ] = useState(txt[0])
+    const { setLoggedIn } = props
 
     const handleClick = () => {
         loginForm ? setButtonText(txt[1]) : setButtonText(txt[0])
@@ -22,7 +23,7 @@ export default function LoginScreen() {
         <div>
             <h1>DeathMachines Prototype</h1>
             <button onClick={() => handleClick()}>{buttonText}</button>
-            {loginForm ? <LoginForm /> : <CreateAccountForm />}
+            {loginForm ? <LoginForm setLoggedIn={setLoggedIn} /> : <CreateAccountForm />}
         </div>
     )
 } 

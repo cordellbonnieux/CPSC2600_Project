@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
 import { io } from 'socket.io-client'
 import MenuButton from '../components/MenuButton'
-import LogoutButton from '../components/Logout'
 
 // server information
 const SERVER_URI = 'http://localhost:5000'
 
 export default function MainMenu(props) {
-    const { logout } = props.logout
+    const { logout } = props
     const { username, email } = props.user
 
     function findMatch() {
@@ -21,12 +20,14 @@ export default function MainMenu(props) {
         findMatch() // only here for the sake of testing!
     })
 
-    return <>
-    <h1>main menu</h1>
-    <p>username: {username}</p>
-    <p>email: {email}</p>
-    <div>
-        <LogoutButton />
-    </div>
-    </>
+    return (
+        <div>
+            <h1>main menu</h1>
+            <p>username: {username}</p>
+            <p>email: {email}</p>
+            <div>
+                <MenuButton text={logout.text} action={logout.action} />
+            </div>
+        </div>
+    )
 }

@@ -9,10 +9,9 @@ const submissionErrorWarnings = [
     'server error, please try again'
 ]
 
-export default function LoginForm() {
+export default function LoginForm(props) {
     const [ user, setUser ] = useState('')
     const [ password, setPassword ] = useState('')
-    let [ userFound, setUserFound ] = useState(false)
     let [ isLoading, setLoading ] = useState(false)
     let [ readyToSubmit, setReadyToSubmit ] = useState(false)
     const [ warnings, setWarnings ] = useState({
@@ -21,86 +20,85 @@ export default function LoginForm() {
         server: ''
     })
 
-    const navigate = useNavigate()
-
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         if (readyToSubmit) {
             e.preventDefault()
-            login()
-            if (userFound) {
-                createSession()
-                resetForm()
-                navigate('/')
-            } else {
-                // do something else here?
-                console.log('credentials incorrect!')
-            }
+            await login().then(async function(loginResponse){
+                if(loginResponse === 'valid') {
+                    await createSession()
+                    .then(res => {
+                        props.setLoggedIn(true)
+                        resetForm()
+                    })
+                } else {
+                    setWarnings({server: loginResponse})
+                }
+            })
         }
+    }
+
+    async function login() {
+        setLoading(true)
+        try {
+            return await axios
+            .post(server+'account/login', {
+                username: user,
+                password: password
+            })
+            .then(response => {
+                setLoading(false)
+                const { result } = response.data
+                if (result === 'valid') {
+                    // pass the user data UP the tree and set logged in
+                } else {
+                    if (result === 'invalid password') {
+                        setWarnings({password: submissionErrorWarnings[0]})
+                    } else if (result === 'invalid user') {
+                        setWarnings({username: submissionErrorWarnings[1]})
+                    } else {
+                        setWarnings({server: submissionErrorWarnings[2]})
+                    }
+                }
+                setLoading(false)
+                return result
+            })
+        } catch(e) {
+            console.log(e.message)
+            setLoading(false)
+            return 'server error'
+        }
+    }
+
+    async function createSession() {
+        setLoading(true)
+        return await axios
+        .post(server+'session/create', {
+            user
+        })
+        .then(session => {
+            let resultText = 'invalid'
+            if (session.data.length > 0) {
+                localStorage.setItem('sessionid', session.data)
+                resultText = 'valid'
+            }            
+            setLoading(false)
+            return resultText
+        })
     }
 
     function resetForm() {
         setUser('')
         setPassword('')
-        setUserFound(false)
         setReadyToSubmit(false)
     }
 
-    function login() {
-        setLoading(true)
-        // log into account
-        axios
-        .post(server+'account/login', {
-            username: user,
-            password: password
-        })
-        .then(response => {
-            // login or don't
-            console.log(response.data.result)
-            //
-            const { result } = response.data
-            if (result === 'valid') {
-                setUserFound(true)
-            } else {
-                setUserFound(false)
-                if (result === 'invalid password') {
-                    setWarnings({password: submissionErrorWarnings[0]})
-                } else if (result === 'invalid user') {
-                    setWarnings({username: submissionErrorWarnings[1]})
-                } else {
-                    setWarnings({server: submissionErrorWarnings[2]})
-                }
-            }
-            setLoading(false)
-        })
-    }
-
-    function createSession() {
-        setLoading(true)
-        axios
-        .post(server+'session/create', {
-            user
-        })
-        .then(session => {
-            // only create session if user exists
-            // route only returns key if user is found
-            if (session.data.length > 0) {
-                localStorage.setItem('sessionid', session.data)
-            }            
-            setLoading(false)
-        })
-    }
-
-    function checkForSubmit() {
+    useEffect(() => {
         if (user.length > 2 && password.length > 5) {
             setReadyToSubmit(true)
         } else {
             setReadyToSubmit(false)
         }
-    }
-
-    useEffect(() => {
-        checkForSubmit()
-    })
+    }, [user, password])
 
     // add a loading spinner
 
@@ -116,12 +114,10 @@ export default function LoginForm() {
                     id='userName'
                     onChange={field => {
                         setUser(field.target.value)
-                        checkForSubmit()
                         setWarnings({username: '', server: ''})
                     }}
                     onBlur={field => {
                         setUser(field.target.value)
-                        checkForSubmit()
                     }}
                 ></input>
                 <span>{warnings.username}</span>
@@ -134,12 +130,10 @@ export default function LoginForm() {
                     id='password'
                     onChange={field => {
                         setPassword(field.target.value)
-                        checkForSubmit()
                         setWarnings({password: '', server: ''})
                     }}
                     onBlur={field => {
                         setPassword(field.target.value)
-                        checkForSubmit()
                     }}
                 ></input>
                 <span>{warnings.password}</span>
