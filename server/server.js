@@ -22,6 +22,10 @@ mongoose.connect(process.env.ATLAS_URI) //async
 const connection = mongoose.connection
 connection.once('open', () => console.log('connected to mongodb atlas'))
 
+// mongoose models
+const User = require('./models/userModel')
+const Que = require('./models/queModel')
+
 // web socket conn
 io.on('connection', socket => {
   console.log(`user connected via sockets: ${socket.id}`)
@@ -36,5 +40,13 @@ io.on('connection', socket => {
 // server
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`)
+
+  // create que
+  Que.find({}).then(qlist => {
+    if (qlist.length === 0) {
+      new Que({userList: [], }).save()
+    }
+  })
+
 })
 
