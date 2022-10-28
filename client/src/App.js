@@ -20,6 +20,12 @@ const App = () => {
     email: ''
   })
 
+  function logout() {
+    setUser({username: '', email: ''})
+    setLoggedIn(false)
+    localStorage.clear()
+  }
+
   useEffect(() => {
     const sessionid = localStorage.getItem('sessionid') ? localStorage.getItem('sessionid') : null
     if (sessionid != null) {
@@ -45,7 +51,7 @@ const App = () => {
 
   return (
     <div id='wrapper'>
-      {loggedIn ? <LoggedInTemplate user={user}/> : <LoggedOutTemplate />}
+      {loggedIn ? <LoggedInTemplate user={user} logout={logout}/> : <LoggedOutTemplate />}
     </div>
   )
 }
