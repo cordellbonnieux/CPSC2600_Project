@@ -21,7 +21,7 @@ const error = {
     ]
 }
 
-export default function CreateAccountForm() {
+export default function CreateAccountForm(props) {
     const [ user, setUser ] = useState('')
     const [ email, setEmail ] = useState('')
     const [ password1, setPassword1 ] = useState('')
@@ -36,38 +36,40 @@ export default function CreateAccountForm() {
     let [ validPassword, setPasswordValid ] = useState(false)
     let [ readyToSubmit, setReadyToSubmit ] = useState(false)
 
-    const navigate = useNavigate()
-
     async function handleSubmit(e) {
         e.preventDefault()
         if (readyToSubmit) {
-            createAccount()
-            createSession()
-            navigate('/')
+            await createAccount().then(async function() {
+                await createSession().then(() => {
+                    props.setLoggedIn(true)
+                })
+            })
         }
     }
 
-    function createAccount() {
+    async function createAccount() {
         setLoading(true)
-        axios
+        return await axios
         .post(serverURL+'account/create', {
             username: user,
             email: email,
             password: password1
         })
-        .then(response => {
+        .then(username => {
             resetForm()
             setLoading(false)
+            return username
         })
     }
 
-    function createSession() {
-        axios
+    async function createSession() {
+        return await axios
         .post(serverURL+'session/create', {
             user
         })
         .then(session => {
             localStorage.setItem('sessionid',session.data)
+            return session.data
         })
     }
 
@@ -85,7 +87,7 @@ export default function CreateAccountForm() {
         } else if (/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(user)) {
             setWarningUser(error.user[1])
             setUserValid(false)
-        } else if (/^\s*$/.test(user)) {
+        } else if (user.includes(' ') || user.includes('    ')) {
             setWarningUser(error.user[2])
             setUserValid(false)
         } else {

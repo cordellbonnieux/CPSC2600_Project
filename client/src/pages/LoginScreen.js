@@ -23,7 +23,7 @@ export default function LoginScreen(props) {
         <div>
             <h1>DeathMachines Prototype</h1>
             <button onClick={() => handleClick()}>{buttonText}</button>
-            {loginForm ? <LoginForm setLoggedIn={setLoggedIn} /> : <CreateAccountForm />}
+            {loginForm ? <LoginForm setLoggedIn={setLoggedIn} /> : <CreateAccountForm setLoggedIn={setLoggedIn} />}
         </div>
     )
 } 
