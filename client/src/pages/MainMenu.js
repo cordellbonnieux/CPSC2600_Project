@@ -20,36 +20,48 @@ export default function MainMenu(props) {
     const [ screenText, setScreenText ] = useState(txt[0])
 
     async function findMatch() {
-        setSearching(true)
-        setScreenText(txt[1])
-        await axios.get(SERVER_URI+'/que/get')
-        .then(async function(res) {
-            const list = res.data[0].userList
-            if (list.length > 0) {
-                for (let i = 0; i < list.length; i++) {
-                    if (username !== list[i]) {
-                        setSearching(false)
-                        return createMatch(username, list[i])
+        if (!searching) {
+            setSearching(true)
+            await addToQue()
+            while(searching) {
+                await axios.get(SERVER_URI+'/que/get')
+                .then(async function(res) {
+                    const list = res.data[0].userList
+                    if (list.length > 0) {
+                        for (let i = 0; i < list.length; i++) {
+                            if (username !== list[i]) {
+                                setSearching(false)
+                                return createMatch(username, list[i])
+                            }
+                        }
                     }
-                }
+                })
             }
-            // add to que
-            return findMatch()
-        })
+        } else {
+            setSearching(false)
+            removeFromQue()
+        }
     }
 
     async function addToQue() {
-        // link this up to que routes /add
-        // send it user:user
+        let resp = await axios.post(SERVER_URI+'/que/add', {user: username})
+        console.log(resp)
+    }
+
+    async function removeFromQue() {
+        // write this
+        return null
     }
 
     function createMatch(user1, user2) {
-// need to write this
+        // remove both from que
+        // create a new match with both players
+        // change inMatch in state and DB
     }
 
     useEffect(() => {
-        
-    }, [])
+        searching ? setScreenText(txt[1]) : setScreenText(txt[0])
+    }, [searching, txt])
 
     return (
         <main>
@@ -58,7 +70,7 @@ export default function MainMenu(props) {
                 <p>{screenText}</p>
             </div>
             <menu>
-                <MenuButton key={1} text={searching ? 'cancel search' : 'search for match'} action={findMatch} isDisabled={searching} />
+                <MenuButton key={1} text={searching ? 'cancel search' : 'search for match'} action={findMatch} />
                 <MenuButton key={2} text={'account'} action={null} />
                 <MenuButton key={3} text={logout.text} action={logout.action} />
             </menu>

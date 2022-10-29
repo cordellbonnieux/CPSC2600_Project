@@ -15,24 +15,45 @@ queRoutes.get('/get', (req, res) => {
     })
 })
 
-queRoutes.post('/add', (req, res) => {
+queRoutes.post('/add', async function(req, res) {
     const { user } = req
-    Que.find({}).then(que => {
+    const que = await Que.findOne()
+
+    if (!que.userList.includes(user)) {
+        que.userList = [...que.userList, user]
+        await que.save()
+        res.send(true)
+    } else {
+        res.send(false)
+    }
+    res.status(200)
+    res.end()
+
+/*
+
+    Que.find({}).then(async function(que) {
         let inQue = false
-        for (let i = 0; i < que.userList.length; i++) {
-            if (que.userList[i] === user) {
+        for (let i = 0; i < que[0].userList.length; i++) {
+            if (que[0].userList[i] === user) {
                 inQue = true
             }
         }
         if (!inQue) {
-            Que.userList = [...Que.userList, user]
-            Que.save()
-            inQue = true
+            //que[0].userList = [...que[0].userList, user]
+            //que[0].save()
+            await Que.updateOne(
+                {userList: que[0].userList},
+                {userList: [...que[0].userList, user]}
+            ).then(() => {
+                inQue = true
+                console.log()
+            })
         }
         res.send(inQue)
         res.status(200)
         res.end()
     })
+    */
 })
 
 module.exports = queRoutes
