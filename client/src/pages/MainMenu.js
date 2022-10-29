@@ -33,12 +33,18 @@ export default function MainMenu(props) {
                     }
                 }
             }
+            // add to que
             return findMatch()
         })
     }
 
-    function createMatch(user1, user2) {
+    async function addToQue() {
+        // link this up to que routes /add
+        // send it user:user
+    }
 
+    function createMatch(user1, user2) {
+// need to write this
     }
 
     useEffect(() => {
