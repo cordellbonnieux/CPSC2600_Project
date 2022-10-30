@@ -44,13 +44,11 @@ export default function MainMenu(props) {
     }
 
     async function addToQue() {
-        let resp = await axios.post(SERVER_URI+'/que/add', {user: username})
-        console.log(resp)
+        console.log(await axios.post(SERVER_URI+'/que/add', {user: username}))
     }
 
-    async function removeFromQue() {
-        // write this
-        return null
+    async function removeFromQue(u) {
+        await axios.post(SERVER_URI+'/que/remove', {user: u})
     }
 
     function createMatch(user1, user2) {

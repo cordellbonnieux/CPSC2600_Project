@@ -4,7 +4,6 @@ const queModel = new mongoose.Schema({
     userList: {
         type: [String],
         required: true,
-        immutable: true
     }
 })
 
