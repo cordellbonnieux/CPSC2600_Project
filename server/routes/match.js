@@ -1,10 +1,12 @@
 const express = require('express')
-const queRoutes = express.Router()
-const Que = require('../models/queModel')
+const matchRoutes = express.Router()
+const Match = require('../models/matchModel')
+const { nanoid } = require('nanoid')
 
 /*
 * Get the current que
 */
+/*
 queRoutes.get('/get', (req, res) => {
     Que.find({}).then(que => {
         res.send(que)
@@ -12,10 +14,10 @@ queRoutes.get('/get', (req, res) => {
         res.end()
     })
 })
-
+*/
 /*
 * Add user to que
-*/
+
 queRoutes.post('/add', async function(req, res) {
     const { user } = req.body
     const que = await Que.findOne()
@@ -32,10 +34,10 @@ queRoutes.post('/add', async function(req, res) {
     res.status(200)
     res.end()
 })
-
+*/
 /*
 * Remove user to que
-*/
+
 queRoutes.post('/remove', async function(req, res) {
     const { user } = req.body
     const que = await Que.findOne()
@@ -52,5 +54,5 @@ queRoutes.post('/remove', async function(req, res) {
     res.status(200)
     res.end()
 })
-
-module.exports = queRoutes
+*/
+module.exports = matchRoutes
