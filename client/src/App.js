@@ -17,7 +17,8 @@ const App = () => {
   const [ loggedIn, setLoggedIn ] = useState(false)
   const [ user, setUser ] = useState({
     username: '',
-    email: ''
+    email: '',
+    matchid: null
   })
 
   function logout() {

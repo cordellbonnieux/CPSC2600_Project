@@ -1,3 +1,3 @@
-export default function Match() {
+export default function Match(props) {
     return <>match</>
 }
