@@ -25,7 +25,7 @@ queRoutes.post('/add', async function(req, res) {
     if (!que.userList.includes(user)) {
         await Que.findOneAndUpdate(
             { '_id': que['_id'] },
-            { userList: [...user.userList, user] },
+            { userList: [...que.userList, user] },
             { new: true }
         ).then(() => res.send(true))
     } else {
@@ -42,11 +42,12 @@ queRoutes.post('/remove', async function(req, res) {
     const { user } = req.body
     const que = await Que.findOne()
 
-    // write here
     if (!que.userList.includes(user)) {
-        que.userList = [...que.userList, user]
-        await que.save()
-        res.send(true)
+        await Que.findOneAndUpdate(
+            { '_id': que['_id'] },
+            { userList: que.userList.filter(u => u !== user) },
+            { new: true }
+        ).then(() => res.send(true))
     } else {
         res.send(false)
     }

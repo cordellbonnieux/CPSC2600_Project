@@ -39,20 +39,23 @@ export default function MainMenu(props) {
             }
         } else {
             setSearching(false)
-            removeFromQue()
+            removeFromQue(username)
         }
     }
 
     async function addToQue() {
-        console.log(await axios.post(SERVER_URI+'/que/add', {user: username}))
+        await axios.post(SERVER_URI+'/que/add', {user: username})
     }
 
     async function removeFromQue(u) {
         await axios.post(SERVER_URI+'/que/remove', {user: u})
+        .then(() => console.log(u + ' removed from que!'))
     }
 
     function createMatch(user1, user2) {
         // remove both from que
+        removeFromQue(user1)
+        removeFromQue(user2)
         // create a new match with both players
         // change inMatch in state and DB
     }
