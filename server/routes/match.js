@@ -1,7 +1,40 @@
 const express = require('express')
 const matchRoutes = express.Router()
 const Match = require('../models/matchModel')
+const User = require('../models/userModel')
 const { nanoid } = require('nanoid')
+
+matchRoutes.route('/create').post(async (req, res) => {
+    const { user1, user2 } = req.body
+    
+    const player1 = await User.find({ username: user1 })
+    const player2 = await User.find({ username: user2 })
+
+    const match = await new Match({
+        player1: {
+            id: player1['_id'],
+            name: player1.username
+        },
+        player2: {
+            id: player2['_id'],
+            name: player2.username
+        }
+    })
+
+    await User.findOneAndUpdate(
+        { _id: player1['_id'] },
+        { matchId: match['_id'] }
+    )
+
+    await User.findOneAndUpdate(
+        { _id: player2['_id'] },
+        { matchId: match['_id'] }
+    )
+
+    res.send(match['_id'])
+    res.status(200)
+    res.end()
+})
 
 /*
 * Get the current que

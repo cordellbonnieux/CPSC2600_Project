@@ -1,6 +1,14 @@
 const mongoose = require('mongoose')
 
 const matchModel = new mongoose.Schema({
+    start: {
+        type: Date,
+        immutable: true,
+        default: () => Date.now()
+    },
+    end: {
+        type: Date
+    },
     player1: {
         type: [Object],
         required: true
@@ -25,6 +33,8 @@ const matchModel = new mongoose.Schema({
         type: [Object]
         /* records the state of units at the end of each turn
             number
+            start
+            end
             unit: [
                 {
                     id
@@ -64,6 +74,8 @@ const matchModel = new mongoose.Schema({
         type: [Object]
         /* records the state of units at the end of each turn
             number
+            start
+            end
             unit: [
                 {
                     id

@@ -54,14 +54,12 @@ export default function MainMenu(props) {
     }
 
     async function createMatch(user1, user2) {
-        // remove both from que
         removeFromQue(user1)
         removeFromQue(user2)
-        // create a new match with both players
-
-        // change inMatch in state and DB
-
-        // redirect user to the match page
+        await axios.post(SERVER_URI+'/match/create', {
+            user1,
+            user2
+        })
     }
 
     useEffect(() => {

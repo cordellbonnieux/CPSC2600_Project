@@ -33,9 +33,8 @@ const userSchema = new mongoose.Schema({
             message: val => `password ${val.value} does not meet schema requirements`
         }
     },
-    inMatch: {
-        type: Boolean,
-        default: false
+    matchId: {
+        type: String,
     },
     created: {
         type: Date,
