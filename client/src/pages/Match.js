@@ -10,11 +10,16 @@ export default function Match(props) {
 
     }
 
-    useEffect(() => {
+    function resize() {
         setCanvasSize({
             x: document.documentElement.clientWidth,
             y: document.documentElement.clientHeight
         })
+    }
+
+    useEffect(() => {
+        window.addEventListener('resize', () => resize())
+
         const canvas = canvasRef.current
         const context = canvas.getContext('2d')
         let frameCount = 0
@@ -29,6 +34,7 @@ export default function Match(props) {
 
         return () => {
             window.cancelAnimationFrame(animationFrameId)
+            window.removeEventListener('resize', () => resize())
         }
     }, [])
 
