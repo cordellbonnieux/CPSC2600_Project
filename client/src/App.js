@@ -8,7 +8,7 @@ import axios from 'axios'
 
 // server information
 const SERVER_URI = 'http://localhost:5000'
-// add a context which holds server uri, session info etc?
+// TODO:add a context which holds server uri, session info etc?
 
 /*
 * App Component
@@ -18,8 +18,9 @@ const App = () => {
   const [ user, setUser ] = useState({
     username: '',
     email: '',
-    matchid: null
-  })
+    matchid: '',
+    inMatch: false
+    })
 
   function logout() {
     setUser({username: '', email: ''})
@@ -31,13 +32,16 @@ const App = () => {
     const sessionid = localStorage.getItem('sessionid') ? localStorage.getItem('sessionid') : null
     if (sessionid != null) {
       axios
+      //TODO: refactor to a get request
       .post(SERVER_URI+'/session/getUser', {sessionid: sessionid})
       .then(response => {
         if (response.data.status === 'valid') {
           setLoggedIn(true)
           setUser({
             username: response.data.username,
-            email: response.data.email
+            email: response.data.email,
+            matchid: response.data.matchId,
+            inMatch: response.data.inMatch
           })
         } else {
           setLoggedIn(false)

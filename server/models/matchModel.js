@@ -3,8 +3,6 @@ const mongoose = require('mongoose')
 const matchModel = new mongoose.Schema({
     start: {
         type: Date,
-        immutable: true,
-        default: () => Date.now()
     },
     end: {
         type: Date

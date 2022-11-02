@@ -49,6 +49,7 @@ sessionRoutes.route('/create').post(function(req,res) {
 * Get User 
 * retrives the user details (sans password) for any given session id
 */
+// TODO:refactor to get request
 sessionRoutes.route('/getUser').post(function(req,res) {
     const { sessionid } = req.body
     try {
@@ -56,7 +57,7 @@ sessionRoutes.route('/getUser').post(function(req,res) {
         .then(sessionRes => {
             if (sessionRes) {
 
-                // here also update the last login field
+                // TODO:here also update the last login field
 
                 User.find({_id: sessionRes[0].userid}) // userid as _id
                 .then(userRes => {
@@ -65,7 +66,9 @@ sessionRoutes.route('/getUser').post(function(req,res) {
                         res.send({
                             status:'valid',
                             email,
-                            username
+                            username,
+                            inMatch,
+                            matchId
                         })
                         res.status(200)
                     } else {
@@ -83,5 +86,10 @@ sessionRoutes.route('/getUser').post(function(req,res) {
         res.status(500)
     }
 })
+
+/*
+* delete session
+*/
+
 
 module.exports = sessionRoutes

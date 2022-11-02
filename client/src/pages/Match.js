@@ -21,13 +21,19 @@ export default function Match(props) {
         window.addEventListener('resize', () => resize())
 
         const canvas = canvasRef.current
-        const context = canvas.getContext('2d')
+        const ctx = canvas.getContext('2d')
         let frameCount = 0
         let animationFrameId
 
         const render = () => {
             frameCount++
             // draw stuff
+
+            ctx.fillStyle = 'green'
+            ctx.fillRect(0,0, canvasSize.x, canvasSize.y)
+            
+
+            //
             animationFrameId = window.requestAnimationFrame(render)
         }
         render()

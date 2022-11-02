@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
     matchId: {
         type: String,
     },
+    inMatch: {
+        type: Boolean,
+        default: false
+    },
     created: {
         type: Date,
         default: () => Date.now(),
