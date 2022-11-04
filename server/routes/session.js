@@ -128,7 +128,6 @@ sessionRoutes.delete('/:id', async function(req, res) {
                 res.status(400).send(`session id:${req.params.id} does not exist`) :
                 res.status(200).json(result)
         })
-        //
     }
     res.end()
 })

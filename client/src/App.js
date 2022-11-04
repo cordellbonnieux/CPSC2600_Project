@@ -32,6 +32,7 @@ const App = () => {
     const sessionid = localStorage.getItem('sessionid') ? localStorage.getItem('sessionid') : null
     if (sessionid != null) {
       //TODO: refactor to a get request
+      /*
       axios.post(SERVER_URI+'/session/getUser', {sessionid: sessionid}).then(async function(response) {
         if (response.data.status === 'valid') {
           setLoggedIn(true)
@@ -47,6 +48,23 @@ const App = () => {
           localStorage.clear()
         }
       })
+      */
+     axios.get(SERVER_URI + '/session/'+ sessionid).then(async function(response) {
+        if (response.data.status === 'valid') {
+          setLoggedIn(true)
+          setUser({
+            username: response.data.username,
+            email: response.data.email,
+            matchid: response.data.matchId,
+            inMatch: response.data.inMatch
+          })
+        } else {
+          setLoggedIn(false)
+          await axios.delete(SERVER_URI + '/session/' + sessionid)
+          localStorage.clear()
+        }
+     })
+
     } else {
       setLoggedIn(false)
       localStorage.clear()
