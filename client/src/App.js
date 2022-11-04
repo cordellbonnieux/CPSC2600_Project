@@ -10,9 +10,6 @@ import axios from 'axios'
 const SERVER_URI = 'http://localhost:5000'
 // TODO:add a context which holds server uri, session info etc?
 
-/*
-* App Component
-*/
 const App = () => {
   const [ loggedIn, setLoggedIn ] = useState(false)
   const [ user, setUser ] = useState({
@@ -29,33 +26,16 @@ const App = () => {
   }
 
   useEffect(() => {
+    // if a sessionid is detected in local storage, log the user in
     const sessionid = localStorage.getItem('sessionid') ? localStorage.getItem('sessionid') : null
     if (sessionid != null) {
-      //TODO: refactor to a get request
-      /*
-      axios.post(SERVER_URI+'/session/getUser', {sessionid: sessionid}).then(async function(response) {
-        if (response.data.status === 'valid') {
-          setLoggedIn(true)
-          setUser({
-            username: response.data.username,
-            email: response.data.email,
-            matchid: response.data.matchId,
-            inMatch: response.data.inMatch
-          })
-        } else {
-          setLoggedIn(false)
-          await axios.delete(SERVER_URI + '/session/' + sessionid)
-          localStorage.clear()
-        }
-      })
-      */
      axios.get(SERVER_URI + '/session/'+ sessionid).then(async function(response) {
         if (response.data.status === 'valid') {
           setLoggedIn(true)
           setUser({
             username: response.data.username,
             email: response.data.email,
-            matchid: response.data.matchId,
+            matchId: response.data.matchId,
             inMatch: response.data.inMatch
           })
         } else {

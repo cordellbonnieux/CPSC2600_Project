@@ -13,24 +13,28 @@ export default function MainMenu(props) {
 
     const txt = [
         `Welcome ${username}, how would you like to proceed?`,
-        `Searching for match, please wait...`
+        `Searching for match, please wait...`,
+        'Opponent found, prepare for battle.'
     ]
 
     const [ searching, setSearching ] = useState(false)
     const [ screenText, setScreenText ] = useState(txt[0])
 
+    /*
     async function findMatch() {
         if (!searching) {
             setSearching(true)
             await addToQue()
             while(searching) {
-                await axios.get(SERVER_URI+'/que/get')
+                console.log('...searching')
+                await axios.get(SERVER_URI + '/que/')
                 .then(async function(res) {
                     const list = res.data[0].userList
                     if (list.length > 0) {
                         for (let i = 0; i < list.length; i++) {
                             if (username !== list[i]) {
                                 setSearching(false)
+                                setScreenText(txt[2])
                                 return createMatch(username, list[i])
                             }
                         }
@@ -38,24 +42,34 @@ export default function MainMenu(props) {
                 })
             }
         } else {
-            setSearching(false)
-            removeFromQue(username)
+            setSearching(true)
+            //removeFromQue(username)
         }
     }
+    */
+   async function findMatch() {
+    if (searching) {
+        removeFromQue(username)
+        // close socket conn
+    } else {
+        addToQue()
+        // set socket object state
+        // open socket
+    }
+   }
 
     async function addToQue() {
         await axios.post(SERVER_URI+'/que/add', {user: username})
     }
 
     async function removeFromQue(u) {
-        await axios.post(SERVER_URI+'/que/remove', {user: u})
-        // .then just for testing! - remove me!
-        .then(() => console.log(u + ' removed from que!'))
+        //await axios.post(SERVER_URI+'/que/remove', {user: u})
+        await axios.delete(SERVER_URI + '/que/' + u)
     }
 
     async function createMatch(user1, user2) {
-        removeFromQue(user1)
-        removeFromQue(user2)
+        await removeFromQue(user1)
+        await removeFromQue(user2)
         await axios.post(SERVER_URI+'/match/create', {
             user1,
             user2
@@ -63,8 +77,20 @@ export default function MainMenu(props) {
     }
 
     useEffect(() => {
-        searching ? setScreenText(txt[1]) : setScreenText(txt[0])
-    }, [searching, txt])
+        async function userInQue() {
+            await axios.get(SERVER_URI + '/que/').then(async function(res) {
+                if(res.data[0].userList.includes(username)) {
+                    return true
+                } else {
+                    return false
+                }
+            })
+        }
+        userInQue() ? setSearching(true) : setSearching(false)
+        searching ? 
+            setScreenText(`Searching for match, please wait...`) : 
+            setScreenText(`Welcome ${username}, how would you like to proceed?`)
+    }, [searching, username])
 
     return (
         <main>

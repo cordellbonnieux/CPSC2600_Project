@@ -23,12 +23,12 @@ matchRoutes.route('/create').post(async (req, res) => {
 
     await User.findOneAndUpdate(
         { _id: player1['_id'] },
-        { matchId: match['_id'] }
+        { matchId: match['_id'], inMatch: true }
     )
 
     await User.findOneAndUpdate(
         { _id: player2['_id'] },
-        { matchId: match['_id'] }
+        { matchId: match['_id'], inMatch: true }
     )
 
     res.send(match['_id'])
