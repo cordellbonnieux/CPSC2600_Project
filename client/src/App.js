@@ -31,10 +31,8 @@ const App = () => {
   useEffect(() => {
     const sessionid = localStorage.getItem('sessionid') ? localStorage.getItem('sessionid') : null
     if (sessionid != null) {
-      axios
       //TODO: refactor to a get request
-      .post(SERVER_URI+'/session/getUser', {sessionid: sessionid})
-      .then(response => {
+      axios.post(SERVER_URI+'/session/getUser', {sessionid: sessionid}).then(async function(response) {
         if (response.data.status === 'valid') {
           setLoggedIn(true)
           setUser({
@@ -45,6 +43,7 @@ const App = () => {
           })
         } else {
           setLoggedIn(false)
+          await axios.delete(SERVER_URI + '/session/' + sessionid)
           localStorage.clear()
         }
       })
