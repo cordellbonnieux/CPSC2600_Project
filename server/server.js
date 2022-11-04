@@ -32,11 +32,7 @@ const Que = require('./models/queModel')
 // web socket conn
 io.on('connection', socket => {
   console.log(`user connected via sockets: ${socket.id}`)
-  // each time a user connects
-  // check the Que, if que contains another user
-  // create a new match, and update both users matchId and inMatch
-  // send users a prompt to check for user details and update user global state to start match
-  socket.emit('hello', {msg:'hey there', somedata: [{one:1},{three:4}]})
+  require('./emits/matchmaking')(socket)
 })
 
 // server

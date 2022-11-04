@@ -17,8 +17,10 @@ export default function MainMenu(props) {
    async function findMatch() {
     if (searching) {
         await axios.delete(SERVER_URI + '/que/' + username)
+            .then(() => setSearching(false))
     } else {
         await axios.post(SERVER_URI+'/que/add', {user: username})
+        .then(() => setSearching(true))
     }
    }
 
@@ -42,6 +44,9 @@ export default function MainMenu(props) {
                 setSearching(true) :
                 setSearching(false)
         })
+    })
+
+    useEffect(() => {
         searching ? 
             setScreenText(`Searching for match, please wait...`) : 
             setScreenText(`Welcome ${username}, how would you like to proceed?`)

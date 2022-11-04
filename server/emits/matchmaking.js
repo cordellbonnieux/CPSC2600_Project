@@ -9,14 +9,21 @@ async function connection(socket) {
             let matchId
             user1 = que.userList[0]
             user2 = que.userList[1]
+            // remove users from que
             async () => await axios.delete(uri + '/que/' + user1)
                 .then(() => console.log(user1 + ' removed from que'))
             async () => await axios.delete(uri + '/que/' + user2)
                 .then(() => console.log(user1 + ' removed from que'))
             
+            // create a new match with users
             async () => axios.post(uri + '/match/' + create, {user1, user2})
-                .then(res => console.log(res))
+                .then(res => matchId = res.data[0])
 
+            // send the matchId to users
+            socket.emit(user1, {matchFound: true, matchId})
+            socket.emit(user2, {matchFound: true, matchId})
         }
     })
 }
+
+module.exports = connection
