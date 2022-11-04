@@ -6,8 +6,8 @@ export default function LoggedInTemplate(props) {
     <div id="loggedInWrapper">
       {
         props.user.inMatch ? 
-          <Match user={props.user} logout={props.logout} /> :
-          <MainMenu user={props.user} logout={props.logout} />
+          <Match user={props.user} setUser={props.setUser} logout={props.logout} /> :
+          <MainMenu user={props.user} setUser={props.setUser} logout={props.logout} />
       }
     </div>
   )

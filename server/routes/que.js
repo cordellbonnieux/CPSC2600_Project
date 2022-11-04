@@ -56,7 +56,7 @@ queRoutes.post('/remove', async function(req, res) {
 */
 queRoutes.delete('/:id', async function(req, res) {
     const que = await Que.findOne()
-    if (!que.userList.includes(req.params.id)) {
+    if (que.userList.includes(req.params.id)) {
         await Que.findByIdAndUpdate(
             { '_id': que['_id'] },
             { userList: que.userList.filter(u => u !== req.params.id) },
