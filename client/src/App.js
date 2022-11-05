@@ -49,7 +49,7 @@ const App = () => {
       setLoggedIn(false)
       localStorage.clear()
     }
-  }, [])
+  }, [user])
 
   return (
     <div id='wrapper'>

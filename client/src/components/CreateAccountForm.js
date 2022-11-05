@@ -54,7 +54,9 @@ export default function CreateAccountForm(props) {
         .post(serverURL+'account/create', {
             username: user,
             email: email,
-            password: password1
+            password: password1,
+            inMatch: false,
+            matchId: ''
         })
         .then(username => {
             resetForm()

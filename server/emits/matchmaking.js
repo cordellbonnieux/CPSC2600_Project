@@ -1,27 +1,55 @@
 const Que = require('../models/queModel')
-const uri = 'localhost:5000/'
+const Match = require('../models/matchModel')
+const User = require('../models/userModel')
 
-async function connection(socket) {
-    let user1, user2
+async function connection(socket, io) {
+
+    let user1 = {}, user2 = {}
+
     // check que for users
-    Que.findOne().then(que => {
-        if (que.userList.length > 1) {
-            let matchId
-            user1 = que.userList[0]
-            user2 = que.userList[1]
+    Que.findOne().then(async function(que) {
+        if (que && que.userList.length > 1) {
+
+            // gather user data
+            user1 = await User.findOne({username: que.userList[0]})
+            user2 = await User.findOne({username: que.userList[1]})
+
             // remove users from que
-            async () => await axios.delete(uri + '/que/' + user1)
-                .then(() => console.log(user1 + ' removed from que'))
-            async () => await axios.delete(uri + '/que/' + user2)
-                .then(() => console.log(user1 + ' removed from que'))
+            await Que.updateOne(
+                {_id: que['_id']},
+                {userList: que.userList.filter(u => u !== user1.username && u !== user2.username)}
+            )
             
             // create a new match with users
-            async () => axios.post(uri + '/match/' + create, {user1, user2})
-                .then(res => matchId = res.data[0])
+            const match = await new Match({
+                start: Date.now(),
+                player1: {
+                    name: user1.username,
+                    id: user1['_id'],
+                    units: [],
+                    turn: 0
+                },
+                player2: {
+                    name: user2.username,
+                    id: user2['_id'],
+                    units: [],
+                    turn: 0
+                }
+            }).save()
 
-            // send the matchId to users
-            socket.emit(user1, {matchFound: true, matchId})
-            socket.emit(user2, {matchFound: true, matchId})
+            // update users to contain match details
+            await User.updateOne(
+                {username: user1.username},
+                {inMatch: true, matchId: match['_id']}
+            )
+            await User.updateOne(
+                {username: user2.username},
+                {inMatch: true, matchId: match['_id']}
+            )
+
+            // the users aren't recieving these
+            io.emit(user1, {matchFound: true, matchId: match['_id']})
+            io.emit(user2, {matchFound: true, matchId: match['_id']})
         }
     })
 }

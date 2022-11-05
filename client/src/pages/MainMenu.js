@@ -22,16 +22,23 @@ export default function MainMenu(props) {
         await axios.post(SERVER_URI+'/que/add', {user: username})
         .then(() => setSearching(true))
     }
+    // tell server when db changes are made
+    console.log('matchmaking req sent to server')
+    socket.current.emit('matchmaking')
    }
 
     useEffect(() => {
         // connect to web socket after component render
         socket.current = io(SERVER_URI)
         // listen for match made
-        socket.current.on(username, response => {
-            if (response.matchFound) {
+        socket.current.on('connect', () => console.log('socket.io-client connected'))
+        socket.current.on('disconnect', () => console.log('socket.io-client disconnected')) //
+
+        // this is not being recieved
+        socket.current.on(username, data => {
+            if (data.matchFound) {
                 setUser({
-                    matchId: response.matchId,
+                    matchId: data.matchId,
                     inMatch: true
                 })
             }
@@ -50,6 +57,8 @@ export default function MainMenu(props) {
         searching ? 
             setScreenText(`Searching for match, please wait...`) : 
             setScreenText(`Welcome ${username}, how would you like to proceed?`)
+        
+        console.log('searching state changed to:', searching)
     }, [searching, username])
 
     return (

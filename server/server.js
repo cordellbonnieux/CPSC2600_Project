@@ -16,9 +16,6 @@ app.use('/match', require('./routes/match'))
 // make server
 const server = require('http').createServer(app)
 
-// web socket
-const io = require('socket.io')(server)
-
 // mongoose conn
 const mongoose = require('mongoose')
 mongoose.connect(process.env.ATLAS_URI) //async
@@ -29,11 +26,19 @@ connection.once('open', () => console.log('connected to mongodb atlas'))
 const User = require('./models/userModel')
 const Que = require('./models/queModel')
 
+// web socket
+const io = require('socket.io')(server)
+const matchmaking = require('./emits/matchmaking')
+
 // web socket conn
 io.on('connection', socket => {
-  console.log(`user connected via sockets: ${socket.id}`)
-  require('./emits/matchmaking')(socket)
+  matchmaking(socket, io)
+  socket.on('matchmaking', () => {
+    console.log('matchmaking req recieved from client')
+    matchmaking(socket, io)
+  })
 })
+
 
 // server
 server.listen(port, () => {
