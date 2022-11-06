@@ -11,7 +11,7 @@ export default function Match(props) {
     const canvasRef = useRef(null)
     const socket = useRef()
     const tiles = useRef()
-    const [ tileData, setTileData ] = useState({tileset: null})
+    const [ tileData, setTileData ] = useState(null)
 
     /*
     * render map
@@ -40,8 +40,8 @@ export default function Match(props) {
                 }
             }
         }
-        if (tileData.tileset === null) {
-            setTileData({tileset: set})
+        if (tileData === null) {
+            setTileData(set)
         }
     }
 
@@ -74,8 +74,13 @@ export default function Match(props) {
     }
 
     function resetCanvas(ctx) {
-        canvasRef.current.height = document.documentElement.clientHeight
-        canvasRef.current.width = document.documentElement.clientWidth
+        const currentHeight = document.documentElement.clientHeight
+        const minHeight = mapData.height * mapData.tileheight
+        const currentWidth = document.documentElement.clientWidth
+        const maxWidth = mapData.width * mapData.tilewidth
+
+        canvasRef.current.height = currentHeight <= minHeight ? minHeight : currentHeight
+        canvasRef.current.width = currentWidth <= maxWidth ? currentWidth : maxWidth
         ctx.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
     }
 

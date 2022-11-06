@@ -1,18 +1,21 @@
 html, body {
-    width: 100%;
-    height: 100%;
     margin: 0;
     padding: 0;
+    background-color: darkgrey;
 }
 
 canvas {
-    height: 100%;
-    width: 100%;
+    margin: 20px auto 100px auto;
+    display: block;
+}
+/* remove .overlay and replace this with a responsive grid later*/
+#overlayWrapper .overlay{
+    z-index: 10;
+    position: fixed;
 }
 
 .overlay {
-    z-index: 10;
-    position: fixed;
+
 }
 
 #turnCounterWrapper {
