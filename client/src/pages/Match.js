@@ -1,25 +1,10 @@
 import { useRef, useEffect, useState } from 'react'
+import '../css/match.css'
+
 export default function Match(props) {
-    const [ canvasSize, setCanvasSize ] = useState({
-        x: document.documentElement.clientWidth,
-        y: document.documentElement.clientHeight
-    })
     const canvasRef = useRef(null)
 
-    function move(unit, xchange, ychange) {
-
-    }
-
-    function resize() {
-        setCanvasSize({
-            x: document.documentElement.clientWidth,
-            y: document.documentElement.clientHeight
-        })
-    }
-
     useEffect(() => {
-        window.addEventListener('resize', () => resize())
-
         const canvas = canvasRef.current
         const ctx = canvas.getContext('2d')
         let frameCount = 0
@@ -27,10 +12,14 @@ export default function Match(props) {
 
         const render = () => {
             frameCount++
-            // draw stuff
+            // set canvas to fill screen
+            canvasRef.current.height = document.documentElement.clientHeight
+            canvasRef.current.width = document.documentElement.clientWidth
+            //
+            // draw everything here
 
             ctx.fillStyle = 'green'
-            ctx.fillRect(0,0, canvasSize.x, canvasSize.y)
+            ctx.fillRect(0,0, canvasRef.current.width, canvasRef.current.height)
             
 
             //
@@ -40,13 +29,31 @@ export default function Match(props) {
 
         return () => {
             window.cancelAnimationFrame(animationFrameId)
-            window.removeEventListener('resize', () => resize())
         }
     }, [])
 
     return (
         <main>
-            <canvas ref={canvasRef} height={canvasSize.y} width={canvasSize.x} />
+            <div className='overlay' id='turnCounterWrapper'>
+                <span>turn:</span>
+                <span>player's turn</span>
+            </div>
+            <div className='overlay' id='unitsWrapper'>
+                <ul>
+                    <li>unit number</li>
+                    <li>health remaining:</li>
+                    <li>attacks remaining:</li>
+                    <li>moves remaining:</li>
+                </ul>
+            </div>
+            <div className='overlay' id='menuWrapper'>
+                <button id='surrenderBtn'>surrender</button>
+                <div id='combatLogWrapper'>
+                    <span>combat log</span>
+                    <div id='combatLog'>...</div>
+                </div>
+            </div>
+            <canvas ref={canvasRef} />
         </main>
     )
 }

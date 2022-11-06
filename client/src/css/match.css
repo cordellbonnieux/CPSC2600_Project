@@ -1,0 +1,51 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+canvas {
+    height: 100%;
+    width: 100%;
+}
+
+.overlay {
+    z-index: 10;
+    position: fixed;
+}
+
+#turnCounterWrapper {
+    top: 10px;
+    left: 40%;
+}
+
+#menuWrapper {
+    bottom: 10px;
+    right: 10px;
+    height: 15%;
+    bottom: 10px;
+    right: 10px;
+    width: 30%;
+    background-color: red;
+    text-align: right;
+}
+#combatLogWrapper {
+    text-align: left;
+}
+
+#combatLogWrapper span {
+    font-size: 0.8em;
+}
+
+#unitsWrapper {
+    bottom: 10px;
+    display: flex;
+    font-size: 0.8em;
+}
+
+#unitsWrapper ul {
+    list-style: none;
+    background: red;
+    padding: 10px;
+}

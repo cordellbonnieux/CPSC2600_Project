@@ -1,6 +1,61 @@
 const Que = require('../models/queModel')
 const Match = require('../models/matchModel')
 const User = require('../models/userModel')
+const { nanoid } = require('nanoid')
+
+// temporarily assign default units to each player upon match creation
+const defaultUnits = [
+    {
+        x: 0,
+        y: 0,
+        type: 'temp',
+        moved: false,
+        attacked: false,
+        firepower: 5,
+        id: nanoid(),
+        hp: 10
+    },
+    {
+        x: 0,
+        y: 0,
+        type: 'temp',
+        moved: false,
+        attacked: false,
+        firepower: 5,
+        id: nanoid(),
+        hp: 10
+    },
+    {
+        x: 0,
+        y: 0,
+        type: 'temp',
+        moved: false,
+        attacked: false,
+        firepower: 5,
+        id: nanoid(),
+        hp: 10
+    },
+    {
+        x: 0,
+        y: 0,
+        type: 'temp',
+        moved: false,
+        attacked: false,
+        firepower: 5,
+        id: nanoid(),
+        hp: 10
+    },
+    {
+        x: 0,
+        y: 0,
+        type: 'temp',
+        moved: false,
+        attacked: false,
+        firepower: 5,
+        id: nanoid(),
+        hp: 10
+    }
+]
 
 async function connection(socket, io) {
 
@@ -26,13 +81,17 @@ async function connection(socket, io) {
                 player1: {
                     name: user1.username,
                     id: user1['_id'],
-                    units: [],
+                    // temporarily set default units
+                    units: defaultUnits,
+                    color: 'red',
                     turn: 0
                 },
                 player2: {
                     name: user2.username,
                     id: user2['_id'],
-                    units: [],
+                    // temporarily set default units
+                    units: defaultUnits,
+                    color: 'blue',
                     turn: 0
                 }
             }).save()
