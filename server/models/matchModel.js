@@ -7,6 +7,9 @@ const matchModel = new mongoose.Schema({
     end: {
         type: Date
     },
+    victor: {
+        type: String
+    },
     player1: {
         type: Object,
         required: true

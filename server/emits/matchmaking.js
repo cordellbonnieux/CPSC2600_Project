@@ -84,7 +84,8 @@ async function connection(socket, io) {
                     // temporarily set default units
                     units: defaultUnits,
                     color: 'red',
-                    turn: 0
+                    turn: 0,
+                    activeTurn: false
                 },
                 player2: {
                     name: user2.username,
@@ -92,7 +93,8 @@ async function connection(socket, io) {
                     // temporarily set default units
                     units: defaultUnits,
                     color: 'blue',
-                    turn: 0
+                    turn: 0,
+                    activeTurn: false
                 }
             }).save()
 
