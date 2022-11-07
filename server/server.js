@@ -29,14 +29,13 @@ const Que = require('./models/queModel')
 // web socket
 const io = require('socket.io')(server)
 const matchmaking = require('./emits/matchmaking')
+const match = require('./emits/match')
 
 // web socket conn
 io.on('connection', socket => {
   matchmaking(socket, io)
-  socket.on('matchmaking', () => {
-    console.log('matchmaking req recieved from client')
-    matchmaking(socket, io)
-  })
+  socket.on('matchmaking', () => matchmaking(socket, io))
+  socket.on('match', id => match(socket, io, id))
 })
 
 // server

@@ -12,6 +12,7 @@ export default function Match(props) {
     const socket = useRef()
     const tiles = useRef()
     const [ tileData, setTileData ] = useState(null)
+    const [ matchData, setMatchData ] = useState(null)
 
     /*
     * render map
@@ -41,6 +42,8 @@ export default function Match(props) {
             }
         }
         if (tileData === null) {
+            // TODO: communicate with the server as to what map is being used
+            // maybe storing the mapData inside the Match record in mongo
             setTileData(set)
         }
     }
@@ -69,8 +72,30 @@ export default function Match(props) {
         }
     }
 
-    function drawUnits() {
+    function drawUnits(ctx) {
+        //console.log(matchData.player1.units)
+        // 
 
+        // something is fucked up here
+
+        //
+        //matchData.player1.units.forEach(unit => drawUnit(ctx,unit))
+        //matchData.player1.units.forEach(unit => console.log(unit))
+        //matchData.player2.units.forEach(unit => drawUnit(ctx, unit))
+    }
+
+    function drawUnit(ctx, unit) {
+        // for now there is only a single generic unit
+        
+        ctx.arc(
+            200, // unit.x
+            200, // unit.y
+            16, //assuming a 32x32 px sprite is used
+            0,
+            2 * Math.PI
+        )
+        
+       //console.log(unit)
     }
 
     function resetCanvas(ctx) {
@@ -85,27 +110,35 @@ export default function Match(props) {
     }
 
     async function loadTiles() {
-        // below is an array, so that later on i can add other layers
+        // TODO: Add multiple tilesets for various layers
         tiles.current = new Image()
         tiles.current.src = mapTiles
+    }
+
+    function getMatchData() {
+        socket.current.emit('match', props.user.matchId)
     }
 
     useEffect(() => {
         loadTiles()
         socket.current = io(SERVER_URI)
+        socket.current.on(props.user.username, data => {
+            if (data['_id'] === props.user.matchId) {
+                //TODO: check here for differences in x/y coords and add animations
+                setMatchData(data)
+            }
+        })
         const canvas = canvasRef.current
         const ctx = canvas.getContext('2d')
         let frameCount = 0
         let animationFrameId
 
         const render = () => {
+            getMatchData()
             frameCount++
-            // draw everything here
             resetCanvas(ctx)
-            drawMap(ctx)
-            //ctx.drawImage(tiles.current,100,100)
-
-            //
+            drawMap(ctx) // for now using a single map
+            drawUnits(ctx)
             animationFrameId = window.requestAnimationFrame(render)
         }
         render()
@@ -117,7 +150,7 @@ export default function Match(props) {
 
     return (
         <main>
-            <MatchOverlay  user={props.user} setUser={props.setUser}  />
+            <MatchOverlay  user={props.user} setUser={props.setUser} matchData={matchData} />
             <canvas ref={canvasRef} />
         </main>
     )
