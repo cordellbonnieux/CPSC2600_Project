@@ -1,0 +1,46 @@
+#map {
+    display: grid;
+}
+
+.tileset0 {
+    background-image: url('../maps/tiles/terrain1.png');
+    width: 32px;
+    height: 32px;
+    background-repeat: no-repeat;
+}
+
+.tileset0.tile1 {
+   background-position-x: 32px; 
+}
+
+.tileset0.tile2 {
+    background-position-x: 64px;
+}
+
+.tileset0.tile3 {
+    background-position-y: 32px;
+}
+
+.tileset0.tile4 {
+    background-position-y: 32px;
+    background-position-x: 32px; 
+}
+
+.tileset0.tile5 {
+    background-position-y: 32px;
+    background-position-x: 64px; 
+}
+
+.tileset0.tile6 {
+    background-position-y: 64px;    
+}
+
+.tileset0.tile7 {
+    background-position-y: 64px;
+    background-position-x: 32px; 
+}
+
+.tileset0.tile8 {
+    background-position-y: 64px;
+    background-position-x: 64px;    
+}

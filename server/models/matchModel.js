@@ -11,9 +11,6 @@ const matchModel = new mongoose.Schema({
         type: String
     },
     map: {
-        type: String
-    },
-    mapData: {
         type: Object
     },
     player1: {

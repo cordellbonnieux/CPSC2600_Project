@@ -76,12 +76,14 @@ async function connection(socket, io) {
                 {userList: que.userList.filter(u => u !== user1.username && u !== user2.username)}
             )
             
+            // parse map data, for now there is only 1 map
+            const mapData = praseTiledData(map3Data)
+
             // create a new match with users
             // all this inputed data should be created using a class or something
             const match = await new Match({
                 start: Date.now(),
-                map: 'map3', // this should be determined by random selection
-                mapData: map3Data,
+                map: mapData,
                 currentPlayer: 0,
                 player1: {
                     name: user1.username,
@@ -118,6 +120,67 @@ async function connection(socket, io) {
             io.emit(user2, {matchFound: true, matchId: match['_id']})
         }
     })
+}
+
+/*
+* parse through the data returned from "tiled" application
+*/
+function praseTiledData(data, tilesetNumber = 0) {
+    let layers = []
+    for (let layerNo = 0; layerNo < data.layers.length; layerNo++) {
+        let layer = []
+        let count = 0
+        for (let y = 0; y < data.height; y++) {
+            for (let x = 0; x < data.width; x++) {
+                const tileType = data.layers[layerNo].data[count] - 1
+                // TODO: depending on the type or, other properties
+                // i can later add stats to tiles
+                const width = data.tilesets[tilesetNumber].tilewidth
+                const height = data.tilesets[tilesetNumber].tileheight
+                const tileInSheet = getTileFromSheet(tileType, data.tilesets[tilesetNumber])
+                layer.push({
+                    tileType: tileType,
+                    sx: tileInSheet.x,
+                    sy: tileInSheet.y,
+                    width: width,
+                    height: height,
+                    posX: x * width,
+                    posY: y * height
+                })
+                count++
+            }
+        }
+        console.log(layer[5], 'anyone home?')
+        layers.push(layer)
+    }
+    return {
+        layers:layers,
+        tileset: tilesetNumber,
+        data: {
+            height: data.height,
+            width: data.width,
+            tilewidth: data.tilewidth,
+            tileheight: data.tileheight
+        }
+    }
+}
+
+/*
+* extract a tile's x,y coords from a sprite sheet
+*/
+function getTileFromSheet(tile, set) {
+    let count = 0
+    for (let y = 0; y < set.columns; y++) {
+        for (let x = 0; x < (set.tiles.length / set.columns); x++) {
+            if (count === tile) {
+                return {
+                    x: x * set.tilewidth,
+                    y: y * set.tileheight
+                }
+            }
+            count++
+        }
+    }
 }
 
 module.exports = connection
