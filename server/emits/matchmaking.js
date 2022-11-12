@@ -2,6 +2,7 @@ const Que = require('../models/queModel')
 const Match = require('../models/matchModel')
 const User = require('../models/userModel')
 const { nanoid } = require('nanoid')
+const map3Data = require('../mapData/map3.json')
 
 // temporarily assign default units to each player upon match creation
 const defaultUnits = [
@@ -78,6 +79,9 @@ async function connection(socket, io) {
             // create a new match with users
             const match = await new Match({
                 start: Date.now(),
+                map: 'map3', // this should be determined by random selection
+                mapData: map3Data,
+                currentPlayer: null,
                 player1: {
                     name: user1.username,
                     id: user1['_id'],

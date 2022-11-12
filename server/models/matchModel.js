@@ -10,6 +10,12 @@ const matchModel = new mongoose.Schema({
     victor: {
         type: String
     },
+    map: {
+        type: String
+    },
+    mapData: {
+        type: Object
+    },
     player1: {
         type: Object,
         required: true
