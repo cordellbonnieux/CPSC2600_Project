@@ -77,11 +77,12 @@ async function connection(socket, io) {
             )
             
             // create a new match with users
+            // all this inputed data should be created using a class or something
             const match = await new Match({
                 start: Date.now(),
                 map: 'map3', // this should be determined by random selection
                 mapData: map3Data,
-                currentPlayer: null,
+                currentPlayer: 0,
                 player1: {
                     name: user1.username,
                     id: user1['_id'],
