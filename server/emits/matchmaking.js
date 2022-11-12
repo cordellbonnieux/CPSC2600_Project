@@ -57,7 +57,11 @@ const defaultUnits = [
         hp: 10
     }
 ]
-
+/*
+* on connection, check for users in que
+* if user is found create a new match with connecting user
+* and user in the que.
+*/
 async function connection(socket, io) {
 
     let user1 = {}, user2 = {}
@@ -150,7 +154,6 @@ function praseTiledData(data, tilesetNumber = 0) {
                 count++
             }
         }
-        console.log(layer[5], 'anyone home?')
         layers.push(layer)
     }
     return {

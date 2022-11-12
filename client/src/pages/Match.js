@@ -9,27 +9,33 @@ const SERVER_URI = 'http://localhost:5000'
 export default function Match(props) {
     const socket = useRef()
     const [ match, setMatch ] = useState(null)
+    const [ units, setUnits ] = useState(null)
 
     function requestMatchData() {
         socket.current.emit('match', props.user.matchId)
     }
 
     function consumeMatchData(data) {
-        // this data is not being recieved
         if (data['_id'] == props.user.matchId) {
             setMatch(data)
+            setUnits([
+                {owner: data.player1.name, units: data.player1.units},
+                {owner: data.player2.name, units: data.player2.units}
+            ])
         } else {
             console.log('recieved non-requested data: ' + data)
         }
     }
 
+    function updateUnits() {
+        setUnits(
+            
+        )
+    }
+
     useEffect(() => {
         socket.current = io(SERVER_URI)
         socket.current.on(props.user.username, data => consumeMatchData(data))
-        requestMatchData()
-        console.log(match)
-        // i dont understand why the data returned is not cohesive to what is being outputed on the server
-        // once a match is created - it has no way to be edited - yet!!
     }, [])
 
     useEffect(() => requestMatchData())
@@ -37,10 +43,24 @@ export default function Match(props) {
     return <main>
         <div id='map'>
             { match != null ? 
-                <Map layers={match.map.layers} tileset={match.map.tileset} mapData={match.map.data} /> : 
+                <Map 
+                    layers={match.map.layers} 
+                    tileset={match.map.tileset} 
+                    mapData={match.map.data} 
+                    units={units}
+                /> : 
                 <span>Loading...</span> 
             }
         </div>
-        <MatchOverlay  user={props.user} setUser={props.setUser} matchData={match} />
+        {
+            units != null ?
+                <MatchOverlay  
+                    user={props.user} 
+                    setUser={props.setUser} 
+                    matchData={match} 
+                    units={props.user === match.player1.name ? match.player1.units : match.player2.units} 
+                /> :
+                <></>
+        }
     </main>
 }

@@ -2,9 +2,14 @@ import { useEffect, useRef } from 'react'
 import ts0 from './tiles/terrain1.png'
 
 export default function Map(props) {
-    const { layers, tileset, mapData } = props
+    const { layers, tileset, mapData, units } = props
     const canvasRef = useRef(null)
     const spritesheet = useRef()
+
+    function renderUnits(ctx) {
+        console.log(units)
+        // TODO NEXT: paint units, add event listeners to those who have owner euqal to username
+    }
 
     function renderMap(ctx) {
         for (let layer = 0; layer < layers.length; layer++) {
