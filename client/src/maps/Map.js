@@ -2,46 +2,26 @@ import { useEffect, useRef } from 'react'
 import ts0 from './tiles/terrain1.png'
 
 export default function Map(props) {
-    const { layers, tileset, mapData, units } = props
+    const { layers, tileset, mapData, units, user, setSelectionIndex } = props
     const canvasRef = useRef(null)
     const spritesheet = useRef()
 
+    /*
+    * renders the units and assigns color based on control
+    */
     function renderUnits(ctx) {
-        //console.log(units)
-        // TODO NEXT: paint units, add event listeners to those who have owner euqal to username
-
-        // paint units
         for (let army = 0; army < units.length; army++) {
-            for (let unit = 0; unit < units[army].units.length; unit++) {
-                if (units[army].owner === props.user) {
-                    // your units
-                    renderUnit(ctx, unit, army, true)
-                } else {
-                    // enemies units
-                    // renderUnit(ctx)
-                }
+            if (units[army].owner === user) {
+                units[army].units.forEach(unit => unit.render(ctx, true))
+            } else {
+                units[army].units.forEach(unit => unit.render(ctx))
             }
         }
     }
 
     /*
-    * render each unit as a circle, for now
-    * blue units are current player's
-    * red are enemies
+    * renders the map by tile
     */
-    function renderUnit(ctx, unitNo, armyNo, userControl = false) {
-        ctx.beginPath()
-        ctx.fillStyle = userControl ? 'blue': 'red'
-        const unit = ctx.arc(
-            units[armyNo].units[unitNo].x + 16,
-            units[armyNo].units[unitNo].y + 16,
-            16,
-            0,
-            2 * Math.PI
-        )
-        ctx.fill()
-    }
-
     function renderMap(ctx) {
         for (let layer = 0; layer < layers.length; layer++) {
             let current = layers[layer]
@@ -61,6 +41,9 @@ export default function Map(props) {
         }
     }
 
+    /*
+    * loads map tile image sheet
+    */
     function loadTiles() {
         spritesheet.current = new Image()
         if (tileset === 0) {
@@ -68,6 +51,9 @@ export default function Map(props) {
         }
     }
 
+    /*
+    * Ensures canvas is correct size based on screen
+    */
     function resetCanvas(ctx) {
         const currentHeight = document.documentElement.clientHeight
         const minHeight = mapData.height * mapData.tileheight
@@ -79,6 +65,41 @@ export default function Map(props) {
         ctx.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
     }
 
+    /*
+    * Detects intersection from x,y coords (clicks) and compares it to a circle's x,y coords
+    * borrowed from: 
+    * https://medium.com/@lavrton/hit-region-detection-for-html5-canvas-and-how-to-listen-to-click-events-on-canvas-shapes-815034d7e9f8
+    */
+    function isIntersect(point, circle) {
+        return Math.sqrt((point.x-circle.x) ** 2 + (point.y - circle.y) ** 2) < circle.radius;
+    }
+
+    /*
+    * Checks for clicks on own units
+    */
+    function checkUnitCoords(e) {
+        const pos = {
+            /*
+            * TODO NEXT: Calculate where Y click is based on canvas offset
+            */
+            x: e.clientX - ((document.documentElement.clientWidth - canvasRef.current.width) / 2),
+            y: e.clientY
+        }
+        for (let army = 0; army < units.length; army++) {
+            if (units[army].owner === user) {
+                for (let unitNo = 0; unitNo < units[army].units.length; unitNo++) {
+                    if (isIntersect(pos, units[army].units[unitNo])) {
+                        console.log('clicked on unit #' + unitNo)
+                        setSelectionIndex(unitNo)
+                    }
+                }
+            }
+        }
+    }
+
+    /*
+    * initial canvas set up, and main render function
+    */
     useEffect(() => {
         loadTiles()
         const canvas = canvasRef.current
@@ -95,6 +116,14 @@ export default function Map(props) {
         render()
         return () => window.cancelAnimationFrame(animationFrameId)
     }, [])
+
+    /*
+    * add event listener to canvas to detect hits
+    */
+    useEffect(() => {
+        canvasRef.current.removeEventListener('click', checkUnitCoords)
+        canvasRef.current.addEventListener('click', checkUnitCoords)
+    })
 
     return <canvas ref={canvasRef} />
 }

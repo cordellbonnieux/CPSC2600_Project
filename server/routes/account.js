@@ -5,10 +5,10 @@ const User = require('../models/userModel')
 /*
 * Create a new user
 */
-accountRoutes.route('/create').post(function(req, res) {
+accountRoutes.route('/create').post(async function(req, res) {
     const { username, email, password } = req.body
     try {
-        return new User({
+        return await new User({
             username,
             email,
             password,
@@ -27,9 +27,9 @@ accountRoutes.route('/create').post(function(req, res) {
 /*
 * Check if user name exists
 */
-accountRoutes.route('/userexists').post(function(req, res) {
+accountRoutes.route('/userexists').post(async function(req, res) {
     const { user } = req.body
-    User.find({}, function(err,result) {
+    await User.find({}, function(err,result) {
         if (err) {
             console.log('checkifuserexists route error:', err.message)
             res.status(500)
@@ -50,9 +50,9 @@ accountRoutes.route('/userexists').post(function(req, res) {
 /*
 * Check if email exists
 */
-accountRoutes.route('/emailexists').post(function(req, res) {
+accountRoutes.route('/emailexists').post(async function(req, res) {
     const { email } = req.body
-    User.find({}, function(err,result) {
+    await User.find({}, function(err,result) {
         if (err) {
             console.log('checkifemailexists route error:', err.message)
             res.status(500)
@@ -73,9 +73,9 @@ accountRoutes.route('/emailexists').post(function(req, res) {
 /*
 * Get email from username
 */
-accountRoutes.route('/getemail').post(function(req, res) {
+accountRoutes.route('/getemail').post(async function(req, res) {
     const { username } = req.body
-    User.find({}, function(err,result) {
+    await User.find({}, function(err,result) {
         if (err) {
             console.log('getemail route error:', err.message)
             res.status(500)
@@ -97,9 +97,9 @@ accountRoutes.route('/getemail').post(function(req, res) {
 * Login
 * Check if username matches password
 */
-accountRoutes.route('/login').post(function(request, response) {
+accountRoutes.route('/login').post(async function(request, response) {
     const { username, password } = request.body
-    User.find({ username: username }, function(error, result) {
+    await User.find({ username: username }, function(error, result) {
         if (error) {
             console.log('login to user error:', error.message)
             response.send(false)

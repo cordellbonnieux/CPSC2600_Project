@@ -8,16 +8,16 @@ const { nanoid } = require('nanoid')
 * create new session
 * for given user and return a sessionid
 */
-sessionRoutes.route('/create').post(function(req,res) {
+sessionRoutes.route('/create').post(async function(req,res) {
     const { user } = req.body
     try {
-        User.find({username:user})
-        .then(data => {
+        await User.find({username:user})
+        .then(async function(data) {
             if (data.length > 0) {
                 let userid = data[0]._id
                 let sessionid = nanoid()
                 if (data.length > 0) {
-                    return new Session({
+                    return await new Session({
                         userid,
                         sessionid
                     }).save()
@@ -46,46 +46,6 @@ sessionRoutes.route('/create').post(function(req,res) {
 })
 
 /*
-* Get User 
-* retrives the user details (sans password) for any given session id
-sessionRoutes.route('/getUser').post(function(req,res) {
-    const { sessionid } = req.body
-    try {
-        Session.find({sessionid: sessionid})
-        .then(sessionRes => {
-            if (sessionRes.length > 0) {
-
-                // TODO:here also update the last login field
-
-                User.find({_id: sessionRes[0].userid}) // userid as _id
-                .then(userRes => {
-                    if (userRes) {
-                    const { email, username, inMatch, matchId } = userRes[0]
-                        res.send({
-                            status:'valid',
-                            email,
-                            username,
-                            inMatch,
-                            matchId
-                        })
-                        res.status(200)
-                    } else {
-                        res.send({status:'user not found'})
-                        res.status(200)
-                    }
-                })
-            } else {
-                res.send({status:'session not found'})
-                res.status(200)
-            }
-        })
-    } catch (e) {
-        console.log('error in session/getuser:', e)
-        res.status(500)
-    }
-})
-*/
-/*
 * Get User: refactored to check for lastActivity
 * Returns a user account details for a given sessionid
 */
@@ -94,7 +54,7 @@ sessionRoutes.get('/:id', async function(req, res) {
         await Session.find({sessionid: req.params.id}).then(async function(sessionResponse) {
             // this variable is no equal to days
             const daysSinceActivity = (Date.now() - sessionResponse[0].lastActivity) / 86400000 //millisecondsInOneDay
-            if (sessionResponse.length > 0) {
+            if (sessionResponse.length > 0 && daysSinceActivity < 60) {
                 await User.find({_id: sessionResponse[0].userid}).then(userResponse => {
                     if (userResponse) {
                         res.send({

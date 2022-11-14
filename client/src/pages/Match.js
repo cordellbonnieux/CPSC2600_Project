@@ -3,6 +3,7 @@ import { io } from 'socket.io-client'
 import '../css/match.css'
 import MatchOverlay from '../components/MatchOverlay'
 import Map from '../maps/Map'
+import Unit from '../units/Unit'
 const SERVER_URI = 'http://localhost:5000'
 
 
@@ -20,8 +21,22 @@ export default function Match(props) {
         if (data['_id'] == props.user.matchId) {
             setMatch(data)
             setUnits([
-                {owner: data.player1.name, units: data.player1.units},
-                {owner: data.player2.name, units: data.player2.units}
+                {
+                    owner: data.player1.name, 
+                    units: data.player1.units.map((unit, i) => new Unit(
+                        data.player1.name,
+                        i,
+                        unit.id
+                    ))
+                },
+                {
+                    owner: data.player2.name, 
+                    units: data.player2.units.map((unit, i) => new Unit(
+                        data.player2.name,
+                        i,
+                        unit.id
+                    ))
+                }
             ])
         } else {
             console.log('recieved non-requested data: ' + data)
