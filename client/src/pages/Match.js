@@ -10,6 +10,7 @@ export default function Match(props) {
     const socket = useRef()
     const [ match, setMatch ] = useState(null)
     const [ units, setUnits ] = useState(null)
+    const [ selectionIndex, setSelectionIndex ] = useState(null)
 
     function requestMatchData() {
         socket.current.emit('match', props.user.matchId)
@@ -44,10 +45,13 @@ export default function Match(props) {
         <div id='map'>
             { match != null ? 
                 <Map 
+                    user={props.user.username}
                     layers={match.map.layers} 
                     tileset={match.map.tileset} 
                     mapData={match.map.data} 
                     units={units}
+                    selectionIndex={selectionIndex}
+                    setSelectionIndex={setSelectionIndex}
                 /> : 
                 <span>Loading...</span> 
             }
@@ -59,6 +63,8 @@ export default function Match(props) {
                     setUser={props.setUser} 
                     matchData={match} 
                     units={props.user === match.player1.name ? match.player1.units : match.player2.units} 
+                    selectionIndex={selectionIndex}
+                    setSelectionIndex={setSelectionIndex}
                 /> :
                 <></>
         }
