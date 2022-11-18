@@ -53,8 +53,8 @@ sessionRoutes.get('/:id', async function(req, res) {
     try {
         await Session.find({sessionid: req.params.id}).then(async function(sessionResponse) {
             // this variable is no equal to days
-            const daysSinceActivity = (Date.now() - sessionResponse[0].lastActivity) / 86400000 //millisecondsInOneDay
-            if (sessionResponse.length > 0 && daysSinceActivity < 60) {
+            //const daysSinceActivity = (Date.now() - sessionResponse[0].lastActivity) / 86400000 //millisecondsInOneDay
+            if (sessionResponse.length > 0) {
                 await User.find({_id: sessionResponse[0].userid}).then(userResponse => {
                     if (userResponse) {
                         res.send({

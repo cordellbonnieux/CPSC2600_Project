@@ -61,6 +61,7 @@ const defaultUnits = [
 * on connection, check for users in que
 * if user is found create a new match with connecting user
 * and user in the que.
+*   TODO: Refactor this
 */
 async function connection(socket, io) {
 
@@ -83,6 +84,37 @@ async function connection(socket, io) {
             // parse map data, for now there is only 1 map
             const mapData = praseTiledData(map3Data)
 
+            // for each player copy defaultUnits and set positions
+            // TODO: Refactor both these into a single function
+
+            const player1Units = defaultUnits.map(unit => {
+                let startIdx = null
+                while (startTile === null) {
+                    let pos = Math.floor(Math.random() * (mapData.layers[0].length / 3))
+                    if (!mapData.layers[0][pos].occupied) {
+                        console.log('pos for player 1 unit found')
+                        startIdx = pos
+                    }
+                }
+                unit.x = mapData.layers[0][pos].posX + 16 // arc starts at center
+                unit.y = mapData.layers[0][pos].posY + 16 //           
+            })
+            const player2Units = defaultUnits.map(unit => {
+                let startIdx = null
+                while (startTile === null) {
+                    const min = (2 * mapData.layers[0].length) / 3 
+                    const max = mapData.layers[0].length
+                    let pos = Math.floor(Math.random() * (max - min + 1) + min)
+                    if (!mapData.layers[0][pos].occupied) {
+                        console.log('pos for player 2 unit found')
+                        startIdx = pos
+                    }
+                }
+                unit.x = mapData.layers[0][pos].posX + 16 // arc starts at center
+                unit.y = mapData.layers[0][pos].posY + 16 //           
+            })
+
+
             // create a new match with users
             // all this inputed data should be created using a class or something
             const match = await new Match({
@@ -93,7 +125,7 @@ async function connection(socket, io) {
                     name: user1.username,
                     id: user1['_id'],
                     // temporarily set default units
-                    units: defaultUnits,
+                    units: player1Units,
                     color: 'red',
                     turn: 0,
                     activeTurn: false
@@ -102,7 +134,7 @@ async function connection(socket, io) {
                     name: user2.username,
                     id: user2['_id'],
                     // temporarily set default units
-                    units: defaultUnits,
+                    units: player2Units,
                     color: 'blue',
                     turn: 0,
                     activeTurn: false
@@ -141,6 +173,7 @@ function praseTiledData(data, tilesetNumber = 0) {
                 // i can later add stats to tiles
                 const width = data.tilesets[tilesetNumber].tilewidth
                 const height = data.tilesets[tilesetNumber].tileheight
+                const occupied = data.tilesets[tilesetNumber].tiles[tileType].properties[2].value // bool - occupied or not
                 const tileInSheet = getTileFromSheet(tileType, data.tilesets[tilesetNumber])
                 layer.push({
                     tileType: tileType,
@@ -149,7 +182,8 @@ function praseTiledData(data, tilesetNumber = 0) {
                     width: width,
                     height: height,
                     posX: x * width,
-                    posY: y * height
+                    posY: y * height,
+                    occupied: occupied
                 })
                 count++
             }

@@ -78,6 +78,7 @@ export default function Map(props) {
     * Checks for clicks on own units
     */
     function checkUnitCoords(e) {
+        console.log(e)
         const pos = {
             /*
             * TODO NEXT: Calculate where Y click is based on canvas offset
@@ -123,7 +124,7 @@ export default function Map(props) {
     useEffect(() => {
         canvasRef.current.removeEventListener('click', checkUnitCoords)
         canvasRef.current.addEventListener('click', checkUnitCoords)
-    })
+    }, [units])
 
     return <canvas ref={canvasRef} />
 }

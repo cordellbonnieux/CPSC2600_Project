@@ -4,6 +4,11 @@ const Match = require('../models/matchModel')
 const User = require('../models/userModel')
 const { nanoid } = require('nanoid')
 
+/*
+*   THIS IS CURRENTLY NOT BEING USED
+*/
+
+
 matchRoutes.route('/create').post(async (req, res) => {
     const { user1, user2 } = req.body
     

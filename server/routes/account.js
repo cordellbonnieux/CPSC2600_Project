@@ -2,6 +2,8 @@ const express = require('express')
 const accountRoutes = express.Router()
 const User = require('../models/userModel')
 
+// TODO: refactor several of these to get requests or puts
+
 /*
 * Create a new user
 */
@@ -27,9 +29,9 @@ accountRoutes.route('/create').post(async function(req, res) {
 /*
 * Check if user name exists
 */
-accountRoutes.route('/userexists').post(async function(req, res) {
+accountRoutes.route('/userexists').post((req, res) => {
     const { user } = req.body
-    await User.find({}, function(err,result) {
+    User.find({}, function(err,result) {
         if (err) {
             console.log('checkifuserexists route error:', err.message)
             res.status(500)
@@ -50,9 +52,9 @@ accountRoutes.route('/userexists').post(async function(req, res) {
 /*
 * Check if email exists
 */
-accountRoutes.route('/emailexists').post(async function(req, res) {
+accountRoutes.route('/emailexists').post((req, res) => {
     const { email } = req.body
-    await User.find({}, function(err,result) {
+    User.find({}, function(err,result) {
         if (err) {
             console.log('checkifemailexists route error:', err.message)
             res.status(500)
@@ -73,9 +75,9 @@ accountRoutes.route('/emailexists').post(async function(req, res) {
 /*
 * Get email from username
 */
-accountRoutes.route('/getemail').post(async function(req, res) {
+accountRoutes.route('/getemail').post((req, res) => {
     const { username } = req.body
-    await User.find({}, function(err,result) {
+    User.find({}, function(err,result) {
         if (err) {
             console.log('getemail route error:', err.message)
             res.status(500)
@@ -97,9 +99,9 @@ accountRoutes.route('/getemail').post(async function(req, res) {
 * Login
 * Check if username matches password
 */
-accountRoutes.route('/login').post(async function(request, response) {
+accountRoutes.route('/login').post((request, response) => {
     const { username, password } = request.body
-    await User.find({ username: username }, function(error, result) {
+    User.find({ username: username }, function(error, result) {
         if (error) {
             console.log('login to user error:', error.message)
             response.send(false)
@@ -120,6 +122,5 @@ accountRoutes.route('/login').post(async function(request, response) {
         }
     })
 })
-
 
 module.exports = accountRoutes
