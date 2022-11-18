@@ -18,6 +18,7 @@ export default function Match(props) {
     }
 
     function consumeMatchData(data) {
+        console.log(data)
         if (data['_id'] == props.user.matchId) {
             setMatch(data)
             setUnits([
@@ -58,7 +59,7 @@ export default function Match(props) {
 
     return <main>
         <div id='map'>
-            { match != null ? 
+            { match != null && units != null ? 
                 <Map 
                     user={props.user.username}
                     layers={match.map.layers} 

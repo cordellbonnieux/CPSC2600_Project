@@ -89,30 +89,33 @@ async function connection(socket, io) {
 
             const player1Units = defaultUnits.map(unit => {
                 let startIdx = null
-                while (startTile === null) {
+                while (startIdx === null) {
                     let pos = Math.floor(Math.random() * (mapData.layers[0].length / 3))
-                    if (!mapData.layers[0][pos].occupied) {
-                        console.log('pos for player 1 unit found')
+                    if (mapData.layers[0][pos] && !mapData.layers[0][pos].occupied) {
                         startIdx = pos
                     }
                 }
-                unit.x = mapData.layers[0][pos].posX + 16 // arc starts at center
-                unit.y = mapData.layers[0][pos].posY + 16 //           
+                unit.x = Number(mapData.layers[0][startIdx].posX) + 16 // arc starts at center
+                unit.y = Number(mapData.layers[0][startIdx].posY) + 16 //
+                return unit        
             })
+
             const player2Units = defaultUnits.map(unit => {
                 let startIdx = null
-                while (startTile === null) {
+                while (startIdx === null) {
                     const min = (2 * mapData.layers[0].length) / 3 
                     const max = mapData.layers[0].length
                     let pos = Math.floor(Math.random() * (max - min + 1) + min)
-                    if (!mapData.layers[0][pos].occupied) {
-                        console.log('pos for player 2 unit found')
+                    if (mapData.layers[0][pos] && !mapData.layers[0][pos].occupied) {
                         startIdx = pos
                     }
                 }
-                unit.x = mapData.layers[0][pos].posX + 16 // arc starts at center
-                unit.y = mapData.layers[0][pos].posY + 16 //           
+                unit.x = mapData.layers[0][startIdx].posX + 16 // arc starts at center
+                unit.y = mapData.layers[0][startIdx].posY + 16 // 
+                return unit          
             })
+
+            console.log(player1Units)
 
 
             // create a new match with users
