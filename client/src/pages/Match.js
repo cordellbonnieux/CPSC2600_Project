@@ -18,27 +18,45 @@ export default function Match(props) {
     }
 
     function consumeMatchData(data) {
-        console.log(data)
         if (data['_id'] == props.user.matchId) {
             setMatch(data)
-            setUnits([
-                {
-                    owner: data.player1.name, 
-                    units: data.player1.units.map((unit, i) => new Unit(
-                        data.player1.name,
-                        i,
-                        unit.id
-                    ))
-                },
-                {
-                    owner: data.player2.name, 
-                    units: data.player2.units.map((unit, i) => new Unit(
-                        data.player2.name,
-                        i,
-                        unit.id
-                    ))
+            if (units === null) {
+                setUnits([
+                    {
+                        owner: data.player1.name, 
+                        units: data.player1.units.map((unit, i) => new Unit(
+                            data.player1.name,
+                            i,
+                            unit.id,
+                            data.player1.units[i].x,
+                            data.player1.units[i].y
+                        ))
+                    },
+                    {
+                        owner: data.player2.name, 
+                        units: data.player2.units.map((unit, i) => new Unit(
+                            data.player2.name,
+                            i,
+                            unit.id,
+                            data.player2.units[i].x,
+                            data.player2.units[i].y
+                        ))
+                    }
+                ])
+            } else {
+                for (let playerNo = 0; playerNo < units.length; playerNo++) {
+                    for (let unit = 0; unit < units[playerNo].units.length; unit++) {
+                        let newX = playerNo === 0 ? data.player1.units[unit].x : data.player2.units[unit].x
+                        let newY = playerNo === 0 ? data.player1.units[unit].y : data.player2.units[unit].y
+                        setUnits([
+                            ...units,
+                            units[playerNo].units[unit].x = newX,
+                            units[playerNo].units[unit].x = newY
+                        ])
+                    }
                 }
-            ])
+            }
+
         } else {
             console.log('recieved non-requested data: ' + data)
         }

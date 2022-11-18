@@ -1,13 +1,13 @@
 export default class Unit {
-    constructor(owner, index, id) {
+    constructor(owner, index, id, x, y) {
         this.owner = owner
         this.type = 'temp'
         this.moved = false
         this.attacked = false
         this.name = ''
         this.id = id
-        this.x = 0
-        this.y = 0
+        this.x = x
+        this.y = y
         this.eventListenerAttached = false
 
         switch(this.type) {

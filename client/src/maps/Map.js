@@ -120,11 +120,12 @@ export default function Map(props) {
 
     /*
     * add event listener to canvas to detect hits
+    * TODO: add the screen sie as a dependency
     */
     useEffect(() => {
         canvasRef.current.removeEventListener('click', checkUnitCoords)
         canvasRef.current.addEventListener('click', checkUnitCoords)
-    }, [units])
+    }, [canvasRef])
 
     return <canvas ref={canvasRef} />
 }

@@ -95,8 +95,8 @@ async function connection(socket, io) {
                         startIdx = pos
                     }
                 }
-                unit.x = Number(mapData.layers[0][startIdx].posX) + 16 // arc starts at center
-                unit.y = Number(mapData.layers[0][startIdx].posY) + 16 //
+                unit.x = mapData.layers[0][startIdx].posX
+                unit.y = mapData.layers[0][startIdx].posY
                 return unit        
             })
 
@@ -110,13 +110,10 @@ async function connection(socket, io) {
                         startIdx = pos
                     }
                 }
-                unit.x = mapData.layers[0][startIdx].posX + 16 // arc starts at center
-                unit.y = mapData.layers[0][startIdx].posY + 16 // 
+                unit.x = mapData.layers[0][startIdx].posX
+                unit.y = mapData.layers[0][startIdx].posY
                 return unit          
             })
-
-            console.log(player1Units)
-
 
             // create a new match with users
             // all this inputed data should be created using a class or something
