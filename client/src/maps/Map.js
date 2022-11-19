@@ -112,10 +112,8 @@ export default function Map(props) {
                         validY = maxY - pos.y <= 32 ? true : false
                     }
 
-                    //console.log(minX + 16, minY + 16)
-
-
                     if (validY && validX) {
+                        // also check if the unit has any attacks or movement left
                         setSelectionIndex(unitNo)
                     }
                 }

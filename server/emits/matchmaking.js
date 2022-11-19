@@ -86,6 +86,10 @@ async function connection(socket, io) {
                 {userList: que.userList.filter(u => u !== user1.username && u !== user2.username)}
             )
 
+            // for now, work from one spawn and modify it for player two
+            // TODO: make something better
+            const starterUnits = setArmySpawn(0, defaultUnits)
+
             // create a new match with users
             const match = await new Match({
                 start: Date.now(),
@@ -96,7 +100,7 @@ async function connection(socket, io) {
                     name: user1.username,
                     id: user1['_id'],
                     // temporarily set default units
-                    units: setArmySpawn(0, defaultUnits),
+                    units: starterUnits,
                     color: 'red', // unused
                     turn: 0,
                     activeTurn: false
@@ -105,7 +109,7 @@ async function connection(socket, io) {
                     name: user2.username,
                     id: user2['_id'],
                     // temporarily set default units
-                    units: setArmySpawn(1, defaultUnits),
+                    units: setArmySpawn(1, starterUnits),
                     color: 'blue', // unused
                     turn: 0,
                     activeTurn: false
@@ -130,24 +134,30 @@ async function connection(socket, io) {
 
 /*
 * Sets spawn points for untis given the player number
+* TODO: make this better
 */
 function setArmySpawn(playerNo, army) {
     let copy = army
     for (let i = 0; i < copy.length; i++) {
         let startIdx = null
         while (startIdx === null) {
-            let pos = playerNo === 0 ?
-            Math.floor(Math.random() * (mapData.layers[0].length / 2)) :
-            Math.floor(Math.random() * (mapData.layers[0].length - mapData.layers[0].length / 2 + 1) + mapData.layers[0].length / 2)
+            let pos = 0 //if something spawns in top left, there is a problem
+            if (playerNo === 0) {
+                pos = Math.floor(Math.random() * (mapData.layers[0].length / 2))
+            } else {
+                pos = Math.floor(Math.random() * (mapData.layers[0].length - mapData.layers[0].length / 2 + 1) + mapData.layers[0].length / 2)
+            }
             if (mapData.layers[0][pos] && !mapData.layers[0][pos].occupied) {
                 startIdx = pos
             }
         }
-        mapData.layers[0][startIdx].occupied = true// not changing the obj
-        army[i].x = mapData.layers[0][startIdx].posX
-        army[i].y = mapData.layers[0][startIdx].posY
+        mapData.layers[0][startIdx].occupied = true// not changing the obj?
+        copy[i].x = mapData.layers[0][startIdx].posX
+        copy[i].y = mapData.layers[0][startIdx].posY
     }
-    return army
+    //console.log('army number:', playerNo, '--------------------------------------------')
+    //console.log(copy)
+    return copy
 }
 
 /*
