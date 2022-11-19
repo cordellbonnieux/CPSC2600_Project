@@ -62,12 +62,6 @@ export default function Match(props) {
         }
     }
 
-    function updateUnits() {
-        setUnits(
-            
-        )
-    }
-
     useEffect(() => {
         socket.current = io(SERVER_URI)
         socket.current.on(props.user.username, data => consumeMatchData(data))

@@ -61,7 +61,7 @@ const defaultUnits = [
 * on connection, check for users in que
 * if user is found create a new match with connecting user
 * and user in the que.
-*   TODO: Refactor this
+*   TODO: Refactor this big time
 */
 async function connection(socket, io) {
 
@@ -85,16 +85,18 @@ async function connection(socket, io) {
             const mapData = praseTiledData(map3Data)
 
             // for each player copy defaultUnits and set positions
-            // TODO: Refactor both these into a single function
+            // TODO: Refactor both of these into a single function
 
+            /*
             const player1Units = defaultUnits.map(unit => {
                 let startIdx = null
                 while (startIdx === null) {
-                    let pos = Math.floor(Math.random() * (mapData.layers[0].length / 3))
+                    let pos = Math.floor(Math.random() * (mapData.layers[0].length / 2))
                     if (mapData.layers[0][pos] && !mapData.layers[0][pos].occupied) {
                         startIdx = pos
                     }
                 }
+                mapData.layers[0][startIdx].occupied = true
                 unit.x = mapData.layers[0][startIdx].posX
                 unit.y = mapData.layers[0][startIdx].posY
                 return unit        
@@ -103,17 +105,19 @@ async function connection(socket, io) {
             const player2Units = defaultUnits.map(unit => {
                 let startIdx = null
                 while (startIdx === null) {
-                    const min = (2 * mapData.layers[0].length) / 3 
+                    const min = mapData.layers[0].length / 2
                     const max = mapData.layers[0].length
                     let pos = Math.floor(Math.random() * (max - min + 1) + min)
                     if (mapData.layers[0][pos] && !mapData.layers[0][pos].occupied) {
                         startIdx = pos
                     }
                 }
+                mapData.layers[0][startIdx].occupied = true
                 unit.x = mapData.layers[0][startIdx].posX
                 unit.y = mapData.layers[0][startIdx].posY
                 return unit          
             })
+            */
 
             // create a new match with users
             // all this inputed data should be created using a class or something
@@ -125,8 +129,8 @@ async function connection(socket, io) {
                     name: user1.username,
                     id: user1['_id'],
                     // temporarily set default units
-                    units: player1Units,
-                    color: 'red',
+                    units: setArmySpawn(0, defaultUnits, mapData),
+                    color: 'red', // unused
                     turn: 0,
                     activeTurn: false
                 },
@@ -134,8 +138,8 @@ async function connection(socket, io) {
                     name: user2.username,
                     id: user2['_id'],
                     // temporarily set default units
-                    units: player2Units,
-                    color: 'blue',
+                    units: setArmySpawn(1, defaultUnits, mapData),
+                    color: 'blue', // unused
                     turn: 0,
                     activeTurn: false
                 }
@@ -155,6 +159,63 @@ async function connection(socket, io) {
             io.emit(user1, {matchFound: true, matchId: match['_id']})
             io.emit(user2, {matchFound: true, matchId: match['_id']})
         }
+    })
+}
+
+/*
+* Sets spawn points for untis given the player number
+*/
+function setArmySpawn(playerNo, army, mapData) {
+    let copy = army
+    for (let i = 0; i < copy.length; i++) {
+        let startIdx = null
+        while (startIdx === null) {
+            let pos = playerNo === 0 ?
+            Math.floor(Math.random() * (mapData.layers[0].length / 2)) :
+            Math.floor(Math.random() * (mapData.layers[0].length - mapData.layers[0].length / 2 + 1) + mapData.layers[0].length / 2)
+            if (mapData.layers[0][pos] && !mapData.layers[0][pos].occupied) {
+                startIdx = pos
+            }
+        }
+        mapData.layers[0][startIdx].occupied = true// not changing the obj
+        army[i].x = mapData.layers[0][startIdx].posX
+        army[i].y = mapData.layers[0][startIdx].posY
+    }
+    return army
+}
+
+/*
+* Determine player unit start positions
+*/
+function determineStartLocations() {
+     const player1Units = defaultUnits.map(unit => {
+        let startIdx = null
+        while (startIdx === null) {
+            let pos = Math.floor(Math.random() * (mapData.layers[0].length / 2))
+            if (mapData.layers[0][pos] && !mapData.layers[0][pos].occupied) {
+                startIdx = pos
+            }
+        }
+        mapData.layers[0][startIdx].occupied = true
+        unit.x = mapData.layers[0][startIdx].posX
+        unit.y = mapData.layers[0][startIdx].posY
+        return unit        
+    })
+
+    const player2Units = defaultUnits.map(unit => {
+        let startIdx = null
+        while (startIdx === null) {
+            const min = mapData.layers[0].length / 2
+            const max = mapData.layers[0].length
+            let pos = Math.floor(Math.random() * (max - min + 1) + min)
+            if (mapData.layers[0][pos] && !mapData.layers[0][pos].occupied) {
+                startIdx = pos
+            }
+        }
+        mapData.layers[0][startIdx].occupied = true
+        unit.x = mapData.layers[0][startIdx].posX
+        unit.y = mapData.layers[0][startIdx].posY
+        return unit          
     })
 }
 

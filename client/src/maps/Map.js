@@ -78,19 +78,41 @@ export default function Map(props) {
     * Checks for clicks on own units
     */
     function checkUnitCoords(e) {
-        console.log(e)
+        //console.log(e)
         const pos = {
-            /*
-            * TODO NEXT: Calculate where Y click is based on canvas offset
-            */
             x: e.clientX - ((document.documentElement.clientWidth - canvasRef.current.width) / 2),
-            y: e.clientY
+            y: e.pageY - 50
         }
+        console.log(e)
         for (let army = 0; army < units.length; army++) {
             if (units[army].owner === user) {
                 for (let unitNo = 0; unitNo < units[army].units.length; unitNo++) {
-                    if (isIntersect(pos, units[army].units[unitNo])) {
-                        console.log('clicked on unit #' + unitNo)
+
+                    let validX = false
+                    let validY = false
+                    
+                    // range of unit selection
+                    const maxX = units[army].units[unitNo].x + 16
+                    const maxY = units[army].units[unitNo].y + 16
+
+                    // check x
+                    if (pos.x > maxX) {
+                        validX = pos.x - maxX <= 32 ? true : false
+                    } else {
+                        validX = maxX - pos.x <= 32 ? true : false
+                    }
+
+                    // check y 
+                    if (pos.y > maxY) {
+                        validY = pos.y - maxY <= 32 ? true : false
+                    } else {
+                        validY = maxY - pos.y <= 32 ? true : false
+                    }
+
+                    //console.log(minX + 16, minY + 16)
+
+
+                    if (validY && validX) {
                         setSelectionIndex(unitNo)
                     }
                 }
