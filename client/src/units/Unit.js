@@ -9,6 +9,7 @@ export default class Unit {
         this.x = x
         this.y = y
         this.eventListenerAttached = false
+        this.selected = false
 
         switch(this.type) {
             default:
@@ -38,7 +39,6 @@ export default class Unit {
     }
 
     renderSelected(ctx) {
-        console.log('hey')
         ctx.beginPath()
         ctx.lineWidth = '2px'
         ctx.strokeStyle = 'red'

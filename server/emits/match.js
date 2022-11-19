@@ -8,7 +8,6 @@ async function getMatch(socket, io, matchId) {
 }
 
 async function endMatch(socket, io, matchId, victor) {
-    console.log('it begins')
     const m = await Match.findOneAndUpdate(
         {_id: matchId},
         {victor: victor, end: Date.now()}
@@ -18,7 +17,6 @@ async function endMatch(socket, io, matchId, victor) {
         {matchId: '', inMatch: false}
     )
     const match = await Match.findOne({_id: matchId})
-    console.log(match)
 
     io.emit(match.player1.name, match)
     io.emit(match.player2.name, match)

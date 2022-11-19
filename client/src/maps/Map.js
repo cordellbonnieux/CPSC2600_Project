@@ -13,11 +13,11 @@ export default function Map(props) {
         for (let army = 0; army < units.length; army++) {
             if (units[army].owner === user) {
                 units[army].units.forEach(unit => unit.render(ctx, true))
+                if (selectionIndex) {
+                    units[army].units[selectionIndex].renderSelected(ctx)
+                }
             } else {
                 units[army].units.forEach(unit => unit.render(ctx))
-            }
-            if (units[army].owner === user && selectionIndex) {
-                units[army].units[selectionIndex].renderSelected(ctx)
             }
         }
     }
@@ -123,11 +123,11 @@ export default function Map(props) {
         }
     }
 
-    /*
-    * initial canvas set up, and main render function
-    */
+    // load tiles
+    useEffect(() => loadTiles(), [loadTiles])
+
+    // set canvas
     useEffect(() => {
-        loadTiles()
         const canvas = canvasRef.current
         const ctx = canvas.getContext('2d')
         let frames = 0
@@ -141,16 +141,16 @@ export default function Map(props) {
         }
         render()
         return () => window.cancelAnimationFrame(animationFrameId)
-    }, [])
+    })
 
-    /*
-    * add event listener to canvas to detect hits
-    * TODO: add the screen sie as a dependency
-    */
+    // add hit detection to canvas
     useEffect(() => {
         canvasRef.current.removeEventListener('click', checkUnitCoords)
         canvasRef.current.addEventListener('click', checkUnitCoords)
     }, [canvasRef])
+
+    // ensure a re-render on unit change
+    useEffect(() => {}, [units, selectionIndex])
 
     return <canvas ref={canvasRef} />
 }
