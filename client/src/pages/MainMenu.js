@@ -36,6 +36,7 @@ export default function MainMenu(props) {
                     matchId: data.matchId,
                     inMatch: true,
                 })
+                socket.current.close()
             }
         })
     }, [])
@@ -46,15 +47,17 @@ export default function MainMenu(props) {
                 setSearching(true) :
                 setSearching(false)
         })
-    })
+    }, [])
 
     useEffect(() => {
         searching ? 
             setScreenText(`Searching for match, please wait...`) : 
             setScreenText(`Welcome ${username}, how would you like to proceed?`)
-        
-        console.log('searching state changed to:', searching)
     }, [searching, username])
+
+    useEffect(() => {
+        socket.current.emit('matchmaking')
+    })
 
     return (
         <main>

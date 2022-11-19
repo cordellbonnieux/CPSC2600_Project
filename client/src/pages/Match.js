@@ -12,29 +12,33 @@ export default function Match(props) {
     const [ match, setMatch ] = useState(null)
     const [ units, setUnits ] = useState(null)
     const [ selectionIndex, setSelectionIndex ] = useState(null)
+    const { setUser, user, logout } = props
 
     function requestMatchData() {
-        socket.current.emit('match', props.user.matchId)
+        socket.current.emit('match', user.matchId)
     }
 
     function surrender() {
-        socket.current.emit('surrender', {
+        socket.current.emit('endMatch', {
             id: props.user.matchId,
-            victor: match.player1.name === props.user.username ?
+            victor: match.player1.name === user.username ?
                 match.player2.name :
                 match.player1.name,
-        })
-        props.setUnits({
-            username: props.user.username,
-            email: props.user.email,
-            matchId: '',
-            inMatch: false
         })
     }
 
     function consumeMatchData(data) {
-        if (data['_id'] == props.user.matchId) {
-
+        if (data['_id'] == user.matchId) {
+            //if match has an end
+            if (data.end != null) {
+                setUser({
+                    username: user.username,
+                    email: user.email,
+                    matchId: '',
+                    inMatch: false
+                })
+                socket.current.close()
+            }
             // set data otherwise
             setMatch(data)
             if (units === null) {
@@ -75,13 +79,13 @@ export default function Match(props) {
             }
 
         } else {
-            console.log('recieved non-requested data: ' + data)
+            //console.log('recieved non-requested data: ' + data)
         }
     }
 
     useEffect(() => {
         socket.current = io(SERVER_URI)
-        socket.current.on(props.user.username, data => consumeMatchData(data))
+        socket.current.on(user.username, data => consumeMatchData(data))
     }, [])
 
     useEffect(() => requestMatchData())
@@ -90,7 +94,7 @@ export default function Match(props) {
         <div id='map'>
             { match != null && units != null ? 
                 <Map 
-                    user={props.user.username}
+                    user={user.username}
                     layers={match.map.layers} 
                     tileset={match.map.tileset} 
                     mapData={match.map.data} 
@@ -104,10 +108,10 @@ export default function Match(props) {
         {
             units != null ?
                 <MatchOverlay  
-                    user={props.user} 
-                    setUser={props.setUser} 
+                    user={user} 
+                    setUser={setUser} 
                     matchData={match} 
-                    units={props.user === match.player1.name ? match.player1.units : match.player2.units} 
+                    units={user === match.player1.name ? match.player1.units : match.player2.units} 
                     selectionIndex={selectionIndex}
                     setSelectionIndex={setSelectionIndex}
                     surrender={surrender}

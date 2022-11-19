@@ -122,7 +122,6 @@ async function connection(socket, io) {
                 {inMatch: true, matchId: match['_id']}
             )
 
-            // the users aren't recieving these
             io.emit(user1, {matchFound: true, matchId: match['_id']})
             io.emit(user2, {matchFound: true, matchId: match['_id']})
         }

@@ -36,7 +36,7 @@ io.on('connection', socket => {
   matchmaking(socket, io)
   socket.on('matchmaking', () => matchmaking(socket, io))
   socket.on('match', id => getMatch(socket, io, id))
-  socket.on('surrender', d => endMatch(socket, io, d.id, d.victor))
+  socket.on('endMatch', d => endMatch(socket, io, d.id, d.victor))
 })
 
 // server

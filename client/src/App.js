@@ -20,50 +20,65 @@ const App = () => {
     inMatch: false
   })
 
+  /*
+  * log out of account
+  */
   function logout() {
     setUser({username: '', email: ''})
     setLoggedIn(false)
+    setLoading(false)
     localStorage.clear()
   }
 
+  /*
+  * render ui
+  */
+  function ui() {
+    if (loading) {
+      return <span>Loading...</span>
+    } else {
+      return loggedIn ? 
+      <LoggedInTemplate user={user} setUser={setUser} logout={{text:'logout', action: () => logout()}}/> : 
+      <LoggedOutTemplate setLoggedIn={setLoggedIn} setUser={setUser} />
+    }
+  }
+
+  /*
+  * check for session, if found, log in
+  */
   useEffect(() => {
     // if a sessionid is detected in local storage, log the user in
     const sessionid = localStorage.getItem('sessionid') ? localStorage.getItem('sessionid') : null
     if (sessionid != null) {
       setLoading(true)
-     axios.get(SERVER_URI + '/session/'+ sessionid).then(async function(response) {
-        if (response.data.status === 'valid') {
-          setLoggedIn(true)
-          setUser({
-            username: response.data.username,
-            email: response.data.email,
-            matchId: response.data.matchId,
-            inMatch: response.data.inMatch
-          })
-        } else {
-          setLoggedIn(false)
-          await axios.delete(SERVER_URI + '/session/' + sessionid)
-          localStorage.clear()
-        }
-        setLoading(false)
-     })
-
+      axios.get(SERVER_URI + '/session/'+ sessionid).then(async function(response) {
+          if (response.data.status === 'valid') {
+            setLoggedIn(true)
+            setUser({
+              username: response.data.username,
+              email: response.data.email,
+              matchId: response.data.matchId,
+              inMatch: response.data.inMatch
+            })
+          } else {
+            setLoggedIn(false)
+            await axios.delete(SERVER_URI + '/session/' + sessionid)
+            localStorage.clear()
+          }
+          setLoading(false)
+      })
     } else {
       setLoggedIn(false)
       setLoading(false)
       localStorage.clear()
     }
+    setLoading(false)
   }, [user])
 
   // check for loading here
   return (
     <div id='wrapper'>
-    { loading ? 
-        (loggedIn ? 
-          <LoggedInTemplate user={user} setUser={setUser} logout={{text:'logout', action: () => logout()}}/> : 
-          <LoggedOutTemplate setLoggedIn={setLoggedIn} setUser={setUser} />) :
-        <span>Loading...</span>
-    }
+    { ui() }
     </div>
   )
 }
