@@ -11,15 +11,19 @@ export default function Map(props) {
     */
     function renderUnits(ctx) {
         for (let army = 0; army < units.length; army++) {
-            if (units[army].owner === user) {
-                units[army].units.forEach(unit => unit.render(ctx, true))
-                if (selectionIndex) {
-                    units[army].units[selectionIndex].renderSelected(ctx)
+            for (let unit = 0; unit < units[army].units.length; unit++) {
+                //console.log('player: ', army, ' - ', units[army].units[unit].x, units[army].units[unit].y)
+                if (units[army].owner === user) {
+                    units[army].units[unit].render(ctx, true)
+                    if (selectionIndex === unit) {
+                        units[army].units[unit].renderSelected(ctx)
+                    }
+                } else {
+                    units[army].units[unit].render(ctx, false)
                 }
-            } else {
-                units[army].units.forEach(unit => unit.render(ctx))
             }
         }
+
     }
 
     /*

@@ -86,10 +86,6 @@ async function connection(socket, io) {
                 {userList: que.userList.filter(u => u !== user1.username && u !== user2.username)}
             )
 
-            // for now, work from one spawn and modify it for player two
-            // TODO: make something better
-            const starterUnits = setArmySpawn(0, defaultUnits)
-
             // create a new match with users
             const match = await new Match({
                 start: Date.now(),
@@ -100,7 +96,7 @@ async function connection(socket, io) {
                     name: user1.username,
                     id: user1['_id'],
                     // temporarily set default units
-                    units: starterUnits,
+                    units: setArmySpawn(0, defaultUnits),
                     color: 'red', // unused
                     turn: 0,
                     activeTurn: false
@@ -109,7 +105,7 @@ async function connection(socket, io) {
                     name: user2.username,
                     id: user2['_id'],
                     // temporarily set default units
-                    units: setArmySpawn(1, starterUnits),
+                    units: setArmySpawn(1, defaultUnits),
                     color: 'blue', // unused
                     turn: 0,
                     activeTurn: false
@@ -131,12 +127,44 @@ async function connection(socket, io) {
         }
     })
 }
+/*
+* set spawm
+*/
+function setArmySpawn(number, units) {
+    let army = []
+    for (let i = 0; i < units.length; i++) {
+        let idx = null
+        while (idx === null) {
+            let pos = null
+            if (number === 0) {
+                pos = Math.floor(Math.random() * (mapData.layers[0].length / 2))
+            } else {
+                pos = Math.floor(Math.random() * (mapData.layers[0].length - mapData.layers[0].length / 2 + 1) + mapData.layers[0].length / 2)
+            }
+            if (mapData.layers[0][pos] && !mapData.layers[0][pos].occupied) {
+                idx = pos
+            }
+        }
+        mapData.layers[0][idx].occupied = true
+        army.push({
+            x: mapData.layers[0][idx].posX,
+            y: mapData.layers[0][idx].posY,
+            type: units[i].type,
+            moved: units[i].moved,
+            attacked: units[i].attacked,
+            firepower: units[i].firepower,
+            id: units[i].id,
+            hp: units[i].hp
+        })
+    }
+    return army
+}
 
 /*
 * Sets spawn points for untis given the player number
 * TODO: make this better
 */
-function setArmySpawn(playerNo, army) {
+function _setArmySpawn(playerNo, army) {
     let copy = army
     for (let i = 0; i < copy.length; i++) {
         let startIdx = null
