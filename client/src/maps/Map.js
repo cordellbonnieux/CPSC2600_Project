@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import ts0 from './tiles/terrain1.png'
 
 export default function Map(props) {
-    const { layers, tileset, mapData, units, user, setSelectionIndex } = props
+    const { layers, tileset, mapData, units, user, setSelectionIndex, selectionIndex } = props
     const canvasRef = useRef(null)
     const spritesheet = useRef()
 
@@ -15,6 +15,9 @@ export default function Map(props) {
                 units[army].units.forEach(unit => unit.render(ctx, true))
             } else {
                 units[army].units.forEach(unit => unit.render(ctx))
+            }
+            if (units[army].owner === user && selectionIndex) {
+                units[army].units[selectionIndex].renderSelected(ctx)
             }
         }
     }
@@ -83,7 +86,7 @@ export default function Map(props) {
             x: e.clientX - ((document.documentElement.clientWidth - canvasRef.current.width) / 2),
             y: e.pageY - 50
         }
-        console.log(e)
+        //console.log(e)
         for (let army = 0; army < units.length; army++) {
             if (units[army].owner === user) {
                 for (let unitNo = 0; unitNo < units[army].units.length; unitNo++) {

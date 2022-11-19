@@ -11,7 +11,7 @@ export default function UnitsOverlay(props) {
             <Unit 
                 data={units[i]}
                 selected={selectionIndex === i} 
-                setSelectionIndex={selectionIndex} 
+                setSelectionIndex={setSelectionIndex} 
                 key={i} 
                 index={i} 
             />)

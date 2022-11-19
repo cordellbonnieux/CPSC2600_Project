@@ -26,7 +26,7 @@ export default class Unit {
     render(ctx, userControl = false) {
         // for now there is only a single generic unit
         ctx.beginPath()
-        ctx.fillStyle = userControl ? 'blue': 'red'
+        ctx.fillStyle = userControl ? 'blue': 'green'
         ctx.arc(
             this.x + 16, // circles drawn from center
             this.y + 16, // circles are drawn from center
@@ -35,5 +35,14 @@ export default class Unit {
             2 * Math.PI
         )
         ctx.fill()
+    }
+
+    renderSelected(ctx) {
+        console.log('hey')
+        ctx.beginPath()
+        ctx.lineWidth = '2px'
+        ctx.strokeStyle = 'red'
+        ctx.rect(this.x, this.y, 32, 32)
+        ctx.stroke()
     }
 }

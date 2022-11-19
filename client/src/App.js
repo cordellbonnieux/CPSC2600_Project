@@ -50,6 +50,7 @@ const App = () => {
 
     } else {
       setLoggedIn(false)
+      setLoading(false)
       localStorage.clear()
     }
   }, [user])
@@ -57,7 +58,12 @@ const App = () => {
   // check for loading here
   return (
     <div id='wrapper'>
-      {loggedIn ? <LoggedInTemplate user={user} setUser={setUser} logout={{text:'logout', action: () => logout()}}/> : <LoggedOutTemplate setLoggedIn={setLoggedIn} setUser={setUser} />}
+    { loading ? 
+        (loggedIn ? 
+          <LoggedInTemplate user={user} setUser={setUser} logout={{text:'logout', action: () => logout()}}/> : 
+          <LoggedOutTemplate setLoggedIn={setLoggedIn} setUser={setUser} />) :
+        <span>Loading...</span>
+    }
     </div>
   )
 }

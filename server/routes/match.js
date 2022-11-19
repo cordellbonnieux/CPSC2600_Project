@@ -41,56 +41,31 @@ matchRoutes.route('/create').post(async (req, res) => {
     res.end()
 })
 
-/*
-* Get the current que
-*/
-/*
-queRoutes.get('/get', (req, res) => {
-    Que.find({}).then(que => {
-        res.send(que)
-        res.status(200)
-        res.end()
+// not using this
+matchRoutes.route('/end/:id').put(async (req, res) => {
+    console.log(req.params.id, req.body.victor)
+    const m = await Match.findOneAndUpdate({
+        _id: req.params.id},
+        {victor: req.body.victor, end: Date.now()
     })
-})
-*/
-/*
-* Add user to que
 
-queRoutes.post('/add', async function(req, res) {
-    const { user } = req.body
-    const que = await Que.findOne()
+    if (m) {
+        const u = await User.updateMany(
+            {matchId: req.params.id},
+            {matchId: '', inMatch: false},
+            (err) => err ? res.status(500) : null
+        )
 
-    if (!que.userList.includes(user)) {
-        await Que.findOneAndUpdate(
-            { '_id': que['_id'] },
-            { userList: [...que.userList, user] },
-            { new: true }
-        ).then(() => res.send(true))
+        if (u) {
+            res.status(200)
+        } else {
+            res.status(500)
+        }
+
     } else {
-        res.send(false)
+        res.status(500)
     }
-    res.status(200)
-    res.end()
 })
-*/
-/*
-* Remove user to que
 
-queRoutes.post('/remove', async function(req, res) {
-    const { user } = req.body
-    const que = await Que.findOne()
 
-    if (!que.userList.includes(user)) {
-        await Que.findOneAndUpdate(
-            { '_id': que['_id'] },
-            { userList: que.userList.filter(u => u !== user) },
-            { new: true }
-        ).then(() => res.send(true))
-    } else {
-        res.send(false)
-    }
-    res.status(200)
-    res.end()
-})
-*/
 module.exports = matchRoutes

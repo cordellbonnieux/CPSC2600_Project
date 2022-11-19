@@ -17,8 +17,25 @@ export default function Match(props) {
         socket.current.emit('match', props.user.matchId)
     }
 
+    function surrender() {
+        socket.current.emit('surrender', {
+            id: props.user.matchId,
+            victor: match.player1.name === props.user.username ?
+                match.player2.name :
+                match.player1.name,
+        })
+        props.setUnits({
+            username: props.user.username,
+            email: props.user.email,
+            matchId: '',
+            inMatch: false
+        })
+    }
+
     function consumeMatchData(data) {
         if (data['_id'] == props.user.matchId) {
+
+            // set data otherwise
             setMatch(data)
             if (units === null) {
                 setUnits([
@@ -93,6 +110,7 @@ export default function Match(props) {
                     units={props.user === match.player1.name ? match.player1.units : match.player2.units} 
                     selectionIndex={selectionIndex}
                     setSelectionIndex={setSelectionIndex}
+                    surrender={surrender}
                 /> :
                 <></>
         }
