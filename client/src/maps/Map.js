@@ -7,6 +7,47 @@ export default function Map(props) {
     const spritesheet = useRef()
 
     /*
+    * render selection tiles 
+    */
+    function renderSelectionTiles(ctx) {
+        if (selectionIndex) {
+            for (let army = 0; army < units.length; army++) {
+                if (units[army].owner === user) {
+                    console.log(units[army].units[selectionIndex])
+                    // find the 9 tiles around units[army].units[selectionIndex]
+                    let coords = []
+                    // attack + move range for now, is 3x3
+                    for (let x = 0; x < 3; x++) {
+                        let posX = 0
+                        if (x !== 1) {
+                            posX = x === 0 ? -32 : 32
+                        }
+                        for (let y = 0; y < 3; y++) {
+                            let posY = 0
+                            if (y !== 1) {
+                                posY = y === 0 ? -32 : 32
+                            }
+                            if (!(x === 1 && y === 1)) {
+                                // check here if the tile is occupied
+                                coords.push({
+                                    x: units[army].units[selectionIndex].x + posX,
+                                    y: units[army].units[selectionIndex].y + posY
+                                })
+                            }
+                        }
+                    }
+                    // paint tiles to screen
+                    for (let tile = 0; tile < coords.length; tile++) {
+                        ctx.beginPath();
+                        ctx.fillStyle = 'rgba(25, 255, 25, 0.5)'
+                        ctx.fillRect(coords[tile].x, coords[tile].y, 32, 32);
+                    }
+                }
+            }
+        }
+    }
+
+    /*
     * renders the units and assigns color based on control
     */
     function renderUnits(ctx) {
@@ -139,6 +180,7 @@ export default function Map(props) {
             resetCanvas(ctx)
             renderMap(ctx)
             renderUnits(ctx)
+            renderSelectionTiles(ctx)
             animationFrameId = window.requestAnimationFrame(render)
         }
         render()
