@@ -29,7 +29,7 @@ const Que = require('./models/queModel')
 // web socket
 const io = require('socket.io')(server)
 const matchmaking = require('./emits/matchmaking')
-const { getMatch, endMatch } = require('./emits/match')
+const { getMatch, endMatch, updateUnits } = require('./emits/match')
 
 // web socket conn
 io.on('connection', socket => {
@@ -37,6 +37,7 @@ io.on('connection', socket => {
   socket.on('matchmaking', () => matchmaking(socket, io))
   socket.on('match', id => getMatch(socket, io, id))
   socket.on('endMatch', d => endMatch(socket, io, d.id, d.victor))
+  socket.on('updateUnits', d => updateUnits(socket, io, d.id, d.units))
 })
 
 // server

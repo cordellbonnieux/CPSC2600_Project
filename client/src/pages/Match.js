@@ -83,6 +83,10 @@ export default function Match(props) {
         }
     }
 
+    function updateUnits() {
+        socket.current.emit('updateUnits', user.matchId ,units)
+    }
+
     useEffect(() => {
         socket.current = io(SERVER_URI)
         socket.current.on(user.username, data => consumeMatchData(data))
@@ -99,6 +103,8 @@ export default function Match(props) {
                     tileset={match.map.tileset} 
                     mapData={match.map.data} 
                     units={units}
+                    setUnits={setUnits}
+                    updateUnits={updateUnits}
                     selectionIndex={selectionIndex}
                     setSelectionIndex={setSelectionIndex}
                 /> : 

@@ -10,10 +10,9 @@ export default function Map(props) {
     * render selection tiles 
     */
     function renderSelectionTiles(ctx) {
-        if (selectionIndex) {
+        if (selectionIndex !== null) {
             for (let army = 0; army < units.length; army++) {
                 if (units[army].owner === user) {
-                    console.log(units[army].units[selectionIndex])
                     // find the 9 tiles around units[army].units[selectionIndex]
                     let coords = []
                     // attack + move range for now, is 3x3
@@ -29,9 +28,29 @@ export default function Map(props) {
                             }
                             if (!(x === 1 && y === 1)) {
                                 // check here if the tile is occupied
+                                function checkPos(tile) {
+                                    return (
+                                        units[army].units[selectionIndex].x + posX === tile.posX &&
+                                        units[army].units[selectionIndex].y + posY === tile.posY
+                                    )
+                                }
+                                let tile = layers[0].filter(checkPos)[0]
+                                // check for enemy unit if occupied
+                                let enemyArmy = army === 0 ? 1 : 0
+                                let enemyNumber = null
+                                for (let u = 0; u < units[enemyArmy].units.length; u++) {
+                                    if (
+                                        units[enemyArmy].units[u].x === units[army].units[selectionIndex].x + posX &&
+                                        units[enemyArmy].units[u].y === units[army].units[selectionIndex].y + posY
+                                    ) {
+                                        enemyNumber = u
+                                    }
+                                }
                                 coords.push({
                                     x: units[army].units[selectionIndex].x + posX,
-                                    y: units[army].units[selectionIndex].y + posY
+                                    y: units[army].units[selectionIndex].y + posY,
+                                    occupied: tile.occupied,
+                                    enemyNumber: enemyNumber
                                 })
                             }
                         }
@@ -39,7 +58,19 @@ export default function Map(props) {
                     // paint tiles to screen
                     for (let tile = 0; tile < coords.length; tile++) {
                         ctx.beginPath();
-                        ctx.fillStyle = 'rgba(25, 255, 25, 0.5)'
+                        if (coords[tile].occupied) {
+                            if (coords[tile].enemyNumber !== null) {
+                                // TODO: add an event on the enemyNumber
+                                // use updateUnits() and setUnits
+                                // first spread unit changes into setUnits
+                                // then call updateUnits()
+                                ctx.fillStyle = 'rgba(255, 25, 255, 0.5)'
+                            } else {
+                                ctx.fillStyle = 'rgba(255, 25, 25, 0.5)'
+                            }
+                        } else {
+                            ctx.fillStyle = 'rgba(25, 255, 25, 0.5)'
+                        }
                         ctx.fillRect(coords[tile].x, coords[tile].y, 32, 32);
                     }
                 }
@@ -114,24 +145,14 @@ export default function Map(props) {
     }
 
     /*
-    * Detects intersection from x,y coords (clicks) and compares it to a circle's x,y coords
-    * borrowed from: 
-    * https://medium.com/@lavrton/hit-region-detection-for-html5-canvas-and-how-to-listen-to-click-events-on-canvas-shapes-815034d7e9f8
-    */
-    function isIntersect(point, circle) {
-        return Math.sqrt((point.x-circle.x) ** 2 + (point.y - circle.y) ** 2) < circle.radius;
-    }
-
-    /*
     * Checks for clicks on own units
     */
     function checkUnitCoords(e) {
-        //console.log(e)
         const pos = {
             x: e.clientX - ((document.documentElement.clientWidth - canvasRef.current.width) / 2),
             y: e.pageY - 50
         }
-        //console.log(e)
+        let deselect = true
         for (let army = 0; army < units.length; army++) {
             if (units[army].owner === user) {
                 for (let unitNo = 0; unitNo < units[army].units.length; unitNo++) {
@@ -159,10 +180,14 @@ export default function Map(props) {
 
                     if (validY && validX) {
                         // also check if the unit has any attacks or movement left
+                        deselect = false
                         setSelectionIndex(unitNo)
                     }
                 }
             }
+        }
+        if (deselect) {
+            setSelectionIndex(null)
         }
     }
 

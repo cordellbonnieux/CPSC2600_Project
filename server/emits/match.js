@@ -22,4 +22,11 @@ async function endMatch(socket, io, matchId, victor) {
     io.emit(match.player2.name, match)
 }
 
-module.exports = { getMatch, endMatch }
+async function updateUnits(socket, io, matchId, unitData) {
+
+    // TODO: update match
+
+}
+
+
+module.exports = { getMatch, endMatch, updateUnits }
