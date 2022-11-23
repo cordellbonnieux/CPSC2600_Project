@@ -21,6 +21,8 @@ const error = {
     ]
 }
 
+// TODO: add conditional rendering for when isLoading is true
+
 export default function CreateAccountForm(props) {
     const [ user, setUser ] = useState('')
     const [ email, setEmail ] = useState('')

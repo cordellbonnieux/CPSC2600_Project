@@ -12,7 +12,20 @@ export default function MainMenu(props) {
     const { setUser } = props.setUser
     const [ searching, setSearching ] = useState(false)
     const [ screenText, setScreenText ] = useState('')
+    const [ loading, setLoading ] = useState(false)
     const socket = useRef()
+
+
+    const menu = (
+        <div>
+            { props.user.inMatch ? 
+                <button>(non-functional) return to match in progress</button> :
+                <MenuButton key={1} text={searching ? 'cancel search' : 'search for match'} action={findMatch} />
+            }
+            <MenuButton key={2} text={'account'} action={null} />
+            <MenuButton key={3} text={logout.text} action={logout.action} />
+        </div>
+    )
 
    async function findMatch() {
     if (searching) {
@@ -27,10 +40,12 @@ export default function MainMenu(props) {
    }
 
     useEffect(() => {
+        setLoading(true)
         // connect to web socket after component render
         socket.current = io(SERVER_URI)
         // server has found username a match, setUser to update client
         socket.current.on(username, data => {
+            setLoading(true)
             if (data.matchFound) {
                 setUser({
                     matchId: data.matchId,
@@ -38,7 +53,9 @@ export default function MainMenu(props) {
                 })
                 socket.current.close()
             }
+            setLoading(false)
         })
+        setLoading(false)
     }, [])
 
     useEffect(() => {
@@ -56,9 +73,12 @@ export default function MainMenu(props) {
     }, [searching, username])
 
     useEffect(() => {
+        setLoading(true)
         socket.current.emit('matchmaking')
+        setLoading(false)
     })
 
+    // TODO: write a signal to be emitted upon clicking 'return to match'
     return (
         <main>
             <div className='screenWrapper'>
@@ -66,9 +86,7 @@ export default function MainMenu(props) {
                 <p>{screenText}</p>
             </div>
             <menu>
-                <MenuButton key={1} text={searching ? 'cancel search' : 'search for match'} action={findMatch} />
-                <MenuButton key={2} text={'account'} action={null} />
-                <MenuButton key={3} text={logout.text} action={logout.action} />
+                {loading ? <span className='loading'>Loading...</span> : menu}
             </menu>
         </main>
     )
