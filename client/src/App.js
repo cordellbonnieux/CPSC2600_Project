@@ -40,33 +40,38 @@ const App = () => {
   }
 
   async function sessionLogin(sessionid) {
-    console.log('the bird has left the nest')
-    setLoading(true)
     await axios.get(SERVER_URI + '/session/'+ sessionid).then(async function(response) {
         if (response.data.status === 'valid') {
-          setLoggedIn(true)
           setUser({
             username: response.data.username,
             email: response.data.email,
             matchId: response.data.matchId,
             inMatch: response.data.inMatch
           })
+          return true
         } else {
-          setLoggedIn(false)
-          localStorage.clear()
           await axios.delete(SERVER_URI + '/session/' + sessionid)
+          localStorage.clear()
+          return false
         }
-    }).then(() => setLoading(false)).then(() => console.log('bird has really returned'))
+    })
+    .then(() => setLoading(false))
+    .catch(err => {
+      console.log(err)
+      localStorage.clear()
+      return false
+    })
   }
 
   /*
   * check for session, if found, log in
   */
   useEffect(() => {
-    // if a sessionid is detected in local storage, log the user in
+    setLoading(true)
     const sessionid = localStorage.getItem('sessionid') ? localStorage.getItem('sessionid') : null
-    if (sessionid != null && !loggedIn) {
-      sessionLogin(sessionid)
+    if (sessionid != null) {
+      const successfulLogin = sessionLogin(sessionid)
+      setLoggedIn(successfulLogin)
     } else {
       setLoggedIn(false)
       setLoading(false)
@@ -78,7 +83,13 @@ const App = () => {
   // check for loading here
   return (
     <div id='wrapper'>
-    { loading ?  <span>Loading...</span> : ui()}
+    {loading ?  
+      <span>Loading...</span> : 
+      (loggedIn ? 
+        <LoggedInTemplate user={user} setUser={setUser} logout={{text:'logout', action: () => logout()}}/> : 
+        <LoggedOutTemplate setLoggedIn={setLoggedIn} setUser={setUser} />
+      )
+    }
     </div>
   )
 }

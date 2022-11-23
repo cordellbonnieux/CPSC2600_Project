@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import ts0 from './tiles/terrain1.png'
 
 export default function Map(props) {
-    const { layers, tileset, mapData, units, user, setSelectionIndex, selectionIndex, locations, setLocations, determineSelectionTiles } = props
+    const { layers, tileset, mapData, units, user, setSelectionIndex, selectionIndex, locations, setLocations, determineSelectionTiles, setUnits, updateUnits } = props
     const canvasRef = useRef(null)
     const spritesheet = useRef()
 
@@ -126,8 +126,6 @@ export default function Map(props) {
                         } else {
                             validX = maxX - pos.x <= 32 ? true : false
                         }
-
-                        // check y 
                         if (pos.y > maxY) {
                             validY = pos.y - maxY <= 32 ? true : false
                         } else {
@@ -178,7 +176,12 @@ export default function Map(props) {
     * move unit to loc
     */
     function move(loc, unitIndex) {
-
+        for (let army = 0; army < units.length; army++) {
+            if (units[army].owner === user) {
+                //units[army].units[unitIndex].x = loc.x
+                //
+            }
+        }
     }
 
     // load tiles

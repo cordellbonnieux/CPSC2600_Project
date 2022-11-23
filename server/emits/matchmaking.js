@@ -86,6 +86,8 @@ async function connection(socket, io) {
                 {userList: que.userList.filter(u => u !== user1.username && u !== user2.username)}
             )
 
+            //TODO: if a match exists already, do not create a new one, return the original
+            
             // create a new match with users
             const match = await new Match({
                 start: Date.now(),

@@ -10,39 +10,35 @@ const { nanoid } = require('nanoid')
 */
 sessionRoutes.route('/create').post(async function(req,res) {
     const { user } = req.body
-    try {
-        await User.find({username:user})
-        .then(async function(data) {
+    await User.find({username:user})
+    .then(async function(data) {
+        if (data.length > 0) {
+            let userid = data[0]._id
+            let sessionid = nanoid()
             if (data.length > 0) {
-                let userid = data[0]._id
-                let sessionid = nanoid()
-                if (data.length > 0) {
-                    return await new Session({
-                        userid,
-                        sessionid
-                    }).save()
-                    .then(() => {
-                        res.send(sessionid)
-                        res.status(200)
-                    })
-                } else {
-                    console.log('session routes create error: no Users can be found.')
-                    // if user cannot be found, don't create a session
-                    res.send(null)
-                    res.status(500)
-                    return
-                }
+                return await new Session({
+                    userid,
+                    sessionid
+                }).save()
+                .then(() => {
+                    res.send(sessionid)
+                    res.status(200)
+                })
+                .catch(err => res.status(500))
             } else {
+                console.log('session routes create error: no Users can be found.')
                 // if user cannot be found, don't create a session
                 res.send(null)
                 res.status(500)
+                return
             }
-        })
-    } catch (e) {
-        // if user cannot be found, don't create a session
-        console.log('session routes create error:', e)
-        res.status(500)
-    }
+        } else {
+            // if user cannot be found, don't create a session
+            res.send(null)
+            res.status(500)
+        }
+    })
+    .catch(err => res.status(500))
 })
 
 /*
