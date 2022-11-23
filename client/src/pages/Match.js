@@ -10,14 +10,68 @@ const SERVER_URI = 'http://localhost:5000'
 export default function Match(props) {
     const socket = useRef()
     const [ match, setMatch ] = useState(null)
-    const [ units, setUnits ] = useState(null)
+    const [ units, setUnits ] = useState([])
+    const [ locations, setLocations ] = useState([])
     const [ selectionIndex, setSelectionIndex ] = useState(null)
     const { setUser, user, logout } = props
 
+    /*
+    * determine location of selection tiles 
+    * - when a unit is selected, 8 selection tiles will spawn around them,
+    * this func determines those tiles.
+    */
+    function determineSelectionTiles(unitNo) {
+        if (selectionIndex !== null) {
+            for (let army = 0; army < units.length; army++) {
+                if (units[army].owner === user.username) {
+                    // find the 9 tiles around units[army].units[selectionIndex]
+                    let coords = []
+                    // attack + move range for now, is 3x3
+                    for (let x = -1; x < 2; x++) {
+                        for (let y = -1; y < 2; y++) {
+                            const posX = units[army].units[unitNo].x + (x * 32)
+                            const posY = units[army].units[unitNo].y + (y * 32)
+                            // x,y === 0,0 is the player's selection unit position 
+                            if (!(x === 0 && y === 0)) {
+                                // check here if the tile is occupied
+                                let tile = match.map.layers[0].filter(tile => posX === tile.posX && posY === tile.posY)[0]
+                                // check for enemy unit if occupied
+                                let enemyArmy = army === 0 ? 1 : 0
+                                let enemyNumber = null
+                                for (let u = 0; u < units[enemyArmy].units.length; u++) {
+                                    if (
+                                        units[enemyArmy].units[u].x === posX &&
+                                        units[enemyArmy].units[u].y === posY
+                                    ) {
+                                        enemyNumber = u
+                                    }
+                                }
+                                coords.push({
+                                    x: posX,
+                                    y: posY,
+                                    occupied: tile.occupied,
+                                    enemyNumber: enemyNumber
+                                })
+                            }
+                        }
+                    }
+                    // set the possible click locations
+                    setLocations(coords)
+                }
+            }
+        }
+    }
+
+    /*
+    * request to server to emit new match data
+    */
     function requestMatchData() {
         socket.current.emit('match', user.matchId)
     }
 
+    /*
+    * current user surrenders match
+    */
     function surrender() {
         socket.current.emit('endMatch', {
             id: props.user.matchId,
@@ -27,6 +81,10 @@ export default function Match(props) {
         })
     }
 
+    /*
+    * when data is emitted from the server to the client,
+    * parse and store the data in state to render the map and ui
+    */
     function consumeMatchData(data) {
         if (data['_id'] == user.matchId) {
             //if match has an end
@@ -41,7 +99,7 @@ export default function Match(props) {
             }
             // set data otherwise
             setMatch(data)
-            if (units === null) {
+            if (units.length === 0) {
                 setUnits([
                     {
                         owner: data.player1.name, 
@@ -83,20 +141,36 @@ export default function Match(props) {
         }
     }
 
+    /*
+    * Emit new unit changes to server
+    */
     function updateUnits() {
         socket.current.emit('updateUnits', user.matchId ,units)
     }
 
+    /*
+    * determine the selection tiles each time selectionIndex is changed
+    */
+    useEffect(() => {
+        determineSelectionTiles(selectionIndex)
+    }, [selectionIndex])
+
+    /*
+    * create web socket conn, after component is mounted
+    */
     useEffect(() => {
         socket.current = io(SERVER_URI)
         socket.current.on(user.username, data => consumeMatchData(data))
     }, [])
 
+    /*
+    * on each render, request data
+    */
     useEffect(() => requestMatchData())
 
     return <main>
         <div id='map'>
-            { match != null && units != null ? 
+            { match != null && units.length > 0 ? 
                 <Map 
                     user={user.username}
                     layers={match.map.layers} 
@@ -107,12 +181,15 @@ export default function Match(props) {
                     updateUnits={updateUnits}
                     selectionIndex={selectionIndex}
                     setSelectionIndex={setSelectionIndex}
+                    locations={locations}
+                    setLocations={setLocations}
+                    determineSelectionTiles={determineSelectionTiles}
                 /> : 
                 <span>Loading...</span> 
             }
         </div>
         {
-            units != null ?
+            units.length > 0 ?
                 <MatchOverlay  
                     user={user} 
                     setUser={setUser} 
@@ -121,6 +198,7 @@ export default function Match(props) {
                     selectionIndex={selectionIndex}
                     setSelectionIndex={setSelectionIndex}
                     surrender={surrender}
+                    determineSelectionTiles={determineSelectionTiles}
                 /> :
                 <></>
         }

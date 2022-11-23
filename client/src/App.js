@@ -34,13 +34,9 @@ const App = () => {
   * render ui
   */
   function ui() {
-    if (loading) {
-      return <span>Loading...</span>
-    } else {
       return loggedIn ? 
       <LoggedInTemplate user={user} setUser={setUser} logout={{text:'logout', action: () => logout()}}/> : 
       <LoggedOutTemplate setLoggedIn={setLoggedIn} setUser={setUser} />
-    }
   }
 
   /*
@@ -49,7 +45,7 @@ const App = () => {
   useEffect(() => {
     // if a sessionid is detected in local storage, log the user in
     const sessionid = localStorage.getItem('sessionid') ? localStorage.getItem('sessionid') : null
-    if (sessionid != null) {
+    if (sessionid != null && !loggedIn) {
       setLoading(true)
       axios.get(SERVER_URI + '/session/'+ sessionid).then(async function(response) {
           if (response.data.status === 'valid') {
@@ -62,8 +58,8 @@ const App = () => {
             })
           } else {
             setLoggedIn(false)
-            await axios.delete(SERVER_URI + '/session/' + sessionid)
             localStorage.clear()
+            await axios.delete(SERVER_URI + '/session/' + sessionid)
           }
           setLoading(false)
       })
@@ -73,12 +69,12 @@ const App = () => {
       localStorage.clear()
     }
     setLoading(false)
-  }, [user])
+  }, [])
 
   // check for loading here
   return (
     <div id='wrapper'>
-    { ui() }
+    { loading ?  <span>Loading...</span> : ui()}
     </div>
   )
 }
