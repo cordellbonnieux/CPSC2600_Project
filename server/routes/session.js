@@ -48,7 +48,6 @@ sessionRoutes.route('/create').post(async function(req,res) {
 /*
 * Get User: refactored to check for lastActivity
 * Returns a user account details for a given sessionid
-*/
 sessionRoutes.get('/:id', async function(req, res) {
     try {
         await Session.find({sessionid: req.params.id}).then(async function(sessionResponse) {
@@ -76,6 +75,36 @@ sessionRoutes.get('/:id', async function(req, res) {
         console.log('error in session/user:', e)
         res.status(500)
     }
+})
+*/
+
+/*
+* Get User: refactored to check for lastActivity
+* Returns a user account details for a given sessionid
+*/
+sessionRoutes.get('/:id', async function(req, res) {
+
+    await Session.find({sessionid: req.params.id}).then(async function(sessionResponse) {
+        // this variable is no equal to days
+        //const daysSinceActivity = (Date.now() - sessionResponse[0].lastActivity) / 86400000 //millisecondsInOneDay
+        if (sessionResponse.length > 0) {
+            await User.find({_id: sessionResponse[0].userid}).then(userResponse => {
+                if (userResponse) {
+                    res.send({
+                        status: 'valid',
+                        email: userResponse[0].email,
+                        username: userResponse[0].username,
+                        inMatch: userResponse[0].inMatch,
+                        matchId: userResponse[0].matchId
+                    }).status(200)
+                } else {
+                    res.status(400).send('user not found')
+                }
+            }).catch(err => res.status(500))
+        } else {
+            res.status(400).send('invalid session')
+        }
+    }).catch(err => res.status(500))
 })
 
 /*

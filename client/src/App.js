@@ -39,6 +39,26 @@ const App = () => {
       <LoggedOutTemplate setLoggedIn={setLoggedIn} setUser={setUser} />
   }
 
+  async function sessionLogin(sessionid) {
+    console.log('the bird has left the nest')
+    setLoading(true)
+    await axios.get(SERVER_URI + '/session/'+ sessionid).then(async function(response) {
+        if (response.data.status === 'valid') {
+          setLoggedIn(true)
+          setUser({
+            username: response.data.username,
+            email: response.data.email,
+            matchId: response.data.matchId,
+            inMatch: response.data.inMatch
+          })
+        } else {
+          setLoggedIn(false)
+          localStorage.clear()
+          await axios.delete(SERVER_URI + '/session/' + sessionid)
+        }
+    }).then(() => setLoading(false)).then(() => console.log('bird has really returned'))
+  }
+
   /*
   * check for session, if found, log in
   */
@@ -46,23 +66,7 @@ const App = () => {
     // if a sessionid is detected in local storage, log the user in
     const sessionid = localStorage.getItem('sessionid') ? localStorage.getItem('sessionid') : null
     if (sessionid != null && !loggedIn) {
-      setLoading(true)
-      axios.get(SERVER_URI + '/session/'+ sessionid).then(async function(response) {
-          if (response.data.status === 'valid') {
-            setLoggedIn(true)
-            setUser({
-              username: response.data.username,
-              email: response.data.email,
-              matchId: response.data.matchId,
-              inMatch: response.data.inMatch
-            })
-          } else {
-            setLoggedIn(false)
-            localStorage.clear()
-            await axios.delete(SERVER_URI + '/session/' + sessionid)
-          }
-          setLoading(false)
-      })
+      sessionLogin(sessionid)
     } else {
       setLoggedIn(false)
       setLoading(false)

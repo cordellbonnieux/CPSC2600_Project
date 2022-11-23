@@ -151,16 +151,13 @@ export default function Map(props) {
                 // this might need to be changed to 16
                 return xDifference <= 32 && yDifference <= 32
             })
-            // TODO: DO SOMETHING HERE
-            console.log(matchingTiles[0])
             // for now just take the first matchingTile, to improve select accuracy
             // filter the matchingTiles array
-
-            
-            
-                /*
-                * if a change to a unit's pos happens, it needs to be emitted
-                */ 
+            if (matchingTiles[0].enemyNumber === null) {
+                // no enemy, just move
+            } else {
+                // enemy detected launch attack
+            }
         }
 
         // deselect
@@ -168,6 +165,20 @@ export default function Map(props) {
             setSelectionIndex(null)
             setLocations([])
         }     
+    }
+
+    /*
+    * attack enemy at loc
+    */
+    function attack(loc, unitIndex) {
+
+    }
+
+    /*
+    * move unit to loc
+    */
+    function move(loc, unitIndex) {
+
     }
 
     // load tiles
