@@ -23,6 +23,7 @@ export default function LoginForm(props) {
         <form onSubmit={e => handleSubmit(e)}>
             <h2>Login</h2>
             <span>{warnings.server}</span>
+            <span>{isLoading ? 'loading...' : ''}</span>
             <label htmlFor='userName'>
                 username:
                 <input 
@@ -141,5 +142,5 @@ export default function LoginForm(props) {
 
     // TODO: add a loading spinner
 
-    return isLoading ? <span className='loading'>Loading...</span> : form
+    return form
 }

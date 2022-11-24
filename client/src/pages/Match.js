@@ -78,7 +78,7 @@ export default function Match(props) {
             victor: match.player1.name === user.username ?
                 match.player2.name :
                 match.player1.name,
-        })
+        }, () => socket.current.close())
     }
 
     /*
@@ -145,7 +145,7 @@ export default function Match(props) {
     * Emit new unit changes to server
     */
     function updateUnits() {
-        socket.current.emit('updateUnits', user.matchId ,units)
+        socket.current.emit('updateUnits' ,user.matchId ,units)
     }
 
     /*

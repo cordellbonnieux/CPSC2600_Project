@@ -30,16 +30,8 @@ const App = () => {
     localStorage.clear()
   }
 
-  /*
-  * render ui
-  */
-  function ui() {
-      return loggedIn ? 
-      <LoggedInTemplate user={user} setUser={setUser} logout={{text:'logout', action: () => logout()}}/> : 
-      <LoggedOutTemplate setLoggedIn={setLoggedIn} setUser={setUser} />
-  }
-
   async function sessionLogin(sessionid) {
+    let successfulLogin = false
     await axios.get(SERVER_URI + '/session/'+ sessionid).then(async function(response) {
         if (response.data.status === 'valid') {
           setUser({
@@ -48,18 +40,17 @@ const App = () => {
             matchId: response.data.matchId,
             inMatch: response.data.inMatch
           })
-          return true
+          successfulLogin = true
         } else {
           await axios.delete(SERVER_URI + '/session/' + sessionid)
-          localStorage.clear()
-          return false
+          .then(() => localStorage.clear())
         }
     })
+    .then(() => setLoggedIn(successfulLogin))
     .then(() => setLoading(false))
     .catch(err => {
       console.log(err)
       localStorage.clear()
-      return false
     })
   }
 
@@ -70,25 +61,24 @@ const App = () => {
     setLoading(true)
     const sessionid = localStorage.getItem('sessionid') ? localStorage.getItem('sessionid') : null
     if (sessionid != null) {
-      const successfulLogin = sessionLogin(sessionid)
-      setLoggedIn(successfulLogin)
+      sessionLogin(sessionid)
     } else {
       setLoggedIn(false)
-      setLoading(false)
       localStorage.clear()
     }
     setLoading(false)
   }, [])
 
+  //useEffect(() => console.log('user changed re-rendering'),[user, setUser])
+
   // check for loading here
   return (
     <div id='wrapper'>
-    {loading ?  
-      <span>Loading...</span> : 
-      (loggedIn ? 
+    {loading ? <span>Loading...</span> : <></>}
+    {
+      loggedIn ? 
         <LoggedInTemplate user={user} setUser={setUser} logout={{text:'logout', action: () => logout()}}/> : 
         <LoggedOutTemplate setLoggedIn={setLoggedIn} setUser={setUser} />
-      )
     }
     </div>
   )

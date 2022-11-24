@@ -93,7 +93,7 @@ async function connection(socket, io) {
                 start: Date.now(),
                 map: mapData,
                 currentPlayer: 0,
-                end: false,
+                end: null,
                 player1: {
                     name: user1.username,
                     id: user1['_id'],
@@ -124,8 +124,16 @@ async function connection(socket, io) {
                 {inMatch: true, matchId: match['_id']}
             )
 
-            io.emit(user1, {matchFound: true, matchId: match['_id']})
-            io.emit(user2, {matchFound: true, matchId: match['_id']})
+            console.log('created match ' + match._id)
+
+            // TODO: rliminate the need for this duplicate emit
+            io.emit(user1.username, {matchFound: true, matchId: match['_id']})
+            io.emit(user2.username, {matchFound: true, matchId: match['_id']})
+
+            socket.emit(user1.username, {matchFound: true, matchId: match['_id']})
+            socket.emit(user2.username, {matchFound: true, matchId: match['_id']})
+
+            //console.log('emitted to', user1.username, user2.username)
         }
     })
 }

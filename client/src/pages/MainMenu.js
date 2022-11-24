@@ -7,9 +7,8 @@ import MenuButton from '../components/MenuButton'
 const SERVER_URI = 'http://localhost:5000'
 
 export default function MainMenu(props) {
-    const { logout } = props
+    const { logout, setUser } = props
     const { username, inMatch, matchId } = props.user
-    const { setUser } = props.setUser
     const [ searching, setSearching ] = useState(false)
     const [ screenText, setScreenText ] = useState('')
     const [ loading, setLoading ] = useState(false)
@@ -18,10 +17,7 @@ export default function MainMenu(props) {
 
     const menu = (
         <div>
-            { inMatch ? 
-                <button>(non-functional) return to match in progress</button> :
-                <MenuButton key={1} text={searching ? 'cancel search' : 'search for match'} action={findMatch} />
-            }
+            <MenuButton key={1} text={searching ? 'cancel search' : 'search for match'} action={findMatch} />
             <MenuButton key={2} text={'account'} action={null} />
             <MenuButton key={3} text={logout.text} action={logout.action} />
         </div>
@@ -46,10 +42,12 @@ export default function MainMenu(props) {
         socket.current = io(SERVER_URI)
         // server has found username a match, setUser to update client
         socket.current.on(username, data => {
-            if (data.matchFound) {
+            if (data.matchFound || data._id) {
                 setUser({
-                    matchId: data.matchId,
-                    inMatch: true,
+                    username: props.user.username,
+                    email: props.user.email,
+                    matchId: data.matchFound ? data.matchId : data._id,
+                    inMatch: true
                 })
                 socket.current.close()
             }
@@ -67,6 +65,7 @@ export default function MainMenu(props) {
         setLoading(false)
     }, [])
 
+    // text prompts
     useEffect(() => {
         searching ? 
             setScreenText(`Searching for match, please wait...`) : 
@@ -76,10 +75,10 @@ export default function MainMenu(props) {
     useEffect(() => {
         if (inMatch) {
             socket.current.emit('joinmatch')
+            setLoading(true)
         }
-    })
+    }, [props.user, setUser])
 
-    // TODO: write a signal to be emitted upon clicking 'return to match'
     return (
         <main>
             <div className='screenWrapper'>
