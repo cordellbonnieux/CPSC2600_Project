@@ -1,7 +1,8 @@
 html, body {
     margin: 0;
     padding: 0;
-    background-color: darkgrey;
+    background-color: #000;
+    color: rgba(0, 255, 0, 1);
 }
 
 canvas {
@@ -18,12 +19,19 @@ canvas {
 
 }
 
+#topOverlayWrapper {
+    display: flex;
+    top: 10px;
+    justify-content: space-evenly;
+    width: 100%;
+    align-items: center;
+}
+
 #turnCounterWrapper {
-    top: 5px;
-    left: 5px;
     background-color: #000;
     padding: 5px; 
     border: 2px solid rgba(0, 200, 0, 1);
+    margin-left: 10px;
 }
 
 #turnCounterWrapper > span {
@@ -37,22 +45,8 @@ canvas {
     padding: 5px;
 }
 
-#menuWrapper {
-    bottom: 10px;
-    right: 10px;
-    height: 15%;
-    bottom: 10px;
-    right: 10px;
-    width: 30%;
-    background-color: red;
-    text-align: right;
-}
-#combatLogWrapper {
-    text-align: left;
-}
-
-#combatLogWrapper span {
-    font-size: 0.8em;
+#surrenderBtn {
+    margin-right: 10px;
 }
 
 #unitsWrapper {
@@ -79,7 +73,3 @@ canvas {
     color: #fff;
 }
 
-#surrenderBtn {
-    top: 10px;
-    right: 10px;
-}

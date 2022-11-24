@@ -1,18 +1,20 @@
-//import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import MainMenu from '../pages/MainMenu'
 import Match from '../pages/Match'
 
 export default function LoggedInTemplate(props) {
+  const { user, setUser, logout } = props
+  const match = <Match user={user} setUser={setUser} logout={logout} />
+  const menu = <MainMenu user={user} setUser={setUser} logout={logout} />
+  const [display, setDisplay] = useState(null)
 
-  //useEffect(() => console.log('logged in state changed'), [props.user])
+  useEffect(() => {
+    if (user.inMatch) {
+      setDisplay(match)
+    } else {
+      setDisplay(menu)
+    }
+  }, [user])
 
-  return (
-    <div id="loggedInWrapper">
-      {
-        props.user.inMatch ? 
-          <Match user={props.user} setUser={props.setUser} logout={props.logout} /> :
-          <MainMenu user={props.user} setUser={props.setUser} logout={props.logout} />
-      }
-    </div>
-  )
+  return <div id="loggedInWrapper">{display !== null ?  display : <></>}</div>
 }

@@ -100,6 +100,10 @@ export default function Match(props) {
             // set data otherwise
             setMatch(data)
             if (units.length === 0) {
+                /*
+                *  TODO: add more properties to units so they may be used in ui and to 
+                * check for movement or attacks
+                */
                 setUnits([
                     {
                         owner: data.player1.name, 

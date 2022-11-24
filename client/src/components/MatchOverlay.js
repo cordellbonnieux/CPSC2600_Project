@@ -6,9 +6,11 @@ export default function MatchOverlay(props) {
     const { user, setUser, selectionIndex, setSelectionIndex, units, matchData, surrender } = props
     return (
         <div id='overlayWrapper'>
-            <TurnCounter match={matchData} user={user} />
+            <div id='topOverlayWrapper' className='overlay'>
+                <TurnCounter match={matchData} user={user} />
+                <SurrenderButton surrender={surrender} />
+            </div>
             <UnitsOverlay units={units} selectionIndex={selectionIndex} setSelectionIndex={setSelectionIndex} />
-            <SurrenderButton surrender={surrender} />
         </div>
     )
 }

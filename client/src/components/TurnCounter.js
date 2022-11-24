@@ -12,7 +12,7 @@ export default function TurnCounter(props) {
     console.log('turncount user and match:', user, match)
     return (
         player !== null ?
-            (<div className='overlay' id='turnCounterWrapper'>
+            (<div id='turnCounterWrapper'>
                 <span>turn: {player.turn}</span>
                 <span>{player.activeTurn ? 'your turn' : 'enemy\'s turn'}</span>
                 <button disabled={!player.activeTurn}>complete turn</button>
