@@ -12,8 +12,8 @@ const { nanoid } = require('nanoid')
 matchRoutes.route('/create').post(async (req, res) => {
     const { user1, user2 } = req.body
     
-    const player1 = await User.find({ username: user1 })
-    const player2 = await User.find({ username: user2 })
+    const player1 = await User.find({ username: user1 }).catch(err => console.log(err))
+    const player2 = await User.find({ username: user2 }).catch(err => console.log(err))
 
     const match = await new Match({
         player1: {
@@ -24,17 +24,17 @@ matchRoutes.route('/create').post(async (req, res) => {
             id: player2['_id'],
             name: player2.username
         }
-    })
+    }).catch(err => console.log(err))
 
     await User.findOneAndUpdate(
         { _id: player1['_id'] },
         { matchId: match['_id'], inMatch: true }
-    )
+    ).catch(err => console.log(err))
 
     await User.findOneAndUpdate(
         { _id: player2['_id'] },
         { matchId: match['_id'], inMatch: true }
-    )
+    ).catch(err => console.log(err))
 
     res.send(match['_id'])
     res.status(200)

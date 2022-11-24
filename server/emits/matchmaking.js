@@ -93,7 +93,7 @@ async function connection(socket, io) {
                 start: Date.now(),
                 map: mapData,
                 currentPlayer: 0,
-                end: null,
+                end: false,
                 player1: {
                     name: user1.username,
                     id: user1['_id'],
@@ -129,6 +129,7 @@ async function connection(socket, io) {
         }
     })
 }
+
 /*
 * set spawm
 */
@@ -160,34 +161,6 @@ function setArmySpawn(number, units) {
         })
     }
     return army
-}
-
-/*
-* Sets spawn points for untis given the player number
-* TODO: make this better
-*/
-function _setArmySpawn(playerNo, army) {
-    let copy = army
-    for (let i = 0; i < copy.length; i++) {
-        let startIdx = null
-        while (startIdx === null) {
-            let pos = 0 //if something spawns in top left, there is a problem
-            if (playerNo === 0) {
-                pos = Math.floor(Math.random() * (mapData.layers[0].length / 2))
-            } else {
-                pos = Math.floor(Math.random() * (mapData.layers[0].length - mapData.layers[0].length / 2 + 1) + mapData.layers[0].length / 2)
-            }
-            if (mapData.layers[0][pos] && !mapData.layers[0][pos].occupied) {
-                startIdx = pos
-            }
-        }
-        mapData.layers[0][startIdx].occupied = true// not changing the obj?
-        copy[i].x = mapData.layers[0][startIdx].posX
-        copy[i].y = mapData.layers[0][startIdx].posY
-    }
-    //console.log('army number:', playerNo, '--------------------------------------------')
-    //console.log(copy)
-    return copy
 }
 
 /*

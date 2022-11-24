@@ -2,9 +2,15 @@ const Match = require('../models/matchModel')
 const User = require('../models/userModel')
 
 async function getMatch(socket, io, matchId) {
-    const match = await Match.findOne({'_id': matchId})
+    const match = await Match.findOne({'_id': matchId}).catch(err => console.log(err))
     io.emit(match.player1.name, match)
     io.emit(match.player2.name, match)
+}
+
+async function joinMatch(socket, io, matchId) {
+    const match = await Match.findOne({'_id': matchId}).catch(err => console.log(err))
+    io.emit(match.player1.name, {matchFound: true, matchId: match['_id']})
+    io.emit(match.player2.name, {matchFound: true, matchId: match['_id']})
 }
 
 async function endMatch(socket, io, matchId, victor) {
@@ -29,4 +35,4 @@ async function updateUnits(socket, io, matchId, unitData) {
 }
 
 
-module.exports = { getMatch, endMatch, updateUnits }
+module.exports = { getMatch, endMatch, updateUnits, joinMatch }
