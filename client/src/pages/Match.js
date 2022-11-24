@@ -79,6 +79,11 @@ export default function Match(props) {
                 match.player2.name :
                 match.player1.name,
         }, () => socket.current.close())
+        setUser({
+            ...user,
+            matchId: '',
+            inMatch: false
+        })
     }
 
     /*

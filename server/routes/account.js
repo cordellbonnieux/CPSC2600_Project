@@ -27,6 +27,34 @@ accountRoutes.route('/create').post(async function(req, res) {
 })
 
 /*
+* Get user from id
+*/
+accountRoutes.route('/id/:id').get((req, res) => {
+    User.findOne({_id: req.params.id}, function(err,result) {
+        if (err) {
+            console.log('get/:id route error:', err.message)
+            res.status(500)
+        } else {
+            res.send(result).status(200)
+        }
+    })
+})
+
+/*
+* Get user from username
+*/
+accountRoutes.route('/username/:id').get((req, res) => {
+    User.findOne({username: req.params.id}, function(err,result) {
+        if (err) {
+            console.log('get/:id route error:', err.message)
+            res.status(500)
+        } else {
+            res.send(result).status(200)
+        }
+    })
+})
+
+/*
 * Check if user name exists
 */
 accountRoutes.route('/userexists').post((req, res) => {

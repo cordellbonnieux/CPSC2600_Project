@@ -16,5 +16,5 @@ export default function LoggedInTemplate(props) {
     }
   }, [user])
 
-  return <div id="loggedInWrapper">{display !== null ?  display : <></>}</div>
+  return <div id="loggedInWrapper">{display !== null ? display : <></>}</div>
 }

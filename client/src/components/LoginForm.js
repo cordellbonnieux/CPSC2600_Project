@@ -9,7 +9,7 @@ const submissionErrorWarnings = [
 ]
 
 export default function LoginForm(props) {
-    const [ user, setUser ] = useState('')
+    const [ user, setUser ] = useState('') // terrible namming convention cordell!
     const [ password, setPassword ] = useState('')
     let [ isLoading, setLoading ] = useState(false)
     let [ readyToSubmit, setReadyToSubmit ] = useState(false)
@@ -60,20 +60,38 @@ export default function LoginForm(props) {
         </form>
     )
 
+    // THIS SHOULD REALLY RETURN INMATCH ASWELL
     async function handleSubmit(e) {
         setLoading(true)
         if (readyToSubmit) {
             e.preventDefault()
             await login().then(async function(loginResponse){
                 if(loginResponse === 'valid') {
+                    console.log(loginResponse)
                     await createSession()
                     .then(async function() {
+                        /*
                         return await axios.post(server+'account/getemail', {username: user})
                         .then(email => {
                             props.setUser({username: user, email: email.data})
                             props.setLoggedIn(true)
                             resetForm()
                         })
+                        */
+                       
+                        return await axios.get(server+'account/username/'+user)
+                        .then(userData => {
+                            console.log('got this data: ', userData.data)
+                            props.setUser({
+                                username: user, 
+                                email: userData.data.email,
+                                inMatch: userData.data.inMatch,
+                                matchId: userData.data.matchId 
+                            })
+                            props.setLoggedIn(true)
+                            resetForm()
+                        })
+
                     })
                 } else {
                     setWarnings({server: loginResponse})
@@ -90,11 +108,9 @@ export default function LoginForm(props) {
                 username: user,
                 password: password
             })
-            .then(response => {
-                const { result } = response.data
-                if (result === 'valid') {
-                    // pass the user data UP the tree and set logged in
-                } else {
+            .then(response => {   
+                const { result } = response.data    
+                if (result !== 'valid') {
                     if (result === 'invalid password') {
                         setWarnings({password: submissionErrorWarnings[0]})
                     } else if (result === 'invalid user') {
@@ -103,6 +119,7 @@ export default function LoginForm(props) {
                         setWarnings({server: submissionErrorWarnings[2]})
                     }
                 }
+                console.log(result, response.data.result)
                 return result
             })
         } catch(e) {
