@@ -37,7 +37,7 @@ export default function MainMenu(props) {
    }
 
     useEffect(() => {
-        setLoading(true)
+        //setLoading(true)
         // connect to web socket after component render
         socket.current = io(SERVER_URI)
         // server has found username a match, setUser to update client
@@ -52,17 +52,17 @@ export default function MainMenu(props) {
                 socket.current.close()
             }
         })
-        setLoading(false)
+        //setLoading(false)
     }, [])
 
     useEffect(() => {
-        setLoading(true)
+        //setLoading(true)
         axios.get(SERVER_URI + '/que/').then(async function(res) {
             res.data[0].userList.includes(username) ?
                 setSearching(true) :
                 setSearching(false)
         })
-        setLoading(false)
+        //setLoading(false)
     }, [])
 
     // text prompts
@@ -75,9 +75,12 @@ export default function MainMenu(props) {
     useEffect(() => {
         if (inMatch) {
             socket.current.emit('joinmatch')
-            setLoading(true)
+            //setLoading(true)
         }
     }, [props.user, setUser])
+
+    // remove this
+    //useEffect(() => console.log(props.user))
 
     return (
         <main>

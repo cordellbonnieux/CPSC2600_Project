@@ -43,7 +43,7 @@ export default function CreateAccountForm(props) {
         if (readyToSubmit) {
             await createAccount().then(async function() {
                 await createSession().then(() => {
-                    props.setUser({username: user, email: email})
+                    props.setUser({username: user, email: email, inMatch: false, matchId: ''})
                     props.setLoggedIn(true)
                 })
             })

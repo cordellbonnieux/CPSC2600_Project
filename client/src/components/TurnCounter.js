@@ -4,7 +4,6 @@ export default function TurnCounter(props) {
     const [player, setPlayer] = useState(null)
 
     useEffect(() => {
-        console.log(match.player1.name, user.username)
         setPlayer(
             match.player1.name === user.username ? match.player1 : match.player2
         )

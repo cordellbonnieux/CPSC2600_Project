@@ -7,6 +7,20 @@ export default function Map(props) {
     const spritesheet = useRef()
 
     /*
+    * tracking clicks to help visualize and test
+    */
+    const [ clicks, setClicks ] = useState([])
+
+    function renderClicks(ctx) {
+        for (let i = 0; i < clicks.length; i++) {
+            ctx.beginPath()
+            ctx.fillStyle = 'pink'
+            ctx.arc(clicks[i].x, clicks[i].y, 3, 0, 2 * Math.PI)
+            ctx.fill()
+        }
+    }
+
+    /*
     * renders selection tiles
     */
     function renderSelectionTiles(ctx) {
@@ -105,6 +119,9 @@ export default function Map(props) {
         }
         let deselect = true
 
+        // for testing
+        setClicks(...clicks, {x: pos.x, y: pos.y})
+
         //console.log(selectionIndex, selectionIndex==null, selectionIndex === null)
 
         if (selectionIndex == null) {
@@ -199,6 +216,8 @@ export default function Map(props) {
             renderMap(ctx)
             renderUnits(ctx)
             renderSelectionTiles(ctx)
+            // for testing only
+            renderClicks(ctx)
             animationFrameId = window.requestAnimationFrame(render)
         }
         render()

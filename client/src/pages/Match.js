@@ -72,18 +72,20 @@ export default function Match(props) {
     /*
     * current user surrenders match
     */
-    function surrender() {
-        socket.current.emit('endMatch', {
+    async function surrender() {
+        await socket.current.emit('endMatch', {
             id: props.user.matchId,
             victor: match.player1.name === user.username ?
                 match.player2.name :
                 match.player1.name,
-        }, () => socket.current.close())
+        })
+        /*
         setUser({
             ...user,
             matchId: '',
             inMatch: false
         })
+        */
     }
 
     /*
@@ -92,16 +94,22 @@ export default function Match(props) {
     */
     function consumeMatchData(data) {
         if (data['_id'] == user.matchId) {
+
+            /*
+            console.log(data)
             //if match has an end
             if (data.end != null) {
                 setUser({
                     username: user.username,
                     email: user.email,
-                    matchId: '',
+                    matchId: data.matchId,
                     inMatch: false
                 })
-                socket.current.close()
+                //socket.current.close()
             }
+            */
+
+            
             // set data otherwise
             setMatch(data)
             if (units.length === 0) {

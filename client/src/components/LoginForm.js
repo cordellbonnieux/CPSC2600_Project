@@ -60,14 +60,12 @@ export default function LoginForm(props) {
         </form>
     )
 
-    // THIS SHOULD REALLY RETURN INMATCH ASWELL
     async function handleSubmit(e) {
         setLoading(true)
         if (readyToSubmit) {
             e.preventDefault()
             await login().then(async function(loginResponse){
                 if(loginResponse === 'valid') {
-                    console.log(loginResponse)
                     await createSession()
                     .then(async function() {
                         /*
@@ -78,10 +76,8 @@ export default function LoginForm(props) {
                             resetForm()
                         })
                         */
-                       
                         return await axios.get(server+'account/username/'+user)
                         .then(userData => {
-                            console.log('got this data: ', userData.data)
                             props.setUser({
                                 username: user, 
                                 email: userData.data.email,
@@ -119,7 +115,6 @@ export default function LoginForm(props) {
                         setWarnings({server: submissionErrorWarnings[2]})
                     }
                 }
-                console.log(result, response.data.result)
                 return result
             })
         } catch(e) {

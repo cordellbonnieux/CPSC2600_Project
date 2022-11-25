@@ -12,7 +12,7 @@ const SERVER_URI = 'http://localhost:5000'
 
 const App = () => {
   const [ loggedIn, setLoggedIn ] = useState(false)
-  const [ loading, setLoading ] = useState(false)
+  const [ loading, setLoading ] = useState(true)
   const [ user, setUser ] = useState({
     username: '',
     email: '',
@@ -23,58 +23,65 @@ const App = () => {
   /*
   * log out of account
   */
-  function logout() {
-    setUser({username: '', email: ''})
-    setLoggedIn(false)
-    setLoading(false)
-    localStorage.clear()
+  async function logout() {
+    //console.log('logging out now')
+    if (user.username.length > 0) {
+      setUser({username: '', email: '', inMatch: false, matchId: ''})
+    }
+    if (localStorage.getItem('sessionid')) {
+      //console.log('removing session id:', localStorage.getItem('sessionid'))
+      // something is big time busted here
+      await axios.delete(SERVER_URI + '/session/' + localStorage.getItem('sessionid'))
+      localStorage.clear()
+    }
   }
 
+  // Login via sessionid from local storage
   async function sessionLogin(sessionid) {
-    let successfulLogin = false
-    await axios.get(SERVER_URI + '/session/'+ sessionid).then(async function(response) {
-        if (response.data.status === 'valid') {
-          setUser({
-            username: response.data.username,
-            email: response.data.email,
-            matchId: response.data.matchId,
-            inMatch: response.data.inMatch
-          })
-          successfulLogin = true
-        } else {
-          await axios.delete(SERVER_URI + '/session/' + sessionid)
-          .then(() => localStorage.clear())
-        }
-    })
-    .then(() => setLoggedIn(successfulLogin))
-    .then(() => setLoading(false))
-    .catch(err => {
-      console.log(err)
-      localStorage.clear()
-    })
+    //console.log('searching for user')
+    await axios.get(SERVER_URI + '/session/' + sessionid).then(response => {
+      //console.log(response.data)
+      if (response.data.status === 'valid') {
+        //console.log('valid response')
+        setUser({
+          username: response.data.username,
+          email: response.data.email,
+          matchId: response.data.matchId,
+          inMatch: response.data.inMatch
+        })
+      } else {
+        //console.log('invalid, logging out')
+        logout()
+      }
+    }).catch(e => console.error(e))
   }
 
   /*
   * check for session, if found, log in
   */
   useEffect(() => {
-    setLoading(true)
     const sessionid = localStorage.getItem('sessionid') ? localStorage.getItem('sessionid') : null
     if (sessionid != null) {
       sessionLogin(sessionid)
     } else {
-      setLoggedIn(false)
-      localStorage.clear()
+      logout()
     }
-    setLoading(false)
+    if (loading) {
+      setLoading(false)
+    }
   }, [])
 
-  //useEffect(() => console.log('user changed re-rendering'),[user, setUser])
+  // set loggedin to true if user is found or logs in
+  useEffect(() => {
+    if (user.username.length > 0) {
+      setLoggedIn(true)
+    }
+  }, [user])
 
-  // check for loading here
+  //{loading ? <span>Loading...</span> : <></>}
+
   return (
     <div id='wrapper'>
-    {loading ? <span>Loading...</span> : <></>}
     {
       loggedIn ? 
         <LoggedInTemplate user={user} setUser={setUser} logout={{text:'logout', action: () => logout()}}/> : 
