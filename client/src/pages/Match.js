@@ -13,7 +13,7 @@ export default function Match(props) {
     const [ units, setUnits ] = useState([])
     const [ locations, setLocations ] = useState([])
     const [ selectionIndex, setSelectionIndex ] = useState(null)
-    const { setUser, user, logout } = props
+    const { setUser, user, logout, surrender, disconnect } = props
 
     /*
     * determine location of selection tiles 
@@ -70,18 +70,6 @@ export default function Match(props) {
     }
 
     /*
-    * current user surrenders match
-    */
-    async function surrender() {
-        await socket.current.emit('endMatch', {
-            id: props.user.matchId,
-            victor: match.player1.name === user.username ?
-                match.player2.name :
-                match.player1.name,
-        })
-    }
-
-    /*
     * when data is emitted from the server to the client,
     * parse and store the data in state to render the map and ui
     */
@@ -101,7 +89,11 @@ export default function Match(props) {
                             i,
                             unit.id,
                             data.player1.units[i].x,
-                            data.player1.units[i].y
+                            data.player1.units[i].y,
+                            data.player1.units[i].moved,
+                            data.player1.units[i].attacked,
+                            data.player1.units[i].firepower,
+                            data.player1.units[i].hp
                         ))
                     },
                     {
@@ -111,7 +103,11 @@ export default function Match(props) {
                             i,
                             unit.id,
                             data.player2.units[i].x,
-                            data.player2.units[i].y
+                            data.player2.units[i].y,
+                            data.player2.units[i].moved,
+                            data.player2.units[i].attacked,
+                            data.player2.units[i].firepower,
+                            data.player2.units[i].hp
                         ))
                     }
                 ])
@@ -147,31 +143,27 @@ export default function Match(props) {
         socket.current.on(user.username, data => consumeMatchData(data))
     }, [])
 
-    /*
-    * When endMatch is returned
-    * TODO: surrender from a match and render main menu properly
-    */
-    useEffect(() => {
-        // if the conditions are met the user should go back to menu
-        if (match && match.end !== null) {
-            // this is still not working.
-            setUser({...user, matchId: '', inMatch: false})
-            socket.current.close()
-            //console.log('whats going on here')
-            // here you need to get out of the match
-        }
-    }, [match])
+    //on each render, request data
+    useEffect(() => requestMatchData())
 
     //determine the selection tiles each time selectionIndex is changed
     useEffect(() => determineSelectionTiles(selectionIndex), [selectionIndex])
 
-    //on each render, request data
-    useEffect(() => requestMatchData())
+    /*
+    * When endMatch emit is returned
+    * TODO: surrender from a match and render main menu properly
+    */
+    useEffect(() => {
+        if (match && match.end !== null && match.victor) {
+            // this is causing problems
+            disconnect(socket.current)
+        }
+    }, [match])
 
     return <main>
         <div id='map'>
             { 
-            user.inMatch && match != null && units.length > 0 ? 
+            match != null && units.length > 0 ? 
                 <Map 
                     user={user.username}
                     layers={match.map.layers} 
@@ -190,7 +182,7 @@ export default function Match(props) {
             }
         </div>
         {
-            user.inMatch && units.length > 0 ?
+            units.length > 0 ?
                 <MatchOverlay  
                     user={user} 
                     setUser={setUser} 
@@ -200,6 +192,7 @@ export default function Match(props) {
                     setSelectionIndex={setSelectionIndex}
                     surrender={surrender}
                     determineSelectionTiles={determineSelectionTiles}
+                    socket={socket.current}
                 /> :
                 <></>
         }

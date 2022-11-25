@@ -80,40 +80,46 @@ async function connection(socket, io) {
             user1 = await User.findOne({username: que.userList[0]})
             user2 = await User.findOne({username: que.userList[1]})
 
+            //TODO: if a match exists already, do not create a new one, return the original
+            //console.log('what in these objects says, im in a game? ', user1, user2)
+
             // remove users from que
             await Que.updateOne(
                 {_id: que['_id']},
                 {userList: que.userList.filter(u => u !== user1.username && u !== user2.username)}
             )
 
-            //TODO: if a match exists already, do not create a new one, return the original
+            let match
+            if (!user1.inMatch || !user2.inMatch) {
+                // create a new match with users
+                match = await new Match({
+                    start: Date.now(),
+                    map: mapData,
+                    currentPlayer: 0,
+                    end: null,
+                    player1: {
+                        name: user1.username,
+                        id: user1['_id'],
+                        // temporarily set default units
+                        units: setArmySpawn(0, defaultUnits),
+                        color: 'red', // unused
+                        turn: 0,
+                        activeTurn: false
+                    },
+                    player2: {
+                        name: user2.username,
+                        id: user2['_id'],
+                        // temporarily set default units
+                        units: setArmySpawn(1, defaultUnits),
+                        color: 'blue', // unused
+                        turn: 0,
+                        activeTurn: false
+                    }
+                }).save()
+            } else {
+                match = await Match.findOne({_id: user1.matchId})
+            }
             
-            // create a new match with users
-            const match = await new Match({
-                start: Date.now(),
-                map: mapData,
-                currentPlayer: 0,
-                end: null,
-                player1: {
-                    name: user1.username,
-                    id: user1['_id'],
-                    // temporarily set default units
-                    units: setArmySpawn(0, defaultUnits),
-                    color: 'red', // unused
-                    turn: 0,
-                    activeTurn: false
-                },
-                player2: {
-                    name: user2.username,
-                    id: user2['_id'],
-                    // temporarily set default units
-                    units: setArmySpawn(1, defaultUnits),
-                    color: 'blue', // unused
-                    turn: 0,
-                    activeTurn: false
-                }
-            }).save()
-
             // update users to contain match details
             await User.updateOne(
                 {username: user1.username},
@@ -124,14 +130,14 @@ async function connection(socket, io) {
                 {inMatch: true, matchId: match['_id']}
             )
 
-            console.log('created match ' + match._id)
+            //console.log('created match ' + match._id)
 
             // TODO: rliminate the need for this duplicate emit
             io.emit(user1.username, {matchFound: true, matchId: match['_id']})
             io.emit(user2.username, {matchFound: true, matchId: match['_id']})
 
-            socket.emit(user1.username, {matchFound: true, matchId: match['_id']})
-            socket.emit(user2.username, {matchFound: true, matchId: match['_id']})
+            //socket.emit(user1.username, {matchFound: true, matchId: match['_id']})
+            //socket.emit(user2.username, {matchFound: true, matchId: match['_id']})
 
             //console.log('emitted to', user1.username, user2.username)
         }

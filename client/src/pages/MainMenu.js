@@ -49,7 +49,7 @@ export default function MainMenu(props) {
                     matchId: data.matchFound ? data.matchId : data._id,
                     inMatch: true
                 })
-                socket.current.close()
+                socket.current.emit('end')
             }
         })
         //setLoading(false)
@@ -74,7 +74,8 @@ export default function MainMenu(props) {
 
     useEffect(() => {
         if (inMatch) {
-            socket.current.emit('joinmatch')
+            console.log('requesting match: ' + matchId)
+            socket.current.emit('joinmatch', matchId)
             //setLoading(true)
         }
     }, [props.user, setUser])

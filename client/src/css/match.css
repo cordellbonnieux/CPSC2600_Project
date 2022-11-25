@@ -22,9 +22,10 @@ canvas {
 #topOverlayWrapper {
     display: flex;
     top: 10px;
-    justify-content: space-evenly;
+    justify-content: space-between;
+    /* for larger screens use space-around
+    */
     width: 100%;
-    align-items: center;
 }
 
 #turnCounterWrapper {
@@ -47,6 +48,7 @@ canvas {
 
 #surrenderBtn {
     margin-right: 10px;
+    height: 30px;
 }
 
 #unitsWrapper {

@@ -120,7 +120,7 @@ export default function Map(props) {
         let deselect = true
 
         // for testing
-        setClicks(...clicks, {x: pos.x, y: pos.y})
+        setClicks(arr => [...arr, {x: pos.x, y: pos.y}])
 
         //console.log(selectionIndex, selectionIndex==null, selectionIndex === null)
 
@@ -134,19 +134,21 @@ export default function Map(props) {
                         let validY = false
                         
                         // range of unit selection
-                        const maxX = units[army].units[unitNo].x //+ 16
-                        const maxY = units[army].units[unitNo].y //+ 16
+                        const unit = {
+                            x: units[army].units[unitNo].x,
+                            y: units[army].units[unitNo].y
+                        }
 
                         // check x
-                        if (pos.x > maxX) {
-                            validX = pos.x - maxX <= 32 ? true : false
+                        if (pos.x > unit.x) {
+                            validX = pos.x - unit.x <= 32 ? true : false
                         } else {
-                            validX = maxX - pos.x <= 32 ? true : false
+                            validX = false
                         }
-                        if (pos.y > maxY) {
-                            validY = pos.y - maxY <= 32 ? true : false
+                        if (pos.y > unit.y) {
+                            validY = pos.y - unit.y <= 32 ? true : false
                         } else {
-                            validY = maxY - pos.y <= 32 ? true : false
+                            validY = false
                         }
 
                         if (validY && validX) {
