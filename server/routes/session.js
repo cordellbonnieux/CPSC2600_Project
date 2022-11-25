@@ -112,7 +112,7 @@ sessionRoutes.delete('/:id', async function(req, res) {
         await Session.deleteOne({sessionid: req.params.id}, (err, result) => {
             err ? 
                 res.status(400).send(`session id:${req.params.id} does not exist`) :
-                res.status(200).json(result)
+                res.status(200).send(result)
         })
     }
     res.end()

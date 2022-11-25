@@ -19,7 +19,7 @@ export default function MainMenu(props) {
         <div>
             <MenuButton key={1} text={searching ? 'cancel search' : 'search for match'} action={findMatch} />
             <MenuButton key={2} text={'account'} action={null} />
-            <MenuButton key={3} text={logout.text} action={logout.action} />
+            <MenuButton key={3} text={'logout'} action={() => logout(socket.current)} />
         </div>
     )
 

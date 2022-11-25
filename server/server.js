@@ -40,6 +40,7 @@ io.on('connection', socket => {
   socket.on('joinMatch', id => joinMatch(socket, io, id))
   socket.on('endMatch', d => endMatch(socket, io, d.id, d.victor))
   socket.on('updateUnits', d => updateUnits(socket, io, d.id, d.units))
+  socket.on('end', () => socket.disconnect(0))
 })
 
 // server

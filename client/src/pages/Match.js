@@ -79,7 +79,6 @@ export default function Match(props) {
                 match.player2.name :
                 match.player1.name,
         })
-        //setUser({...user, matchId: '',inMatch: false})
     }
 
     /*
@@ -88,23 +87,6 @@ export default function Match(props) {
     */
     function consumeMatchData(data) {
         if (data['_id'] == user.matchId) {
-
-            /*
-            //if match has an end
-            if (data.end != null) {
-                setUser({
-                    username: user.username,
-                    email: user.email,
-                    matchId: data.matchId,
-                    inMatch: false
-                })
-                //socket.current.close()
-            }
-            */
-
-            //console.log(data)
-            
-            // set data otherwise
             setMatch(data)
             if (units.length === 0) {
                 /*
@@ -147,8 +129,6 @@ export default function Match(props) {
                 }
             }
 
-        } else {
-            //console.log('recieved non-requested data: ' + data)
         }
     }
 
@@ -167,34 +147,31 @@ export default function Match(props) {
         socket.current.on(user.username, data => consumeMatchData(data))
     }, [])
 
-   /*
-   * When endMatch is returned
-   */
-   useEffect(() => {
-    // if the conditions are met the user should go back to menu
-    if (match && match.end !== null) {
-        //setUser({...user, matchId: '', inMatch: false})
-        //socket.current.close()
-        console.log('whats going on here')
-        // here you need to get out of the match
-    }
-   }, [match])
-
     /*
-    * determine the selection tiles each time selectionIndex is changed
+    * When endMatch is returned
+    * TODO: surrender from a match and render main menu properly
     */
     useEffect(() => {
-        determineSelectionTiles(selectionIndex)
-    }, [selectionIndex])
+        // if the conditions are met the user should go back to menu
+        if (match && match.end !== null) {
+            // this is still not working.
+            setUser({...user, matchId: '', inMatch: false})
+            socket.current.close()
+            //console.log('whats going on here')
+            // here you need to get out of the match
+        }
+    }, [match])
 
-    /*
-    * on each render, request data
-    */
+    //determine the selection tiles each time selectionIndex is changed
+    useEffect(() => determineSelectionTiles(selectionIndex), [selectionIndex])
+
+    //on each render, request data
     useEffect(() => requestMatchData())
 
     return <main>
         <div id='map'>
-            { match != null && units.length > 0 ? 
+            { 
+            user.inMatch && match != null && units.length > 0 ? 
                 <Map 
                     user={user.username}
                     layers={match.map.layers} 
@@ -213,7 +190,7 @@ export default function Match(props) {
             }
         </div>
         {
-            units.length > 0 ?
+            user.inMatch && units.length > 0 ?
                 <MatchOverlay  
                     user={user} 
                     setUser={setUser} 

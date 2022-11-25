@@ -23,17 +23,18 @@ const App = () => {
   /*
   * log out of account
   */
-  async function logout() {
-    //console.log('logging out now')
+  async function logout(socket) {
+    localStorage.clear()
+    if (socket) {
+      socket.emit('end')
+    }
+    if (localStorage.getItem('sessionid')) {
+      await axios.delete(SERVER_URI + '/session/' + localStorage.getItem('sessionid'))
+    }
     if (user.username.length > 0) {
       setUser({username: '', email: '', inMatch: false, matchId: ''})
     }
-    if (localStorage.getItem('sessionid')) {
-      //console.log('removing session id:', localStorage.getItem('sessionid'))
-      // something is big time busted here
-      await axios.delete(SERVER_URI + '/session/' + localStorage.getItem('sessionid'))
-      localStorage.clear()
-    }
+    setLoggedIn(false)
   }
 
   // Login via sessionid from local storage
@@ -84,7 +85,7 @@ const App = () => {
     <div id='wrapper'>
     {
       loggedIn ? 
-        <LoggedInTemplate user={user} setUser={setUser} logout={{text:'logout', action: () => logout()}}/> : 
+        <LoggedInTemplate user={user} setUser={setUser} logout={logout}/> : 
         <LoggedOutTemplate setLoggedIn={setLoggedIn} setUser={setUser} />
     }
     </div>
