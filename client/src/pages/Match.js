@@ -79,13 +79,7 @@ export default function Match(props) {
                 match.player2.name :
                 match.player1.name,
         })
-        /*
-        setUser({
-            ...user,
-            matchId: '',
-            inMatch: false
-        })
-        */
+        //setUser({...user, matchId: '',inMatch: false})
     }
 
     /*
@@ -96,7 +90,6 @@ export default function Match(props) {
         if (data['_id'] == user.matchId) {
 
             /*
-            console.log(data)
             //if match has an end
             if (data.end != null) {
                 setUser({
@@ -109,6 +102,7 @@ export default function Match(props) {
             }
             */
 
+            //console.log(data)
             
             // set data otherwise
             setMatch(data)
@@ -166,19 +160,32 @@ export default function Match(props) {
     }
 
     /*
-    * determine the selection tiles each time selectionIndex is changed
-    */
-    useEffect(() => {
-        determineSelectionTiles(selectionIndex)
-    }, [selectionIndex])
-
-    /*
     * create web socket conn, after component is mounted
     */
     useEffect(() => {
         socket.current = io(SERVER_URI)
         socket.current.on(user.username, data => consumeMatchData(data))
     }, [])
+
+   /*
+   * When endMatch is returned
+   */
+   useEffect(() => {
+    // if the conditions are met the user should go back to menu
+    if (match && match.end !== null) {
+        //setUser({...user, matchId: '', inMatch: false})
+        //socket.current.close()
+        console.log('whats going on here')
+        // here you need to get out of the match
+    }
+   }, [match])
+
+    /*
+    * determine the selection tiles each time selectionIndex is changed
+    */
+    useEffect(() => {
+        determineSelectionTiles(selectionIndex)
+    }, [selectionIndex])
 
     /*
     * on each render, request data

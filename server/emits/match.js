@@ -20,11 +20,17 @@ async function endMatch(socket, io, matchId, victor) {
         {_id: matchId},
         {victor: victor, end: Date.now()}
     )
+
+    //console.log('1', m)
+
     const updateUsers = await User.updateMany(
         {matchId: matchId},
         {matchId: '', inMatch: false}
     )
+
     const match = await Match.findOne({_id: matchId})
+
+    //console.log('2', match)
 
     io.emit(match.player1.name, match)
     io.emit(match.player2.name, match)

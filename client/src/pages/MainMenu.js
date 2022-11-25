@@ -89,7 +89,7 @@ export default function MainMenu(props) {
                 <p>{screenText}</p>
             </div>
             <div>
-                {loading ? <span className='loading'>Loading...</span> : menu}
+                {menu}
             </div>
         </main>
     )
