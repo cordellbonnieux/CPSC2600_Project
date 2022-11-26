@@ -179,7 +179,6 @@ export default function Map(props) {
                         x: units[army].units[selectionFromUI].x + 16,
                         y: units[army].units[selectionFromUI].y + 16
                     })
-                    return
                 }
             }
             setSelectionFromUI(null)
@@ -218,8 +217,10 @@ export default function Map(props) {
 
                     if (validY && validX) {
                         deselect = false
-                        setSelectionIndex(unitNo)
-                        //console.log('unit selected:', unitNo)
+                        // this check prevents re-rendering on each frame
+                        if (!deselect && selectionIndex != unitNo) {
+                            setSelectionIndex(unitNo)
+                        }
                         return
                     }
                 }
