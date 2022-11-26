@@ -64,20 +64,17 @@ export default function Match(props) {
     }
 
     /*
-    * request to server to emit new match data
-    */
-    function requestMatchData() {
-        socket.current.emit('match', user.matchId)
-    }
-
-    /*
     * when data is emitted from the server to the client,
     * parse and store the data in state to render the map and ui
     */
     function consumeMatchData(data) {
+
+        console.log(data)
+
+
         if (data['_id'] == user.matchId) {
             setMatch(data)
-            if (units.length === 0) {
+            //if (units.length === 0) {
                 /*
                 *  TODO: add more properties to units so they may be used in ui and to 
                 * check for movement or attacks
@@ -112,7 +109,13 @@ export default function Match(props) {
                         ))
                     }
                 ])
-            } else {
+
+
+
+            //} 
+            // do i need this? probably not.
+            /*
+            else {
                 for (let playerNo = 0; playerNo < units.length; playerNo++) {
                     for (let unit = 0; unit < units[playerNo].units.length; unit++) {
                         let newX = playerNo === 0 ? data.player1.units[unit].x : data.player2.units[unit].x
@@ -125,6 +128,7 @@ export default function Match(props) {
                     }
                 }
             }
+            */
 
         }
     }
@@ -133,7 +137,7 @@ export default function Match(props) {
     * Emit new unit changes to server
     */
     function updateUnits() {
-        socket.current.emit('updateUnits' ,user.matchId ,units)
+        socket.current.emit('updateUnits' , {id: user.matchId, units: units})
     }
 
     /*
@@ -145,21 +149,27 @@ export default function Match(props) {
     }, [])
 
     //on each render, request data
-    useEffect(() => requestMatchData())
+    useEffect(() => {socket.current.emit('match', user.matchId)})
 
     //determine the selection tiles each time selectionIndex is changed
-    useEffect(() => determineSelectionTiles(selectionIndex), [selectionIndex])
+    useEffect(() => {determineSelectionTiles(selectionIndex)}, [selectionIndex])
+
+    useEffect(() => {updateUnits()}, [units, setUnits])
 
     /*
     * When endMatch emit is returned
     * TODO: surrender from a match and render main menu properly
+    * Perhaps another state is needed to toggle when to disconnect
     */
+   /*
     useEffect(() => {
-        if (match && match.end !== null && match.victor) {
+        //console.log('disconnect')
+        if (match !== null && match.end != null && match.end.length > 10) { // 10 is just large but not too large
             // this is causing problems
-            disconnect(socket.current)
+            //disconnect(socket.current)
         }
     }, [match])
+    */
 
     /*
     * When a unit card from the ui is selected, the selectionFromUI state will contain

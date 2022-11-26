@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import ts0 from './tiles/terrain1.png'
 
 export default function Map(props) {
-    const { selectionFromUI, setSelectionFromUI, layers, tileset, mapData, units, user, setSelectionIndex, selectionIndex, locations, setLocations, determineSelectionTiles, setUnits, updateUnits } = props
+    const { 
+        selectionFromUI, setSelectionFromUI, layers, tileset, mapData, units, 
+        user, setSelectionIndex, selectionIndex, locations, setLocations, 
+        determineSelectionTiles, setUnits, updateUnits 
+    } = props
     const canvasRef = useRef(null)
     const spritesheet = useRef()
     const [pos, setPos ] = useState({x: null ,y: null})
@@ -105,25 +109,6 @@ export default function Map(props) {
         ctx.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
     }
 
-    /*
-    * attack enemy at loc
-    */
-    function attack(loc, unitIndex) {
-
-    }
-
-    /*
-    * move unit to loc
-    */
-    function move(loc, unitIndex) {
-        for (let army = 0; army < units.length; army++) {
-            if (units[army].owner === user) {
-                //units[army].units[unitIndex].x = loc.x
-                //
-            }
-        }
-    }
-
     // load tiles
     useEffect(() => {
         spritesheet.current = new Image()
@@ -187,7 +172,7 @@ export default function Map(props) {
 
     // check for unit selection
     useEffect(() => {
-        let deselect = true
+        let deselect = true // i can probably remove this alltogether
 
         // check if the pos is valid
         for (let army = 0; army < units.length; army++) {
@@ -241,20 +226,38 @@ export default function Map(props) {
         }
     }, [selectionIndex, setLocations])
 
-    // select adjacent tile, when unit is selected
+    // move unit or attack enemy unit
     useEffect(() => {
-        //console.log('new possible locations', locations)
         if (selectionIndex !== null) {
-            // should only return 1 tile
+
             let matchingTiles = locations.filter(loc => {
                 const diffX = pos.x - loc.x
                 const diffY = pos.y - loc.y
                 return diffX > 0 && diffX <= 32 && diffY > 0 && diffY <= 32
             })
 
-            // for testing
-            //console.log('matching',matchingTiles)
-            setSquares(arr => [...arr, ...matchingTiles])
+            //setSquares(arr => [...arr, ...matchingTiles])
+
+            // TODO: make a state var for which army is the users, which is set on first render
+            let army = units[0].owner === user ? 0 : 1
+
+            //console.log(matchingTiles[0])
+
+            if (matchingTiles[0]) {
+                if (!matchingTiles[0].occupied) {
+                    // move
+                    // check is movement is true
+                    setUnits(current => {
+                        current[army].units[selectionIndex].x = matchingTiles[0].x
+                        current[army].units[selectionIndex].y = matchingTiles[0].y
+                        return current
+                    })
+                } else if (matchingTiles[0].enemyNumber !== null) {
+                    // attack
+                }
+                // emit changes
+                updateUnits()
+            }
         }
     }, [locations, pos, selectionIndex])
 

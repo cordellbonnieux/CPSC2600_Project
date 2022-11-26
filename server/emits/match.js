@@ -3,6 +3,7 @@ const User = require('../models/userModel')
 
 async function getMatch(socket, io, matchId) {
     const match = await Match.findOne({'_id': matchId}).catch(err => console.log(err))
+    
     if (match) {
         io.emit(match.player1.name, match)
         io.emit(match.player2.name, match)
@@ -38,8 +39,30 @@ async function endMatch(socket, io, matchId, victor) {
 
 async function updateUnits(socket, io, matchId, unitData) {
 
-    // TODO: update match
+    console.log('incoming match id and unit data needs to be sorted: ', matchId, unitData)
 
+    // this fucked shit up
+
+    //console.log(unitData[0].units)
+    /* TODO: FIX ASAP
+    const match = await Match.findOneAndUpdate(
+        {_id: matchId},
+        {
+            player1: { 
+                units: unitData[0].units
+            },
+            player2: {
+                units: unitData[1].units
+            }
+        }
+    )
+
+    //console.log(match)
+    //const match = await Match.findOne({_id: matchId})
+
+    io.emit(match.player1.name, match)
+    io.emit(match.player2.name, match)
+    */
 }
 
 

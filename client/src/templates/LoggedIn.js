@@ -8,8 +8,8 @@ export default function LoggedInTemplate(props) {
   /*
   * current user surrenders match
   */
-  async function surrender(socket, player1, player2) {
-    await socket.emit('endMatch', {
+  function surrender(socket, player1, player2) {
+    socket.emit('endMatch', {
         id: user.matchId,
         victor: player1 === user.username ? player2 : player1,
     })
