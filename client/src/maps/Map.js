@@ -10,12 +10,19 @@ export default function Map(props) {
     * tracking clicks to help visualize and test
     */
     const [ clicks, setClicks ] = useState([])
+    const [ squares, setSquares ] = useState([])
 
     function renderClicks(ctx) {
         for (let i = 0; i < clicks.length; i++) {
             ctx.beginPath()
             ctx.fillStyle = 'pink'
             ctx.arc(clicks[i].x, clicks[i].y, 3, 0, 2 * Math.PI)
+            ctx.fill()
+        }
+        for (let i = 0; i < squares.length; i++) {
+            ctx.beginPath()
+            ctx.fillStyle = 'rgba(200,200,120,0.5)'
+            ctx.fillRect(squares[i].x, squares[i].y, 32,32)
             ctx.fill()
         }
     }
@@ -122,9 +129,9 @@ export default function Map(props) {
         // for testing
         setClicks(arr => [...arr, {x: pos.x, y: pos.y}])
 
-        //console.log(selectionIndex, selectionIndex==null, selectionIndex === null)
+        console.log(selectionIndex)
 
-        if (selectionIndex == null) {
+        if (selectionIndex === null) {
             // check for unit selection
             for (let army = 0; army < units.length; army++) {
                 if (units[army].owner === user) {
@@ -133,7 +140,7 @@ export default function Map(props) {
                         let validX = false
                         let validY = false
                         
-                        // range of unit selection
+                        // unit pos
                         const unit = {
                             x: units[army].units[unitNo].x,
                             y: units[army].units[unitNo].y
@@ -159,18 +166,31 @@ export default function Map(props) {
                     }
                 }
             }
-        } else {
+        } else if (!isNaN(selectionIndex)) {
             // something is already selected
             deselect = false
+
+
+            // should only return 1 tile
             let matchingTiles = locations.filter(loc => {
-                const xDifference = pos.x > loc.x ? pos.x - loc.x : loc.x - pos.x
-                const yDifference = pos.y > loc.y ? pos.y - loc.y : loc.y - pos.y
-                // this might need to be changed to 16
-                return xDifference <= 32 && yDifference <= 32
+                const diffX = pos.x - loc.x
+                const diffY = pos.y - loc.y
+
+                console.log('difference x,y = ', diffX, diffY)
+
+
+                return diffX > 0 && diffX <= 32 && diffY > 0 && diffY <= 32
             })
+
+            console.log('matching',matchingTiles)
+
+            // for testing
+            setSquares(arr => [...arr, ...matchingTiles])
+
+
             // for now just take the first matchingTile, to improve select accuracy
             // filter the matchingTiles array
-            if (matchingTiles[0].enemyNumber === null) {
+            if (null) {
                 // no enemy, just move
             } else {
                 // enemy detected launch attack
@@ -228,8 +248,8 @@ export default function Map(props) {
 
     // add hit detection to canvas
     useEffect(() => {
-        canvasRef.current.removeEventListener('click', checkUnitCoords)
-        canvasRef.current.addEventListener('click', checkUnitCoords)
+        canvasRef.current.removeEventListener('mousedown', checkUnitCoords)
+        canvasRef.current.addEventListener('mousedown', checkUnitCoords)
     }, [canvasRef])
 
     // ensure a re-render on unit change
