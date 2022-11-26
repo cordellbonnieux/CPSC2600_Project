@@ -11,6 +11,7 @@ export default function Match(props) {
     const socket = useRef()
     const [ match, setMatch ] = useState(null)
     const [ units, setUnits ] = useState([])
+    const [ selectionFromUI, setSelectionFromUI ] = useState(null)
     const [ locations, setLocations ] = useState([])
     const [ selectionIndex, setSelectionIndex ] = useState(null)
     const { setUser, user, logout, surrender, disconnect } = props
@@ -160,7 +161,36 @@ export default function Match(props) {
         }
     }, [match])
 
+    /*
+    * When a unit card from the ui is selected, the selectionFromUI state will contain
+    * the new selectionIndex
+    */
+    useEffect(() => {
+        if (selectionFromUI) {
+            setSelectionIndex(selectionFromUI)
+        }
+    }, [selectionFromUI])
+
     return <main>
+        <div id='matchOverlay'>
+        {
+            match != null && units.length > 0 ?
+                <MatchOverlay  
+                    user={user} 
+                    setUser={setUser} 
+                    matchData={match} 
+                    units={user === match.player1.name ? match.player1.units : match.player2.units} 
+                    selectionIndex={selectionIndex}
+                    setSelectionIndex={setSelectionIndex}
+                    surrender={surrender}
+                    determineSelectionTiles={determineSelectionTiles}
+                    socket={socket.current}
+                    selectionFromUI={selectionFromUI}
+                    setSelectionFromUI={setSelectionFromUI}
+                /> :
+                <></>
+        }
+        </div>
         <div id='map'>
             { 
             match != null && units.length > 0 ? 
@@ -177,24 +207,11 @@ export default function Match(props) {
                     locations={locations}
                     setLocations={setLocations}
                     determineSelectionTiles={determineSelectionTiles}
+                    selectionFromUI={selectionFromUI}
+                    setSelectionFromUI={setSelectionFromUI}
                 /> : 
                 <span>Loading...</span> 
             }
         </div>
-        {
-            units.length > 0 ?
-                <MatchOverlay  
-                    user={user} 
-                    setUser={setUser} 
-                    matchData={match} 
-                    units={user === match.player1.name ? match.player1.units : match.player2.units} 
-                    selectionIndex={selectionIndex}
-                    setSelectionIndex={setSelectionIndex}
-                    surrender={surrender}
-                    determineSelectionTiles={determineSelectionTiles}
-                    socket={socket.current}
-                /> :
-                <></>
-        }
     </main>
 }

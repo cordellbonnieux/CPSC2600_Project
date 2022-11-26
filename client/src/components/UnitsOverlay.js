@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Unit from './UnitsOverlayUnit'
 export default function UnitsOverlay(props) {
-    const { units, selectionIndex, setSelectionIndex } = props
+    const { units, selectionIndex, setSelectionIndex, setUnits, selectionFromUI, setSelectionFromUI } = props
     const [ cards, setCards ] = useState([])
 
     useEffect(() => {
@@ -14,10 +14,12 @@ export default function UnitsOverlay(props) {
                 setSelectionIndex={setSelectionIndex} 
                 key={i} 
                 index={i} 
+                setSelectionFromUI={setSelectionFromUI}
             />)
         }
         setCards(unitCards)
-    }, [units, selectionIndex])
+        //console.log('set cards')
+    }, [units, selectionIndex, setSelectionIndex, setUnits])
 
     return (
         <div className='overlay' id='unitsWrapper'>

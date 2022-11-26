@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import ts0 from './tiles/terrain1.png'
 
 export default function Map(props) {
-    const { layers, tileset, mapData, units, user, setSelectionIndex, selectionIndex, locations, setLocations, determineSelectionTiles, setUnits, updateUnits } = props
+    const { selectionFromUI, setSelectionFromUI, layers, tileset, mapData, units, user, setSelectionIndex, selectionIndex, locations, setLocations, determineSelectionTiles, setUnits, updateUnits } = props
     const canvasRef = useRef(null)
     const spritesheet = useRef()
     const [pos, setPos ] = useState({x: null ,y: null})
@@ -12,7 +12,6 @@ export default function Map(props) {
     */
     const [ clicks, setClicks ] = useState([])
     const [ squares, setSquares ] = useState([])
-
     function renderClicks(ctx) {
         for (let i = 0; i < clicks.length; i++) {
             ctx.beginPath()
@@ -93,16 +92,6 @@ export default function Map(props) {
     }
 
     /*
-    * loads map tile image sheet
-    */
-    function loadTiles() {
-        spritesheet.current = new Image()
-        if (tileset === 0) {
-            spritesheet.current.src = ts0
-        }
-    }
-
-    /*
     * Ensures canvas is correct size based on screen
     */
     function resetCanvas(ctx) {
@@ -114,19 +103,6 @@ export default function Map(props) {
         canvasRef.current.height = currentHeight <= minHeight ? minHeight : currentHeight
         canvasRef.current.width = currentWidth <= maxWidth ? currentWidth : maxWidth
         ctx.clearRect(0,0, canvasRef.current.width, canvasRef.current.height)
-    }
-
-    /*
-    * Checks for clicks on own units
-    */
-    function checkUnitCoords(e) {
-        //the selection
-        setPos({
-            x: e.clientX - ((document.documentElement.clientWidth - canvasRef.current.width) / 2),
-            y: e.pageY - 50
-        })
-        // for testing
-        setClicks(arr => [...arr, {x: pos.x, y: pos.y}])  
     }
 
     /*
@@ -149,7 +125,12 @@ export default function Map(props) {
     }
 
     // load tiles
-    useEffect(() => loadTiles(), [loadTiles])
+    useEffect(() => {
+        spritesheet.current = new Image()
+        if (tileset === 0) {
+            spritesheet.current.src = ts0
+        }   
+    }, [])
 
     // set canvas
     useEffect(() => {
@@ -173,16 +154,43 @@ export default function Map(props) {
 
     // add hit detection to canvas
     useEffect(() => {
+        function checkUnitCoords(e) {
+            setPos({
+                x: e.clientX - ((document.documentElement.clientWidth - canvasRef.current.width) / 2),
+                y: e.pageY - 50
+            })
+        }
         canvasRef.current.removeEventListener('mousedown', checkUnitCoords)
         canvasRef.current.addEventListener('mousedown', checkUnitCoords)
     }, [canvasRef])
 
-    // ensure a re-render on unit change
-    useEffect(() => {}, [units, selectionIndex])
+    // for testing - add every click on canvas to clicks, to render
+    useEffect(() => {
+        setClicks(arr => [...arr, {x: pos.x, y: pos.y}])  
+    }, [pos])
+
+    // detect selection from ui and use it to set pos
+    useEffect(() => {
+        if (selectionFromUI !== null) {
+            for (let army = 0; army < units.length; army++) {
+                if (units[army].owner === user) {
+                    setPos({
+                        // +16, so the 'click' is in the center of the unit
+                        x: units[army].units[selectionFromUI].x + 16,
+                        y: units[army].units[selectionFromUI].y + 16
+                    })
+                    return
+                }
+            }
+            setSelectionFromUI(null)
+        }
+    }, [selectionFromUI, setSelectionFromUI, setPos, units, user])
 
     // check for unit selection
     useEffect(() => {
         let deselect = true
+
+        // check if the pos is valid
         for (let army = 0; army < units.length; army++) {
             if (units[army].owner === user) {
                 for (let unitNo = 0; unitNo < units[army].units.length; unitNo++) {
@@ -211,21 +219,30 @@ export default function Map(props) {
                     if (validY && validX) {
                         deselect = false
                         setSelectionIndex(unitNo)
-                        console.log('unit selected:', unitNo)
+                        //console.log('unit selected:', unitNo)
                         return
                     }
                 }
             }
         }
+
         // deselect
         if (deselect) {
+            //console.log('deselected')
             setSelectionIndex(null)
-            setLocations([])
         }   
     }, [pos, setLocations, setSelectionIndex, selectionIndex, user, units])
 
+    // if selection index is null, then no selection tiles should appear
     useEffect(() => {
-        // maybe move this into useeffect listening to locations
+        if (selectionIndex == null) {
+            setLocations([])
+        }
+    }, [selectionIndex, setLocations])
+
+    // select adjacent tile, when unit is selected
+    useEffect(() => {
+        //console.log('new possible locations', locations)
         if (selectionIndex !== null) {
             // should only return 1 tile
             let matchingTiles = locations.filter(loc => {
@@ -234,12 +251,11 @@ export default function Map(props) {
                 return diffX > 0 && diffX <= 32 && diffY > 0 && diffY <= 32
             })
 
-            console.log('matching',matchingTiles)
-
             // for testing
+            //console.log('matching',matchingTiles)
             setSquares(arr => [...arr, ...matchingTiles])
         }
-    }, [locations, pos])
+    }, [locations, pos, selectionIndex])
 
     return <canvas ref={canvasRef} />
 }
