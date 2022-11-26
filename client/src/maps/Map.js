@@ -5,6 +5,7 @@ export default function Map(props) {
     const { layers, tileset, mapData, units, user, setSelectionIndex, selectionIndex, locations, setLocations, determineSelectionTiles, setUnits, updateUnits } = props
     const canvasRef = useRef(null)
     const spritesheet = useRef()
+    const [pos, setPos ] = useState({x: null ,y: null})
 
     /*
     * tracking clicks to help visualize and test
@@ -120,88 +121,12 @@ export default function Map(props) {
     */
     function checkUnitCoords(e) {
         //the selection
-        const pos = {
+        setPos({
             x: e.clientX - ((document.documentElement.clientWidth - canvasRef.current.width) / 2),
             y: e.pageY - 50
-        }
-        let deselect = true
-
+        })
         // for testing
-        setClicks(arr => [...arr, {x: pos.x, y: pos.y}])
-
-        console.log(selectionIndex)
-
-        if (selectionIndex === null) {
-            // check for unit selection
-            for (let army = 0; army < units.length; army++) {
-                if (units[army].owner === user) {
-                    for (let unitNo = 0; unitNo < units[army].units.length; unitNo++) {
-
-                        let validX = false
-                        let validY = false
-                        
-                        // unit pos
-                        const unit = {
-                            x: units[army].units[unitNo].x,
-                            y: units[army].units[unitNo].y
-                        }
-
-                        // check x
-                        if (pos.x > unit.x) {
-                            validX = pos.x - unit.x <= 32 ? true : false
-                        } else {
-                            validX = false
-                        }
-                        if (pos.y > unit.y) {
-                            validY = pos.y - unit.y <= 32 ? true : false
-                        } else {
-                            validY = false
-                        }
-
-                        if (validY && validX) {
-                            deselect = false
-                            setSelectionIndex(unitNo)
-                            return // return if unit found
-                        }
-                    }
-                }
-            }
-        } else if (!isNaN(selectionIndex)) {
-            // something is already selected
-            deselect = false
-
-
-            // should only return 1 tile
-            let matchingTiles = locations.filter(loc => {
-                const diffX = pos.x - loc.x
-                const diffY = pos.y - loc.y
-
-                console.log('difference x,y = ', diffX, diffY)
-
-
-                return diffX > 0 && diffX <= 32 && diffY > 0 && diffY <= 32
-            })
-
-            console.log('matching',matchingTiles)
-
-            // for testing
-            setSquares(arr => [...arr, ...matchingTiles])
-
-
-            // for now just take the first matchingTile, to improve select accuracy
-            // filter the matchingTiles array
-            if (null) {
-                // no enemy, just move
-            } else {
-                // enemy detected launch attack
-            }
-        }
-
-        // deselect
-        if (deselect) {
-            setSelectionIndex(null)
-            setLocations([])
-        }     
+        setClicks(arr => [...arr, {x: pos.x, y: pos.y}])  
     }
 
     /*
@@ -254,6 +179,67 @@ export default function Map(props) {
 
     // ensure a re-render on unit change
     useEffect(() => {}, [units, selectionIndex])
+
+    // check for unit selection
+    useEffect(() => {
+        let deselect = true
+        for (let army = 0; army < units.length; army++) {
+            if (units[army].owner === user) {
+                for (let unitNo = 0; unitNo < units[army].units.length; unitNo++) {
+
+                    let validX = false
+                    let validY = false
+                        
+                    // unit pos
+                    const unit = {
+                        x: units[army].units[unitNo].x,
+                        y: units[army].units[unitNo].y
+                    }
+
+                    // check x
+                    if (pos.x > unit.x) {
+                        validX = pos.x - unit.x <= 32 ? true : false
+                    } else {
+                        validX = false
+                    }
+                    if (pos.y > unit.y) {
+                        validY = pos.y - unit.y <= 32 ? true : false
+                    } else {
+                        validY = false
+                    }
+
+                    if (validY && validX) {
+                        deselect = false
+                        setSelectionIndex(unitNo)
+                        console.log('unit selected:', unitNo)
+                        return
+                    }
+                }
+            }
+        }
+        // deselect
+        if (deselect) {
+            setSelectionIndex(null)
+            setLocations([])
+        }   
+    }, [pos, setLocations, setSelectionIndex, selectionIndex, user, units])
+
+    useEffect(() => {
+        // maybe move this into useeffect listening to locations
+        if (selectionIndex !== null) {
+            // should only return 1 tile
+            let matchingTiles = locations.filter(loc => {
+                const diffX = pos.x - loc.x
+                const diffY = pos.y - loc.y
+                return diffX > 0 && diffX <= 32 && diffY > 0 && diffY <= 32
+            })
+
+            console.log('matching',matchingTiles)
+
+            // for testing
+            setSquares(arr => [...arr, ...matchingTiles])
+        }
+    }, [locations, pos])
 
     return <canvas ref={canvasRef} />
 }
