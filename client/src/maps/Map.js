@@ -5,7 +5,7 @@ export default function Map(props) {
     const { 
         selectionFromUI, setSelectionFromUI, layers, tileset, mapData, units, 
         user, setSelectionIndex, selectionIndex, locations, setLocations, 
-        determineSelectionTiles, setUnits, updateUnits 
+        determineSelectionTiles, setUnits, updateMatch
     } = props
     const canvasRef = useRef(null)
     const spritesheet = useRef()
@@ -244,19 +244,24 @@ export default function Map(props) {
             //console.log(matchingTiles[0])
 
             if (matchingTiles[0]) {
+                let u = units
                 if (!matchingTiles[0].occupied) {
                     // move
                     // check is movement is true
+                    /*
                     setUnits(current => {
                         current[army].units[selectionIndex].x = matchingTiles[0].x
                         current[army].units[selectionIndex].y = matchingTiles[0].y
                         return current
                     })
+                    */
+                    u[army].units[selectionIndex].x = matchingTiles[0].x
+                    u[army].units[selectionIndex].y = matchingTiles[0].y
                 } else if (matchingTiles[0].enemyNumber !== null) {
                     // attack
                 }
                 // emit changes
-                updateUnits()
+                updateMatch(u)
             }
         }
     }, [locations, pos, selectionIndex])

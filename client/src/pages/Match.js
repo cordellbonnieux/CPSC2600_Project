@@ -68,76 +68,47 @@ export default function Match(props) {
     * parse and store the data in state to render the map and ui
     */
     function consumeMatchData(data) {
-
-        console.log(data)
-
-
         if (data['_id'] == user.matchId) {
+            console.log(data)
             setMatch(data)
-            //if (units.length === 0) {
-                /*
-                *  TODO: add more properties to units so they may be used in ui and to 
-                * check for movement or attacks
-                */
-                setUnits([
-                    {
-                        owner: data.player1.name, 
-                        units: data.player1.units.map((unit, i) => new Unit(
-                            data.player1.name,
-                            i,
-                            unit.id,
-                            data.player1.units[i].x,
-                            data.player1.units[i].y,
-                            data.player1.units[i].moved,
-                            data.player1.units[i].attacked,
-                            data.player1.units[i].firepower,
-                            data.player1.units[i].hp
-                        ))
-                    },
-                    {
-                        owner: data.player2.name, 
-                        units: data.player2.units.map((unit, i) => new Unit(
-                            data.player2.name,
-                            i,
-                            unit.id,
-                            data.player2.units[i].x,
-                            data.player2.units[i].y,
-                            data.player2.units[i].moved,
-                            data.player2.units[i].attacked,
-                            data.player2.units[i].firepower,
-                            data.player2.units[i].hp
-                        ))
-                    }
-                ])
-
-
-
-            //} 
-            // do i need this? probably not.
-            /*
-            else {
-                for (let playerNo = 0; playerNo < units.length; playerNo++) {
-                    for (let unit = 0; unit < units[playerNo].units.length; unit++) {
-                        let newX = playerNo === 0 ? data.player1.units[unit].x : data.player2.units[unit].x
-                        let newY = playerNo === 0 ? data.player1.units[unit].y : data.player2.units[unit].y
-                        setUnits([
-                            ...units,
-                            units[playerNo].units[unit].x = newX,
-                            units[playerNo].units[unit].x = newY
-                        ])
-                    }
+            setUnits([
+                {
+                    owner: data.player1.name, 
+                    units: data.player1.units.map((unit, i) => new Unit(
+                        data.player1.name,
+                        i,
+                        unit.id,
+                        data.player1.units[i].x,
+                        data.player1.units[i].y,
+                        data.player1.units[i].moved,
+                        data.player1.units[i].attacked,
+                        data.player1.units[i].firepower,
+                        data.player1.units[i].hp
+                    ))
+                },
+                {
+                    owner: data.player2.name, 
+                    units: data.player2.units.map((unit, i) => new Unit(
+                        data.player2.name,
+                        i,
+                        unit.id,
+                        data.player2.units[i].x,
+                        data.player2.units[i].y,
+                        data.player2.units[i].moved,
+                        data.player2.units[i].attacked,
+                        data.player2.units[i].firepower,
+                        data.player2.units[i].hp
+                    ))
                 }
-            }
-            */
-
+            ])
         }
     }
 
     /*
     * Emit new unit changes to server
     */
-    function updateUnits() {
-        socket.current.emit('updateUnits' , {id: user.matchId, units: units})
+    function updateMatch(newUnits) {
+        socket.current.emit('updateMatch' , {id: user.matchId, units: newUnits, match: match})
     }
 
     /*
@@ -154,7 +125,7 @@ export default function Match(props) {
     //determine the selection tiles each time selectionIndex is changed
     useEffect(() => {determineSelectionTiles(selectionIndex)}, [selectionIndex])
 
-    useEffect(() => {updateUnits()}, [units, setUnits])
+    //useEffect(() => {updateMatch()}, [units, setUnits])
 
     /*
     * When endMatch emit is returned
@@ -211,7 +182,7 @@ export default function Match(props) {
                     mapData={match.map.data} 
                     units={units}
                     setUnits={setUnits}
-                    updateUnits={updateUnits}
+                    updateMatch={updateMatch}
                     selectionIndex={selectionIndex}
                     setSelectionIndex={setSelectionIndex}
                     locations={locations}
