@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 export default function TurnCounter(props) {
-    const { match, user } = props
+    const { match, user, endTurn, setEndTurn } = props
     const [player, setPlayer] = useState(null)
 
     useEffect(() => {
@@ -14,7 +14,7 @@ export default function TurnCounter(props) {
             (<div id='turnCounterWrapper'>
                 <span>turn: {player.turn}</span>
                 <span>{player.activeTurn ? 'your turn' : 'enemy\'s turn'}</span>
-                <button disabled={!player.activeTurn}>complete turn</button>
+                <button onClick={() => setEndTurn(true)} disabled={!player.activeTurn}>complete turn</button>
             </div>) : <></>
     )
 }

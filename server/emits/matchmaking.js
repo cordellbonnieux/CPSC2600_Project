@@ -104,7 +104,7 @@ async function connection(socket, io) {
                         units: setArmySpawn(0, defaultUnits),
                         color: 'red', // unused
                         turn: 0,
-                        activeTurn: false
+                        activeTurn: true
                     },
                     player2: {
                         name: user2.username,

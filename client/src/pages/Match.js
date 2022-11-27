@@ -14,6 +14,7 @@ export default function Match(props) {
     const [ selectionFromUI, setSelectionFromUI ] = useState(null)
     const [ locations, setLocations ] = useState([])
     const [ selectionIndex, setSelectionIndex ] = useState(null)
+    const [ endTurn, setEndTurn] = useState(false)
     const { setUser, user, logout, surrender, disconnect } = props
 
     /*
@@ -69,38 +70,83 @@ export default function Match(props) {
     */
     function consumeMatchData(data) {
         if (data['_id'] == user.matchId) {
-            console.log(data)
-            setMatch(data)
-            setUnits([
-                {
-                    owner: data.player1.name, 
-                    units: data.player1.units.map((unit, i) => new Unit(
-                        data.player1.name,
-                        i,
-                        unit.id,
-                        data.player1.units[i].x,
-                        data.player1.units[i].y,
-                        data.player1.units[i].moved,
-                        data.player1.units[i].attacked,
-                        data.player1.units[i].firepower,
-                        data.player1.units[i].hp
-                    ))
-                },
-                {
-                    owner: data.player2.name, 
-                    units: data.player2.units.map((unit, i) => new Unit(
-                        data.player2.name,
-                        i,
-                        unit.id,
-                        data.player2.units[i].x,
-                        data.player2.units[i].y,
-                        data.player2.units[i].moved,
-                        data.player2.units[i].attacked,
-                        data.player2.units[i].firepower,
-                        data.player2.units[i].hp
-                    ))
+            /*
+            if (match) {
+                console.log(match.player1.units[0], data.player1.units[0])
+            }
+            */
+            let changesDetected = false
+
+
+            // soo.... units suddenly does not exist, but they all appear on the screen?
+            //console.log('units ', units)
+            
+            // checks units for changes
+            if (match !== null && units !== []) {
+                for (let army = 0; army < units.length; army++) {
+                    for (let num = 0; num < units[army].units.length; army++) {
+                        // TODO: refactor: there is a better way to write this
+                        if (army === 0) {
+                            if (
+                                match.player1.units[num].x !== data.player1.units[num].x &&
+                                match.player1.units[num].y !== data.player1.units[num].y &&
+                                match.player1.units[num].attacked  !== data.player1.units[num].attacked &&
+                                match.player1.units[num].moved !== data.player1.units[num].moved &&
+                                match.player1.units[num].hp !== data.player1.units[num].hp
+                            ) {
+                                console.log('change found in player ' + army + ', unit #' + num)
+                                changesDetected = true
+                            }
+                        } else {
+                            if (
+                                match.player2.units[num].x !== data.player2.units[num].x &&
+                                match.player2.units[num].y !== data.player2.units[num].y &&
+                                match.player2.units[num].attacked !== data.player2.units[num].attacked &&
+                                match.player2.units[num].moved !== data.player2.units[num].moved &&
+                                match.player2.units[num].hp !== data.player2.units[num].hp
+                            ) {
+                                console.log('change found in player ' + army + ', unit #' + num)
+                                changesDetected = true
+                            }
+                        }
+                    }
                 }
-            ])
+            }
+ 
+            // sets new data as state
+            if (changesDetected || match === null || units === []) {
+                setMatch(data)
+                setUnits([
+                    {
+                        owner: data.player1.name, 
+                        units: data.player1.units.map((unit, i) => new Unit(
+                            data.player1.name,
+                            i,
+                            unit.id,
+                            data.player1.units[i].x,
+                            data.player1.units[i].y,
+                            data.player1.units[i].moved,
+                            data.player1.units[i].attacked,
+                            data.player1.units[i].firepower,
+                            data.player1.units[i].hp
+                        ))
+                    },
+                    {
+                        owner: data.player2.name, 
+                        units: data.player2.units.map((unit, i) => new Unit(
+                            data.player2.name,
+                            i,
+                            unit.id,
+                            data.player2.units[i].x,
+                            data.player2.units[i].y,
+                            data.player2.units[i].moved,
+                            data.player2.units[i].attacked,
+                            data.player2.units[i].firepower,
+                            data.player2.units[i].hp
+                        ))
+                    }
+                ])
+            }
         }
     }
 
@@ -109,6 +155,7 @@ export default function Match(props) {
     */
     function updateMatch(newUnits) {
         socket.current.emit('updateMatch' , {id: user.matchId, units: newUnits, match: match})
+        setUnits(newUnits)
     }
 
     /*
@@ -168,6 +215,8 @@ export default function Match(props) {
                     socket={socket.current}
                     selectionFromUI={selectionFromUI}
                     setSelectionFromUI={setSelectionFromUI}
+                    endTurn={endTurn}
+                    setEndTurn={setEndTurn}
                 /> :
                 <></>
         }
@@ -190,6 +239,7 @@ export default function Match(props) {
                     determineSelectionTiles={determineSelectionTiles}
                     selectionFromUI={selectionFromUI}
                     setSelectionFromUI={setSelectionFromUI}
+                    matchData={match}
                 /> : 
                 <span>Loading...</span> 
             }

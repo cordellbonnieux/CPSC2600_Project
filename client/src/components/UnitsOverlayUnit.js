@@ -4,8 +4,8 @@ export default function UnitsOverlayUnit(props) {
         <ul onClick={() => setSelectionFromUI(index)} className={selected ? 'selected' : ''}>
             <li>unit number: {index}</li>
             <li>health remaining: {data.hp}</li>
-            <li>ready to attack: {data.attacked}</li>
-            <li>ready to move: {data.moved}</li>
+            <li>{data.attacked ? 'attack completed' : 'ready to attack'}</li>
+            <li>{data.moved ? 'movement complete' : 'raedy to move'}</li>
         </ul>
     )
 }

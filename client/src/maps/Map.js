@@ -5,7 +5,7 @@ export default function Map(props) {
     const { 
         selectionFromUI, setSelectionFromUI, layers, tileset, mapData, units, 
         user, setSelectionIndex, selectionIndex, locations, setLocations, 
-        determineSelectionTiles, setUnits, updateMatch
+        determineSelectionTiles, setUnits, updateMatch, matchData
     } = props
     const canvasRef = useRef(null)
     const spritesheet = useRef()
@@ -14,8 +14,9 @@ export default function Map(props) {
     /*
     * tracking clicks to help visualize and test
     */
-    const [ clicks, setClicks ] = useState([])
-    const [ squares, setSquares ] = useState([])
+    //const [ clicks, setClicks ] = useState([])
+    //const [ squares, setSquares ] = useState([])
+    /*
     function renderClicks(ctx) {
         for (let i = 0; i < clicks.length; i++) {
             ctx.beginPath()
@@ -30,6 +31,7 @@ export default function Map(props) {
             ctx.fill()
         }
     }
+    */
 
     /*
     * renders selection tiles
@@ -130,7 +132,7 @@ export default function Map(props) {
             renderUnits(ctx)
             renderSelectionTiles(ctx)
             // for testing only
-            renderClicks(ctx)
+            //renderClicks(ctx)
             animationFrameId = window.requestAnimationFrame(render)
         }
         render()
@@ -150,9 +152,11 @@ export default function Map(props) {
     }, [canvasRef])
 
     // for testing - add every click on canvas to clicks, to render
+    /*
     useEffect(() => {
         setClicks(arr => [...arr, {x: pos.x, y: pos.y}])  
     }, [pos])
+    */
 
     // detect selection from ui and use it to set pos
     useEffect(() => {
@@ -173,40 +177,42 @@ export default function Map(props) {
     // check for unit selection
     useEffect(() => {
         let deselect = true // i can probably remove this alltogether
-
+        const playerTurn = matchData.player1.name === user ? matchData.player1.activeTurn : matchData.player2.activeTurn
+        if (playerTurn) {
         // check if the pos is valid
-        for (let army = 0; army < units.length; army++) {
-            if (units[army].owner === user) {
-                for (let unitNo = 0; unitNo < units[army].units.length; unitNo++) {
+            for (let army = 0; army < units.length; army++) {
+                if (units[army].owner === user) {
+                    for (let unitNo = 0; unitNo < units[army].units.length; unitNo++) {
 
-                    let validX = false
-                    let validY = false
-                        
-                    // unit pos
-                    const unit = {
-                        x: units[army].units[unitNo].x,
-                        y: units[army].units[unitNo].y
-                    }
-
-                    // check x
-                    if (pos.x > unit.x) {
-                        validX = pos.x - unit.x <= 32 ? true : false
-                    } else {
-                        validX = false
-                    }
-                    if (pos.y > unit.y) {
-                        validY = pos.y - unit.y <= 32 ? true : false
-                    } else {
-                        validY = false
-                    }
-
-                    if (validY && validX) {
-                        deselect = false
-                        // this check prevents re-rendering on each frame
-                        if (!deselect && selectionIndex != unitNo) {
-                            setSelectionIndex(unitNo)
+                        let validX = false
+                        let validY = false
+                            
+                        // unit pos
+                        const unit = {
+                            x: units[army].units[unitNo].x,
+                            y: units[army].units[unitNo].y
                         }
-                        return
+
+                        // check x
+                        if (pos.x > unit.x) {
+                            validX = pos.x - unit.x <= 32 ? true : false
+                        } else {
+                            validX = false
+                        }
+                        if (pos.y > unit.y) {
+                            validY = pos.y - unit.y <= 32 ? true : false
+                        } else {
+                            validY = false
+                        }
+
+                        if (validY && validX) {
+                            deselect = false
+                            // this check prevents re-rendering on each frame
+                            if (!deselect && selectionIndex != unitNo) {
+                                setSelectionIndex(unitNo)
+                            }
+                            return
+                        }
                     }
                 }
             }
@@ -241,24 +247,23 @@ export default function Map(props) {
             // TODO: make a state var for which army is the users, which is set on first render
             let army = units[0].owner === user ? 0 : 1
 
-            //console.log(matchingTiles[0])
-
             if (matchingTiles[0]) {
                 let u = units
                 if (!matchingTiles[0].occupied) {
                     // move
-                    // check is movement is true
-                    /*
-                    setUnits(current => {
-                        current[army].units[selectionIndex].x = matchingTiles[0].x
-                        current[army].units[selectionIndex].y = matchingTiles[0].y
-                        return current
-                    })
-                    */
-                    u[army].units[selectionIndex].x = matchingTiles[0].x
-                    u[army].units[selectionIndex].y = matchingTiles[0].y
+                    //console.log(u[army].units[selectionIndex].moved)
+                    if (!u[army].units[selectionIndex].moved && !units[army].units[selectionIndex].moved) {
+                        u[army].units[selectionIndex].x = matchingTiles[0].x
+                        u[army].units[selectionIndex].y = matchingTiles[0].y
+                        u[army].units[selectionIndex].moved = true
+                    }
+ 
                 } else if (matchingTiles[0].enemyNumber !== null) {
                     // attack
+                    if (!u[army].units[selectionIndex].attacked && !units[army].units[selectionIndex].attacked) {
+                        u[army].units[selectionIndex].attacked = true 
+                        u[army === 0 ? 1 : 0].units[selectionIndex].hp -= u[army].units[selectionIndex].firepower
+                    }
                 }
                 // emit changes
                 updateMatch(u)
