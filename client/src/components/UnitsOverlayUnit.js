@@ -5,7 +5,7 @@ export default function UnitsOverlayUnit(props) {
             <li>unit number: {index}</li>
             <li>health remaining: {data.hp}</li>
             <li>{data.attacked ? 'attack completed' : 'ready to attack'}</li>
-            <li>{data.moved ? 'movement complete' : 'raedy to move'}</li>
+            <li>{data.moved ? 'movement complete' : 'ready to move'}</li>
         </ul>
     )
 }

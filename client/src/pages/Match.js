@@ -14,7 +14,6 @@ export default function Match(props) {
     const [ selectionFromUI, setSelectionFromUI ] = useState(null)
     const [ locations, setLocations ] = useState([])
     const [ selectionIndex, setSelectionIndex ] = useState(null)
-    const [ endTurn, setEndTurn] = useState(false)
     const { setUser, user, logout, surrender, disconnect } = props
 
     /*
@@ -70,18 +69,8 @@ export default function Match(props) {
     */
     function consumeMatchData(data) {
         if (data['_id'] == user.matchId) {
-            /*
-            if (match) {
-                console.log(match.player1.units[0], data.player1.units[0])
-            }
-            */
-            let changesDetected = false
-
-
-            // soo.... units suddenly does not exist, but they all appear on the screen?
-            //console.log('units ', units)
-            
             // checks units for changes
+            let changesDetected = false
             if (match !== null && units !== []) {
                 for (let army = 0; army < units.length; army++) {
                     for (let num = 0; num < units[army].units.length; army++) {
@@ -112,7 +101,6 @@ export default function Match(props) {
                     }
                 }
             }
- 
             // sets new data as state
             if (changesDetected || match === null || units === []) {
                 setMatch(data)
@@ -149,6 +137,22 @@ export default function Match(props) {
             }
         }
     }
+
+    /*
+    * end turn
+    */
+   function endTurn() {
+        let modifiedMatch = match
+        if (match.player1.name === user.username) {
+            modifiedMatch.player1.activeTurn = false
+            modifiedMatch.player2.activeTurn = true
+        } else {
+            modifiedMatch.player1.activeTurn = true
+            modifiedMatch.player2.activeTurn = false 
+        }
+        socket.current.emit('updateMatch' , {id: match._id, units: units, match: modifiedMatch})
+        setMatch(modifiedMatch)
+   }
 
     /*
     * Emit new unit changes to server
@@ -216,7 +220,6 @@ export default function Match(props) {
                     selectionFromUI={selectionFromUI}
                     setSelectionFromUI={setSelectionFromUI}
                     endTurn={endTurn}
-                    setEndTurn={setEndTurn}
                 /> :
                 <></>
         }
