@@ -29,17 +29,19 @@ const Que = require('./models/queModel')
 // web socket
 const io = require('socket.io')(server)
 const matchmaking = require('./emits/matchmaking')
-const { getMatch, endMatch, updateMatch, joinMatch } = require('./emits/match')
+const { getMatch, endMatch, updateMatch, joinMatch, updateLayers } = require('./emits/match')
 
 // web socket conn
 io.on('connection', socket => {
+  //TODO: can this be 'more' async? If so, do so
   matchmaking(socket, io)
   //TODO: come up with a way better naming convention for emits
   socket.on('matchmaking', () => matchmaking(socket, io))
   socket.on('match', id => getMatch(socket, io, id))
   socket.on('joinMatch', id => joinMatch(socket, io, id))
   socket.on('endMatch', d => endMatch(socket, io, d.id, d.victor))
-  socket.on('updateMatch', d => updateMatch(socket, io, d.id, d.units, d.match))
+  socket.on('updateMatch', d => updateMatch(io, d.match))
+  //socket.on('updateLayers', d => updateLayers(io, d.id, d.layers))
   socket.on('end', () => socket.disconnect(0))
 })
 

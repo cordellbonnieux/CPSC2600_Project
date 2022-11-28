@@ -67,100 +67,49 @@ export default function Match(props) {
     * when data is emitted from the server to the client,
     * parse and store the data in state to render the map and ui
     */
-    function consumeMatchData(data) {
+    async function consumeMatchData(data) {
         if (data['_id'] == user.matchId) {
-            // checks units for changes
-            let changesDetected = false
-            if (match !== null && units !== []) {
-                for (let army = 0; army < units.length; army++) {
-                    for (let num = 0; num < units[army].units.length; army++) {
-                        // TODO: refactor: there is a better way to write this
-                        if (army === 0) {
-                            if (
-                                match.player1.units[num].x !== data.player1.units[num].x &&
-                                match.player1.units[num].y !== data.player1.units[num].y &&
-                                match.player1.units[num].attacked  !== data.player1.units[num].attacked &&
-                                match.player1.units[num].moved !== data.player1.units[num].moved &&
-                                match.player1.units[num].hp !== data.player1.units[num].hp
-                            ) {
-                                console.log('change found in player ' + army + ', unit #' + num)
-                                changesDetected = true
-                            }
-                        } else {
-                            if (
-                                match.player2.units[num].x !== data.player2.units[num].x &&
-                                match.player2.units[num].y !== data.player2.units[num].y &&
-                                match.player2.units[num].attacked !== data.player2.units[num].attacked &&
-                                match.player2.units[num].moved !== data.player2.units[num].moved &&
-                                match.player2.units[num].hp !== data.player2.units[num].hp
-                            ) {
-                                console.log('change found in player ' + army + ', unit #' + num)
-                                changesDetected = true
-                            }
-                        }
-                    }
+            // this should only update if changes are made from either user 
+            // these 2 conditions should really be 4, but javascript is insane
+            if ((!data.setupComplete && data.updateNo === 0) || (!isNaN(match.updateNo) && (data.updateNo > match.updateNo))) {
+                console.log('data:', data)
+                console.log('match:', match)
+                if (!data.setupComplete) {
+                    data.setupComplete = true
+                    data.updateNo = 1
                 }
-            }
-            // sets new data as state
-            if (changesDetected || match === null || units === []) {
-                setMatch(data)
-                setUnits([
-                    {
-                        owner: data.player1.name, 
-                        units: data.player1.units.map((unit, i) => new Unit(
-                            data.player1.name,
-                            i,
-                            unit.id,
-                            data.player1.units[i].x,
-                            data.player1.units[i].y,
-                            data.player1.units[i].moved,
-                            data.player1.units[i].attacked,
-                            data.player1.units[i].firepower,
-                            data.player1.units[i].hp
-                        ))
-                    },
-                    {
-                        owner: data.player2.name, 
-                        units: data.player2.units.map((unit, i) => new Unit(
-                            data.player2.name,
-                            i,
-                            unit.id,
-                            data.player2.units[i].x,
-                            data.player2.units[i].y,
-                            data.player2.units[i].moved,
-                            data.player2.units[i].attacked,
-                            data.player2.units[i].firepower,
-                            data.player2.units[i].hp
-                        ))
-                    }
-                ])
+                setMatch(data)             
             }
         }
+    }
+
+    /*
+    * Emit new unit changes to server
+    * change local state to match
+    */
+    async function updateMatch(m) {
+        m.updateNo++
+        socket.current.emit('updateMatch' , {match: m})
+        setMatch(m)
+        console.log('update no: ' + m.updateNo)
     }
 
     /*
     * end turn
     */
-   function endTurn() {
+    function endTurn() {
         let modifiedMatch = match
         if (match.player1.name === user.username) {
             modifiedMatch.player1.activeTurn = false
             modifiedMatch.player2.activeTurn = true
+            modifiedMatch.player1.turn++
         } else {
             modifiedMatch.player1.activeTurn = true
             modifiedMatch.player2.activeTurn = false 
+            modifiedMatch.player2.turn++
         }
-        socket.current.emit('updateMatch' , {id: match._id, units: units, match: modifiedMatch})
-        setMatch(modifiedMatch)
+        updateMatch(units, modifiedMatch)       
    }
-
-    /*
-    * Emit new unit changes to server
-    */
-    function updateMatch(newUnits) {
-        socket.current.emit('updateMatch' , {id: user.matchId, units: newUnits, match: match})
-        setUnits(newUnits)
-    }
 
     /*
     * create web socket conn, after component is mounted
@@ -175,6 +124,40 @@ export default function Match(props) {
 
     //determine the selection tiles each time selectionIndex is changed
     useEffect(() => {determineSelectionTiles(selectionIndex)}, [selectionIndex])
+
+    // when match data is consumed, set the units
+    useEffect(() => {
+        setUnits([
+            {
+                owner: match.player1.name, 
+                units: match.player1.units.map((unit, i) => new Unit(
+                    match.player1.name,
+                    i,
+                    unit.id,
+                    match.player1.units[i].x,
+                    match.player1.units[i].y,
+                    match.player1.units[i].moved,
+                    match.player1.units[i].attacked,
+                    match.player1.units[i].firepower,
+                    match.player1.units[i].hp
+                ))
+            },
+            {
+                owner: match.player2.name, 
+                units: match.player2.units.map((unit, i) => new Unit(
+                    match.player2.name,
+                    i,
+                    unit.id,
+                    match.player2.units[i].x,
+                    match.player2.units[i].y,
+                    match.player2.units[i].moved,
+                    match.player2.units[i].attacked,
+                    match.player2.units[i].firepower,
+                    match.player2.units[i].hp
+                ))
+            }
+        ])
+    }, [match, setMatch])
 
     //useEffect(() => {updateMatch()}, [units, setUnits])
 

@@ -24,12 +24,12 @@ async function endMatch(socket, io, matchId, victor) {
     const m = await Match.findOneAndUpdate(
         {_id: matchId},
         {victor: victor, end: Date.now()}
-    ).save()
+    )
 
     const updateUsers = await User.updateMany(
         {matchId: matchId},
         {matchId: '', inMatch: false}
-    ).save()
+    )
 
     const match = await Match.findOne({_id: matchId})
 
@@ -37,17 +37,20 @@ async function endMatch(socket, io, matchId, victor) {
     io.emit(match.player2.name, match)
 }
 
-async function updateMatch(socket, io, matchId, unitData, matchData) {
+async function updateMatch(io, matchData) {
     if (matchData !== null) {
-        matchData.player1.units = unitData[0].units
-        matchData.player2.units = unitData[1].units
-
-        const match = await Match.findOneAndUpdate({_id: matchId}, matchData, {new: true})
+        const match = await Match.findOneAndUpdate({_id: matchData._id}, matchData, {new: true})
 
         io.emit(match.player1.name, match)
         io.emit(match.player2.name, match)
     }
 }
 
+// unused
+async function updateLayers(io, matchId, layers) {
+    const match = await Match.findOneAndUpdate({_id: matchId}, {map: layers}, {new: true})
+    io.emit(match.player1.name, match)
+    io.emit(match.player2.name, match)
+}
 
-module.exports = { getMatch, endMatch, updateMatch, joinMatch }
+module.exports = { getMatch, endMatch, updateMatch, joinMatch, updateLayers }

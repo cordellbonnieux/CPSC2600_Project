@@ -220,7 +220,6 @@ export default function Map(props) {
 
         // deselect
         if (deselect) {
-            //console.log('deselected')
             setSelectionIndex(null)
         }   
     }, [pos, setLocations, setSelectionIndex, selectionIndex, user, units])
@@ -235,41 +234,86 @@ export default function Map(props) {
     // move unit or attack enemy unit
     useEffect(() => {
         if (selectionIndex !== null) {
-
-            let matchingTiles = locations.filter(loc => {
+            let matchingTile = locations.filter(loc => {
                 const diffX = pos.x - loc.x
                 const diffY = pos.y - loc.y
                 return diffX > 0 && diffX <= 32 && diffY > 0 && diffY <= 32
-            })
+            })[0]
 
-            //setSquares(arr => [...arr, ...matchingTiles])
+            let thisPlayer, thatPlayer
+            let newLayers = layers
+            let newData = matchData
 
-            // TODO: make a state var for which army is the users, which is set on first render
-            let army = units[0].owner === user ? 0 : 1
+            if (matchData.player1.name === user) {
+                thisPlayer = matchData.player1
+                thatPlayer = matchData.player2
+            } else {
+                thisPlayer = matchData.player2
+                thatPlayer = matchData.player1
+            }
 
-            if (matchingTiles[0]) {
-                let u = units
-                if (!matchingTiles[0].occupied) {
+            if (matchingTile) {
+                if (!matchingTile.occupied) {
                     // move
-                    //console.log(u[army].units[selectionIndex].moved)
-                    if (!u[army].units[selectionIndex].moved && !units[army].units[selectionIndex].moved) {
-                        u[army].units[selectionIndex].x = matchingTiles[0].x
-                        u[army].units[selectionIndex].y = matchingTiles[0].y
-                        u[army].units[selectionIndex].moved = true
+                    if (!thisPlayer.units[selectionIndex].moved) {
+                        let tiles = layers[0]
+                        for (let i = 0; i < tiles.length; i++) {
+                            //destination tile
+                            if (tiles[i].posX === matchingTile.x && tiles[i].posY === matchingTile.y) {
+                                tiles[i].occupied = true
+                            }
+                            // starting tile
+                            if (tiles[i].posX === thisPlayer.units[selectionIndex].x && tiles[i].posY === thisPlayer.units[selectionIndex].y) {
+                                tiles[i].occupied = false
+                            }
+                        }
+
+                        // make changes
+                        newLayers[0] = tiles
+                        thisPlayer.units[selectionIndex].x = matchingTile.x
+                        thisPlayer.units[selectionIndex].y = matchingTile.y
+                        thisPlayer.units[selectionIndex].moved = true
+
+                        // set changes
+                        if (newData.player1.name === user) {
+                            newData.player1 = thisPlayer
+                        } else {
+                            newData.player2 = thisPlayer
+                        }
+
+                        console.log('unit ' + selectionIndex + ' moved') // remove
                     }
- 
-                } else if (matchingTiles[0].enemyNumber !== null) {
+
+                } else if (matchingTile.enemyNumber !== null) {
                     // attack
-                    if (!u[army].units[selectionIndex].attacked && !units[army].units[selectionIndex].attacked) {
-                        u[army].units[selectionIndex].attacked = true 
-                        u[army === 0 ? 1 : 0].units[selectionIndex].hp -= u[army].units[selectionIndex].firepower
+                    if (!thisPlayer.units[selectionIndex].attacked) {
+                        let enemyIndex = thatPlayer.units.filter(unit => {
+                            return unit.x === matchingTile.x && unit.y === matchingTile.y
+                        })[0]
+
+                        if (enemyIndex) {
+                            // make changes
+                            thisPlayer.units[selectionIndex].attacked = true 
+                            thatPlayer.units[enemyIndex].hp -= thisPlayer.units[selectionIndex].firepower
+
+                            // set changes
+                            if (newData.player1.name === user) {
+                                newData.player1 = thisPlayer
+                                newData.player2 = thatPlayer
+                            } else {
+                                newData.player2 = thisPlayer
+                                newData.player1 = thatPlayer
+                            }
+
+                            console.log('unit ' + selectionIndex + ' attacked enemy ' + enemyIndex) // remove
+                        }
                     }
                 }
-                // emit changes
-                updateMatch(u)
+                newData.layers = newLayers
+                updateMatch(newData)
             }
         }
-    }, [locations, pos, selectionIndex])
+    }, [locations, pos, selectionIndex, layers, updateMatch, user, matchData])
 
     return <canvas ref={canvasRef} />
 }

@@ -3,15 +3,30 @@ const mongoose = require('mongoose')
 const matchModel = new mongoose.Schema({
     start: {
         type: Date,
+        default: () => Date.now(),
+        required: true
     },
     end: {
-        type: Date
+        type: Date,
+        default: null,
     },
     victor: {
-        type: String
+        type: String,
+        default: null
     },
     map: {
-        type: Object
+        type: Object,
+        required: true
+    },
+    updateNo: {
+        type: Number,
+        default: 0,
+        required: true
+    },
+    setupComplete: {
+        type: Boolean,
+        default: false,
+        required: true
     },
     player1: {
         type: Object,
@@ -21,6 +36,7 @@ const matchModel = new mongoose.Schema({
             _id
             turn
             units[]
+            etc
         */
     },
     player2: {
@@ -31,6 +47,7 @@ const matchModel = new mongoose.Schema({
             _id
             turn
             units[]
+            etc
         */
     }
 })

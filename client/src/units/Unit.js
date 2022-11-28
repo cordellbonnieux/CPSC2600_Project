@@ -10,6 +10,7 @@ export default class Unit {
         this.y = y
         this.eventListenerAttached = false
         this.selected = false
+        this.selectable = true
 
         switch(this.type) {
             default:
