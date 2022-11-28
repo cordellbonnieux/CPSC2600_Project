@@ -76,7 +76,7 @@ export default function Match(props) {
                 if ((data.updateNo > match.updateNo && match.updateNo >= 0) || !ready) {
                     //console.log('update:', data.updateNo, `this must be true: ${data.updateNo} > ${match.updateNo}`)
                     setMatch(data)
-                    console.log('update', data.updateNo, match.updateNo, match.updateNo >= 0)
+                    console.log('update', data.updateNo, match.updateNo, match.updateNo >= 0, ready)
                 }
             } else {
                 console.log('bad data:', data)
@@ -161,7 +161,7 @@ export default function Match(props) {
     /*
     * TODO: end turn
     */
-    function endTurn() {
+    const endTurn = useCallback(() => {
         let modifiedMatch = match
         if (match.player1.name === user.username) {
             modifiedMatch.player1.activeTurn = false
@@ -172,28 +172,22 @@ export default function Match(props) {
             modifiedMatch.player2.activeTurn = false 
             modifiedMatch.player2.turn++
         }
-        //updateMatch(units, modifiedMatch)       
-   }
+        updateMatch(modifiedMatch)       
+   }, [match, updateMatch, user.username])
 
-    /*
-    * create web socket conn, after component is mounted
-    */
-    useEffect(() => {
-
+   useEffect(() => {
+    // componentDidMount
+    socket.current = io(SERVER_URI)
+    socket.current.on(user.username, data => consumeMatchData(data))
+    socket.current.emit('match', user.matchId)
+    return () => {
+      // componentWillUnmount
+      socket.current.emit('end')
+    }
     }, [])
 
-    useEffect(() => {
-        // componentDidMount
-        socket.current = io(SERVER_URI)
-        socket.current.on(user.username, data => consumeMatchData(data))
-        return () => {
-          // componentWillUnmount
-          socket.current.emit('end')
-        }
-      }, [])
-
     //on each render, request data
-    useEffect(() => {socket.current.emit('match', user.matchId)})
+    //useEffect(() => {socket.current.emit('match', user.matchId)})
 
     //determine the selection tiles each time selectionIndex is changed
     useEffect(() => {determineSelectionTiles(selectionIndex)}, [selectionIndex])
@@ -206,7 +200,7 @@ export default function Match(props) {
                 setReady(true)
             }   
         }
-    }, [match, setMatch])
+    }, [match, setMatch, ready, handleSetUnits])
 
     //useEffect(() => {updateMatch()}, [units, setUnits])
 
