@@ -166,10 +166,21 @@ export default function Match(props) {
         if (match.player1.name === user.username) {
             modifiedMatch.player1.activeTurn = false
             modifiedMatch.player2.activeTurn = true
+            // reset unit commands
+            modifiedMatch.player2.units.forEach((unit, i, army) => {
+                unit.attacked = false
+                unit.moved = false
+                army[i] = unit
+            })
             modifiedMatch.player1.turn++
         } else {
             modifiedMatch.player1.activeTurn = true
-            modifiedMatch.player2.activeTurn = false 
+            modifiedMatch.player2.activeTurn = false
+            modifiedMatch.player1.units.forEach((unit, i, army) => {
+                unit.attacked = false
+                unit.moved = false
+                army[i] = unit
+            })
             modifiedMatch.player2.turn++
         }
         updateMatch(modifiedMatch)       
