@@ -23,11 +23,6 @@ const matchModel = new mongoose.Schema({
         default: 0,
         required: true
     },
-    setupComplete: {
-        type: Boolean,
-        default: false,
-        required: true
-    },
     player1: {
         type: Object,
         required: true

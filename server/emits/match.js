@@ -3,7 +3,6 @@ const User = require('../models/userModel')
 
 async function getMatch(socket, io, matchId) {
     const match = await Match.findOne({'_id': matchId}).catch(err => console.log(err))
-    
     if (match) {
         io.emit(match.player1.name, match)
         io.emit(match.player2.name, match)
@@ -43,6 +42,7 @@ async function updateMatch(io, matchData) {
 
         io.emit(match.player1.name, match)
         io.emit(match.player2.name, match)
+        //console.log('emitted updated match ' + match._id)
     }
 }
 

@@ -9,7 +9,7 @@ const SERVER_URI = 'http://localhost:5000'
 
 export default function Match(props) {
     const socket = useRef()
-    const [ match, setMatch ] = useState(null)
+    const [ match, setMatch ] = useState({updateNo:-1})
     const [ units, setUnits ] = useState([])
     const [ selectionFromUI, setSelectionFromUI ] = useState(null)
     const [ locations, setLocations ] = useState([])
@@ -66,20 +66,47 @@ export default function Match(props) {
     /*
     * when data is emitted from the server to the client,
     * parse and store the data in state to render the map and ui
+    * TODO: this is the bottleneck, and what determines if the app works
     */
-    async function consumeMatchData(data) {
-        if (data['_id'] == user.matchId) {
-            // this should only update if changes are made from either user 
-            // these 2 conditions should really be 4, but javascript is insane
-            if ((!data.setupComplete && data.updateNo === 0) || (!isNaN(match.updateNo) && (data.updateNo > match.updateNo))) {
-                console.log('data:', data)
-                console.log('match:', match)
-                if (!data.setupComplete) {
-                    data.setupComplete = true
-                    data.updateNo = 1
+    function consumeMatchData(data, localChange = false) {
+        /*
+        *
+        * TRY TO REFACTOR THIS COMPONENT TO A CLASS??
+        * https://dev.to/bravemaster619/how-to-use-socket-io-client-correctly-in-react-app-o65
+        * 
+        * *
+        * USE MEMO OR USE CALLBACK - ONE OF THOSE WILL SOLVE THIS!
+        * 
+        * */
+        if (data['_id'] === user.matchId) {
+            if (!isNaN(data.updateNo)) {
+                // next time I'm using typescript
+                if (data.updateNo > match.updateNo) {
+                    console.log('update:', data.updateNo, `this must be true: ${data.updateNo} > ${match.updateNo}`)
+                    setMatch(data
+                        /*
+                        prev => {
+                        prev._id = data._id
+                        prev.end = data.end
+                        prev.layers = data.layers
+                        prev.map = data.map
+                        prev.player1 = data.player1
+                        prev.player2 =  data.player2
+                        prev.start = data.start
+                        prev.updateNo = data.updateNo
+                        prev.victor = data.victor
+                        return prev
+                    }*/
+                    )
+                    if (localChange) {
+                        console.log('local data:', data)
+                    }
                 }
-                setMatch(data)             
+            } else {
+                console.log('bad data:', data)
             }
+        } else {
+            console.log('really bad data:', data)
         }
     }
 
@@ -87,15 +114,40 @@ export default function Match(props) {
     * Emit new unit changes to server
     * change local state to match
     */
-    async function updateMatch(m) {
+    function updateMatch(m) {
+        // convert Units back to objects
+        m.player1.units = m.player1.units.map(unit => {
+            return {
+                x: unit.x,
+                y: unit.y,
+                type: unit.type,
+                moved: unit.moved,
+                attacked: unit.attacked,
+                firepower: unit.firepower,
+                id: unit.id,
+                hp: unit.hp
+            }
+        })
+        m.player2.units = m.player2.units.map(unit => {
+            return {
+                x: unit.x,
+                y: unit.y,
+                type: unit.type,
+                moved: unit.moved,
+                attacked: unit.attacked,
+                firepower: unit.firepower,
+                id: unit.id,
+                hp: unit.hp
+            }
+        })
         m.updateNo++
+        //console.log('something\'s wrong', m)
         socket.current.emit('updateMatch' , {match: m})
-        setMatch(m)
-        console.log('update no: ' + m.updateNo)
+        consumeMatchData(m, true)
     }
 
     /*
-    * end turn
+    * TODO: end turn
     */
     function endTurn() {
         let modifiedMatch = match
@@ -108,16 +160,25 @@ export default function Match(props) {
             modifiedMatch.player2.activeTurn = false 
             modifiedMatch.player2.turn++
         }
-        updateMatch(units, modifiedMatch)       
+        //updateMatch(units, modifiedMatch)       
    }
 
     /*
     * create web socket conn, after component is mounted
     */
     useEffect(() => {
+
+    }, [])
+
+    useEffect(() => {
+        // componentDidMount
         socket.current = io(SERVER_URI)
         socket.current.on(user.username, data => consumeMatchData(data))
-    }, [])
+        return () => {
+          // componentWillUnmount
+          socket.current.emit('end')
+        }
+      }, [])
 
     //on each render, request data
     useEffect(() => {socket.current.emit('match', user.matchId)})
@@ -127,36 +188,42 @@ export default function Match(props) {
 
     // when match data is consumed, set the units
     useEffect(() => {
-        setUnits([
-            {
-                owner: match.player1.name, 
-                units: match.player1.units.map((unit, i) => new Unit(
-                    match.player1.name,
-                    i,
-                    unit.id,
-                    match.player1.units[i].x,
-                    match.player1.units[i].y,
-                    match.player1.units[i].moved,
-                    match.player1.units[i].attacked,
-                    match.player1.units[i].firepower,
-                    match.player1.units[i].hp
-                ))
-            },
-            {
-                owner: match.player2.name, 
-                units: match.player2.units.map((unit, i) => new Unit(
-                    match.player2.name,
-                    i,
-                    unit.id,
-                    match.player2.units[i].x,
-                    match.player2.units[i].y,
-                    match.player2.units[i].moved,
-                    match.player2.units[i].attacked,
-                    match.player2.units[i].firepower,
-                    match.player2.units[i].hp
-                ))
-            }
-        ])
+        if (match.updateNo >= 0) {
+            // todo: improve  this, check each value
+            setUnits(prev => {
+                //todo
+                return [
+                    {
+                        owner: match.player1.name, 
+                        units: match.player1.units.map((unit, i) => new Unit(
+                            match.player1.name,
+                            i,
+                            unit.id,
+                            match.player1.units[i].x,
+                            match.player1.units[i].y,
+                            match.player1.units[i].moved,
+                            match.player1.units[i].attacked,
+                            match.player1.units[i].firepower,
+                            match.player1.units[i].hp
+                        ))
+                    },
+                    {
+                        owner: match.player2.name, 
+                        units: match.player2.units.map((unit, i) => new Unit(
+                            match.player2.name,
+                            i,
+                            unit.id,
+                            match.player2.units[i].x,
+                            match.player2.units[i].y,
+                            match.player2.units[i].moved,
+                            match.player2.units[i].attacked,
+                            match.player2.units[i].firepower,
+                            match.player2.units[i].hp
+                        ))
+                    }
+                ]
+            })
+        }
     }, [match, setMatch])
 
     //useEffect(() => {updateMatch()}, [units, setUnits])
@@ -189,7 +256,7 @@ export default function Match(props) {
     return <main>
         <div id='matchOverlay'>
         {
-            match != null && units.length > 0 ?
+            match.updateNo >= 0 && units.length > 0 ?
                 <MatchOverlay  
                     user={user} 
                     setUser={setUser} 
@@ -209,7 +276,7 @@ export default function Match(props) {
         </div>
         <div id='map'>
             { 
-            match != null && units.length > 0 ? 
+            match.updateNo >= 0 && units.length > 0 ? 
                 <Map 
                     user={user.username}
                     layers={match.map.layers} 

@@ -121,6 +121,8 @@ async function connection(socket, io) {
 
             io.emit(user1.username, {matchFound: true, matchId: match['_id']})
             io.emit(user2.username, {matchFound: true, matchId: match['_id']})
+
+            //console.log('match made!')
         }
     })
 }
