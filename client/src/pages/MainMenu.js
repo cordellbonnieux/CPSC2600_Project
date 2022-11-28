@@ -52,6 +52,10 @@ export default function MainMenu(props) {
                 socket.current.emit('end')
             }
         })
+        return () => {
+            // componentWillUnmount
+            socket.current.emit('end')
+          }
         //setLoading(false)
     }, [])
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { io } from 'socket.io-client'
 import '../css/match.css'
 import MatchOverlay from '../components/MatchOverlay'
@@ -14,6 +14,7 @@ export default function Match(props) {
     const [ selectionFromUI, setSelectionFromUI ] = useState(null)
     const [ locations, setLocations ] = useState([])
     const [ selectionIndex, setSelectionIndex ] = useState(null)
+    const [ ready, setReady ] = useState(false)
     const { setUser, user, logout, surrender, disconnect } = props
 
     /*
@@ -68,39 +69,14 @@ export default function Match(props) {
     * parse and store the data in state to render the map and ui
     * TODO: this is the bottleneck, and what determines if the app works
     */
-    function consumeMatchData(data, localChange = false) {
-        /*
-        *
-        * TRY TO REFACTOR THIS COMPONENT TO A CLASS??
-        * https://dev.to/bravemaster619/how-to-use-socket-io-client-correctly-in-react-app-o65
-        * 
-        * *
-        * USE MEMO OR USE CALLBACK - ONE OF THOSE WILL SOLVE THIS!
-        * 
-        * */
+    const consumeMatchData = useCallback(data => {
         if (data['_id'] === user.matchId) {
             if (!isNaN(data.updateNo)) {
                 // next time I'm using typescript
-                if (data.updateNo > match.updateNo) {
-                    console.log('update:', data.updateNo, `this must be true: ${data.updateNo} > ${match.updateNo}`)
-                    setMatch(data
-                        /*
-                        prev => {
-                        prev._id = data._id
-                        prev.end = data.end
-                        prev.layers = data.layers
-                        prev.map = data.map
-                        prev.player1 = data.player1
-                        prev.player2 =  data.player2
-                        prev.start = data.start
-                        prev.updateNo = data.updateNo
-                        prev.victor = data.victor
-                        return prev
-                    }*/
-                    )
-                    if (localChange) {
-                        console.log('local data:', data)
-                    }
+                if ((data.updateNo > match.updateNo && match.updateNo >= 0) || !ready) {
+                    //console.log('update:', data.updateNo, `this must be true: ${data.updateNo} > ${match.updateNo}`)
+                    setMatch(data)
+                    console.log('update', data.updateNo, match.updateNo, match.updateNo >= 0)
                 }
             } else {
                 console.log('bad data:', data)
@@ -108,13 +84,13 @@ export default function Match(props) {
         } else {
             console.log('really bad data:', data)
         }
-    }
+    }, [match.updateNo, user.matchId, ready])
 
     /*
     * Emit new unit changes to server
     * change local state to match
     */
-    function updateMatch(m) {
+    const updateMatch = useCallback(m => {
         // convert Units back to objects
         m.player1.units = m.player1.units.map(unit => {
             return {
@@ -143,8 +119,44 @@ export default function Match(props) {
         m.updateNo++
         //console.log('something\'s wrong', m)
         socket.current.emit('updateMatch' , {match: m})
-        consumeMatchData(m, true)
-    }
+        consumeMatchData(m)
+    }, [consumeMatchData])
+
+    /*
+    * set units wrapped in usecallback
+    */
+    const handleSetUnits = useCallback(() => {
+        setUnits([
+            {
+                owner: match.player1.name, 
+                units: match.player1.units.map((unit, i) => new Unit(
+                    match.player1.name,
+                    i,
+                    unit.id,
+                    match.player1.units[i].x,
+                    match.player1.units[i].y,
+                    match.player1.units[i].moved,
+                    match.player1.units[i].attacked,
+                    match.player1.units[i].firepower,
+                    match.player1.units[i].hp
+                ))
+            },
+            {
+                owner: match.player2.name, 
+                units: match.player2.units.map((unit, i) => new Unit(
+                    match.player2.name,
+                    i,
+                    unit.id,
+                    match.player2.units[i].x,
+                    match.player2.units[i].y,
+                    match.player2.units[i].moved,
+                    match.player2.units[i].attacked,
+                    match.player2.units[i].firepower,
+                    match.player2.units[i].hp
+                ))
+            }
+        ])
+    }, [match])
 
     /*
     * TODO: end turn
@@ -189,40 +201,10 @@ export default function Match(props) {
     // when match data is consumed, set the units
     useEffect(() => {
         if (match.updateNo >= 0) {
-            // todo: improve  this, check each value
-            setUnits(prev => {
-                //todo
-                return [
-                    {
-                        owner: match.player1.name, 
-                        units: match.player1.units.map((unit, i) => new Unit(
-                            match.player1.name,
-                            i,
-                            unit.id,
-                            match.player1.units[i].x,
-                            match.player1.units[i].y,
-                            match.player1.units[i].moved,
-                            match.player1.units[i].attacked,
-                            match.player1.units[i].firepower,
-                            match.player1.units[i].hp
-                        ))
-                    },
-                    {
-                        owner: match.player2.name, 
-                        units: match.player2.units.map((unit, i) => new Unit(
-                            match.player2.name,
-                            i,
-                            unit.id,
-                            match.player2.units[i].x,
-                            match.player2.units[i].y,
-                            match.player2.units[i].moved,
-                            match.player2.units[i].attacked,
-                            match.player2.units[i].firepower,
-                            match.player2.units[i].hp
-                        ))
-                    }
-                ]
-            })
+            handleSetUnits()
+            if (!ready) {
+                setReady(true)
+            }   
         }
     }, [match, setMatch])
 
@@ -256,7 +238,8 @@ export default function Match(props) {
     return <main>
         <div id='matchOverlay'>
         {
-            match.updateNo >= 0 && units.length > 0 ?
+            //match.updateNo >= 0 && units.length > 0
+            ready ?
                 <MatchOverlay  
                     user={user} 
                     setUser={setUser} 
@@ -276,7 +259,7 @@ export default function Match(props) {
         </div>
         <div id='map'>
             { 
-            match.updateNo >= 0 && units.length > 0 ? 
+            ready ? 
                 <Map 
                     user={user.username}
                     layers={match.map.layers} 
