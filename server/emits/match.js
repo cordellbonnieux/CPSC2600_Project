@@ -1,11 +1,22 @@
 const Match = require('../models/matchModel')
 const User = require('../models/userModel')
 
-async function getMatch(socket, io, matchId) {
+// TODO: many of these could solely use the socket, rather than the io
+
+async function getMatch(io, matchId) {
     const match = await Match.findOne({'_id': matchId}).catch(err => console.log(err))
     if (match) {
         io.emit(match.player1.name, match)
         io.emit(match.player2.name, match)
+    }
+    //console.log('emitted ongoing match ' + match._id)
+}
+
+async function setupMatch(io, matchId) {
+    const match = await Match.findOne({'_id': matchId}).catch(err => console.log(err))
+    if (match) {
+        io.emit(match.player1.name+'-setup', match)
+        io.emit(match.player2.name+'-setup', match)
     }
     //console.log('emitted ongoing match ' + match._id)
 }
@@ -53,4 +64,4 @@ async function updateLayers(io, matchId, layers) {
     io.emit(match.player2.name, match)
 }
 
-module.exports = { getMatch, endMatch, updateMatch, joinMatch, updateLayers }
+module.exports = { getMatch, endMatch, updateMatch, joinMatch, updateLayers, setupMatch }

@@ -175,13 +175,27 @@ export default function Match(props) {
         updateMatch(modifiedMatch)       
    }, [match, updateMatch, user.username])
 
+   /*
+   * initial setup
+   */
+  const setupMatch = useCallback((d) => {
+    consumeMatchData(d)
+    setReady(true)
+    socket.current.off(user.username+'-setup', setupMatch)
+  }, [])
+
    useEffect(() => {
     // componentDidMount
     socket.current = io(SERVER_URI)
-    socket.current.on(user.username, data => consumeMatchData(data))
-    socket.current.emit('match', user.matchId)
+    socket.current.on(user.username, consumeMatchData)
+    socket.current.on(user.username+'-setup', setupMatch)
+    socket.current.emit('setupMatch', user.matchId)
+    //socket.current.emit('match', user.matchId)
+    socket.current.emit('')
     return () => {
       // componentWillUnmount
+      socket.current.off(user.username, consumeMatchData)
+      //socket.current.off('match', user.matchId)
       socket.current.emit('end')
     }
     }, [])
@@ -195,12 +209,9 @@ export default function Match(props) {
     // when match data is consumed, set the units
     useEffect(() => {
         if (match.updateNo >= 0) {
-            handleSetUnits()
-            if (!ready) {
-                setReady(true)
-            }   
+            handleSetUnits()   
         }
-    }, [match, setMatch, ready, handleSetUnits])
+    }, [match, handleSetUnits])
 
     //useEffect(() => {updateMatch()}, [units, setUnits])
 
