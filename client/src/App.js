@@ -6,6 +6,9 @@ import LoggedOutTemplate from './templates/LoggedOut'
 import LoggedInTemplate from './templates/LoggedIn'
 import axios from 'axios'
 
+// css
+import './css/app.css'
+
 // server information
 const SERVER_URI = 'http://localhost:5000'
 // TODO:add a context which holds server uri, session info etc?

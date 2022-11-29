@@ -1,0 +1,14 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+}
+
+button {
+    border-radius: 0;
+    border: 2px solid grey;
+    background-color: lightgrey;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+}

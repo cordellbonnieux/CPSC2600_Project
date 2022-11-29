@@ -22,8 +22,8 @@ export default function MatchOverlay(props) {
         player !== null ? (
             <div id='overlayWrapper'>
                 <div id='topOverlayWrapper' className='overlay'>
-                    <button onClick={() => endTurn()} disabled={!player.activeTurn}>complete turn</button>
-                    <TurnCounter player={player} match={matchData} user={user} endTurn={endTurn} />
+                    <button id='turnBtn' onClick={() => endTurn()} disabled={!player.activeTurn}>complete turn</button>
+                    <TurnCounter player={player} />
                     <SurrenderButton surrender={surrender} socket={socket} data={matchData} />
                 </div>
                 <UnitsOverlay 
