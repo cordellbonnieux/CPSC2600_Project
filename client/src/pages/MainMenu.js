@@ -94,7 +94,7 @@ export default function MainMenu(props) {
                     <h1>main menu</h1>
                     <p>{screenText}</p>
                 </div>
-                <div id='mainMenuWrapper'>
+                <div id='mainMenu'>
                     {menu}
                 </div>
             </div>

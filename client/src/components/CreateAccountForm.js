@@ -171,7 +171,7 @@ export default function CreateAccountForm(props) {
         <form onSubmit={e => handleSubmit(e)}>
             <h2>Create Account</h2>
             <label htmlFor='userName'>
-                desired username:
+                username:
                 <input 
                     type='text' 
                     name='userName' 
@@ -216,7 +216,7 @@ export default function CreateAccountForm(props) {
                 <span className='inputFormWarning'>{warningPassword1}</span>
             </label>
             <label htmlFor='password2'>
-                password, again:
+                password:
                 <input 
                     type='password' 
                     name='password2' 

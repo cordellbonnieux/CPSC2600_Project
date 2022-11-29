@@ -68,14 +68,6 @@ export default function LoginForm(props) {
                 if(loginResponse === 'valid') {
                     await createSession()
                     .then(async function() {
-                        /*
-                        return await axios.post(server+'account/getemail', {username: user})
-                        .then(email => {
-                            props.setUser({username: user, email: email.data})
-                            props.setLoggedIn(true)
-                            resetForm()
-                        })
-                        */
                         return await axios.get(server+'account/username/'+user)
                         .then(userData => {
                             props.setUser({

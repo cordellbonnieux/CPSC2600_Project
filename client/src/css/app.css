@@ -20,7 +20,40 @@ button {
 }
 
 #loggedoutToggler {
-    /* make this look more like underlinned text*/
+    border: none;
+    background-color: transparent;
+    color: rgba(0, 255, 0, 1);
+    text-decoration: underline;
+}
+
+
+#loggedoutToggler:hover {
+    text-decoration: none;
+}
+
+#loggedoutMenuWrapper form label {
+    margin: 15px 0;
+    display: block;
+}
+
+#loggedoutMenuWrapper form label input {
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+    border-bottom:1px solid rgba(0, 255, 0, 1);
+    color: rgba(0, 255, 0, 1);
+}
+
+#loggedoutMenuWrapper form button[type="submit"] {
+
+}
+
+.inputFormWarning {
+    font-size: 0.8em; 
+    background-color: rgba(0, 200, 0, 1);;
+    color: #000;   
+    display: block;
+    margin: 3px 0;
 }
 
 #mainMenuWrapper, #loggedOutWrapper {
@@ -29,6 +62,7 @@ button {
     width: 100%;
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 #mainMenuWrapper > div, #loggedOutWrapper > div {
@@ -46,7 +80,11 @@ button {
     padding-top: 10px;
 }
 
-#mainMenuWrapper  button{
+#mainMenu {
+    margin: 25px 0;
+}
+
+#mainMenu  button{
     width: 80%;
     margin: 5px 10%;
     padding: 8px;
