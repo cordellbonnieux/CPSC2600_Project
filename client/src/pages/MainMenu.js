@@ -88,13 +88,15 @@ export default function MainMenu(props) {
     //useEffect(() => console.log(props.user))
 
     return (
-        <main>
-            <div className='screenWrapper'>
-                <h1>main menu</h1>
-                <p>{screenText}</p>
-            </div>
+        <main id='mainMenuWrapper'>
             <div>
-                {menu}
+                <div className='screenWrapper'>
+                    <h1>main menu</h1>
+                    <p>{screenText}</p>
+                </div>
+                <div id='mainMenuWrapper'>
+                    {menu}
+                </div>
             </div>
         </main>
     )

@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap');
 html, body {
     margin: 0;
     padding: 0;
-    background-color: #000;
+    background-color: #202020;
+    font-family: 'Inconsolata', monospace;
 }
 
 button {
@@ -11,4 +13,41 @@ button {
     color: #000;
     font-weight: bold;
     cursor: pointer;
+}
+
+#loggedoutMenuWrapper{
+    margin: 25px 0;
+}
+
+#loggedoutToggler {
+    /* make this look more like underlinned text*/
+}
+
+#mainMenuWrapper, #loggedOutWrapper {
+    position: fixed;
+    top: 5%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#mainMenuWrapper > div, #loggedOutWrapper > div {
+    width: 300px;
+}
+
+.screenWrapper, #loggedoutMenuWrapper {
+    padding: 10px;
+    background: #000;
+    border: 5px solid rgba(0, 200, 0, 1);
+    color: rgba(0, 255, 0, 1);
+}
+
+#mainMenuButtons {
+    padding-top: 10px;
+}
+
+#mainMenuWrapper  button{
+    width: 80%;
+    margin: 5px 10%;
+    padding: 8px;
 }
