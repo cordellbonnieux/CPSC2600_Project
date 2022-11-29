@@ -76,7 +76,7 @@ export default function Match(props) {
                 if ((data.updateNo > match.updateNo && match.updateNo >= 0) || !ready) {
                     //console.log('update:', data.updateNo, `this must be true: ${data.updateNo} > ${match.updateNo}`)
                     setMatch(data)
-                    console.log('update', data.updateNo, match.updateNo, match.updateNo >= 0, ready)
+                    //console.log('update', data.updateNo, match.updateNo, match.updateNo >= 0, ready)
                 }
             } else {
                 console.log('bad data:', data)
@@ -159,7 +159,7 @@ export default function Match(props) {
     }, [match])
 
     /*
-    * TODO: end turn
+    * end turn
     */
     const endTurn = useCallback(() => {
         let modifiedMatch = match

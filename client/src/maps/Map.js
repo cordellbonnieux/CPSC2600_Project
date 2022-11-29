@@ -14,9 +14,9 @@ export default function Map(props) {
     /*
     * tracking clicks to help visualize and test
     */
-    //const [ clicks, setClicks ] = useState([])
+    const [ clicks, setClicks ] = useState([])
     //const [ squares, setSquares ] = useState([])
-    /*
+    
     function renderClicks(ctx) {
         for (let i = 0; i < clicks.length; i++) {
             ctx.beginPath()
@@ -24,6 +24,9 @@ export default function Map(props) {
             ctx.arc(clicks[i].x, clicks[i].y, 3, 0, 2 * Math.PI)
             ctx.fill()
         }
+    }
+    /*
+    function renderSquares() {
         for (let i = 0; i < squares.length; i++) {
             ctx.beginPath()
             ctx.fillStyle = 'rgba(200,200,120,0.5)'
@@ -132,7 +135,8 @@ export default function Map(props) {
             renderUnits(ctx)
             renderSelectionTiles(ctx)
             // for testing only
-            //renderClicks(ctx)
+            renderClicks(ctx)
+            //renderSquares(ctx)
             animationFrameId = window.requestAnimationFrame(render)
         }
         render()
@@ -147,16 +151,16 @@ export default function Map(props) {
                 y: e.pageY - 50
             })
         }
-        canvasRef.current.removeEventListener('mousedown', checkUnitCoords)
-        canvasRef.current.addEventListener('mousedown', checkUnitCoords)
+        canvasRef.current.removeEventListener('click', checkUnitCoords)
+        canvasRef.current.addEventListener('click', checkUnitCoords)
     }, [canvasRef])
 
     // for testing - add every click on canvas to clicks, to render
-    /*
+    
     useEffect(() => {
         setClicks(arr => [...arr, {x: pos.x, y: pos.y}])  
     }, [pos])
-    */
+    
 
     // detect selection from ui and use it to set pos
     useEffect(() => {
@@ -284,17 +288,23 @@ export default function Map(props) {
                         console.log('unit ' + selectionIndex + ' moved') // remove
                     }
 
-                } else if (matchingTile.enemyNumber !== null) {
+                    // TODO: this doesn't always fire
+                } else if (!isNaN(matchingTile.enemyNumber)) {
+                    console.log('attack!')
                     // attack
                     if (!thisPlayer.units[selectionIndex].attacked) {
-                        let enemyIndex = thatPlayer.units.filter(unit => {
-                            return unit.x === matchingTile.x && unit.y === matchingTile.y
-                        })[0]
+                        let index
+                        for (let i = 0; i < thatPlayer.units.length; i++) {
+                            if (thatPlayer.units[i].x === matchingTile.x && thatPlayer.units[i].y === matchingTile.y) {
+                                index = i
+                                console.log('attacking', thatPlayer.units[i])
+                            }
+                        }
 
-                        if (enemyIndex) {
+                        if (index) {
                             // make changes
-                            thisPlayer.units[selectionIndex].attacked = true 
-                            thatPlayer.units[enemyIndex].hp -= thisPlayer.units[selectionIndex].firepower
+                            thisPlayer.units[selectionIndex].attacked = true
+                            thatPlayer.units[index].hp -= thisPlayer.units[selectionIndex].firepower
 
                             // set changes
                             if (newData.player1.name === user) {
@@ -305,7 +315,7 @@ export default function Map(props) {
                                 newData.player1 = thatPlayer
                             }
 
-                            console.log('unit ' + selectionIndex + ' attacked enemy ' + enemyIndex) // remove
+                            console.log('unit ' + selectionIndex + ' attacked enemy ' + index) // remove
                         }
                     }
                 }
