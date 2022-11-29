@@ -15,22 +15,20 @@ canvas {
     position: fixed;
 }
 
-.overlay {
-
-}
-
 #topOverlayWrapper {
     display: flex;
     top: 10px;
     justify-content: space-between;
-    /* for larger screens use space-around
-    */
     width: 100%;
 }
 
 #turnBtn {
     margin-left: 10px;
     height: 30px;
+}
+
+#turnBtn:disabled {
+    opacity: 0.2;
 }
 
 #turnCounterWrapper {

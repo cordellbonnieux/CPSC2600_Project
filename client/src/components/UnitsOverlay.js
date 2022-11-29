@@ -7,19 +7,22 @@ export default function UnitsOverlay(props) {
     useEffect(() => {
         let unitCards = []
         for (let i = 0; i < units.length; i++) {
-            unitCards.push(
-            <Unit 
-                data={units[i]}
-                selected={selectionIndex === i} 
-                setSelectionIndex={setSelectionIndex} 
-                key={i} 
-                index={i} 
-                setSelectionFromUI={setSelectionFromUI}
-            />)
+            if (units[i].hp > 0) {
+                unitCards.push(
+                    <Unit 
+                        data={units[i]}
+                        selected={selectionIndex === i} 
+                        setSelectionIndex={setSelectionIndex} 
+                        key={i} 
+                        index={i} 
+                        setSelectionFromUI={setSelectionFromUI}
+                    />
+                )
+            }
         }
         setCards(unitCards)
         //console.log('set cards')
-    }, [units, selectionIndex, setSelectionIndex, setUnits])
+    }, [units, selectionIndex, setSelectionIndex, setUnits, setSelectionFromUI])
 
     return (
         <div className='overlay' id='unitsWrapper'>

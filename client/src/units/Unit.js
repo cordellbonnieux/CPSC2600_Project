@@ -27,16 +27,18 @@ export default class Unit {
 
     render(ctx, userControl = false) {
         // for now there is only a single generic unit
-        ctx.beginPath()
-        ctx.fillStyle = userControl ? 'blue': 'green'
-        ctx.arc(
-            this.x + 16, // circles drawn from center
-            this.y + 16, // circles are drawn from center
-            16, //assuming a 32x32 px sprite is used
-            0,
-            2 * Math.PI
-        )
-        ctx.fill()
+        if (this.hp > 0) {
+            ctx.beginPath()
+            ctx.fillStyle = userControl ? 'blue': 'green'
+            ctx.arc(
+                this.x + 16, // circles drawn from center
+                this.y + 16, // circles are drawn from center
+                16, //assuming a 32x32 px sprite is used
+                0,
+                2 * Math.PI
+            )
+            ctx.fill()
+        }
     }
 
     renderSelected(ctx) {

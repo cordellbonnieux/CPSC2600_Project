@@ -224,22 +224,19 @@ export default function Match(props) {
         }
     }, [match, handleSetUnits])
 
-    //useEffect(() => {updateMatch()}, [units, setUnits])
-
     /*
     * When endMatch emit is returned
     * TODO: surrender from a match and render main menu properly
     * Perhaps another state is needed to toggle when to disconnect
     */
-   /*
+   
+    /*
     useEffect(() => {
-        //console.log('disconnect')
-        if (match !== null && match.end != null && match.end.length > 10) { // 10 is just large but not too large
-            // this is causing problems
-            //disconnect(socket.current)
+        if (match.victor.length >= 3 && match.end.length > 10) {
+            //
         }
     }, [match])
-    */
+    */    
 
     /*
     * When a unit card from the ui is selected, the selectionFromUI state will contain
@@ -260,7 +257,7 @@ export default function Match(props) {
                     user={user} 
                     setUser={setUser} 
                     matchData={match} 
-                    units={user === match.player1.name ? match.player1.units : match.player2.units} 
+                    units={user.username === match.player1.name ? match.player1.units : match.player2.units} 
                     selectionIndex={selectionIndex}
                     setSelectionIndex={setSelectionIndex}
                     surrender={surrender}

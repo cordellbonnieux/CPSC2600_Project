@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import MainMenu from '../pages/MainMenu'
 import Match from '../pages/Match'
 
@@ -8,20 +8,18 @@ export default function LoggedInTemplate(props) {
   /*
   * current user surrenders match
   */
-  function surrender(socket, player1, player2) {
+  function surrender(socket, player1, player2, updateNo) {
     socket.emit('endMatch', {
         id: user.matchId,
         victor: player1 === user.username ? player2 : player1,
+        updateNo: updateNo + 1
     })
+    disconnectFromMatch()
   }
 
-  function disconnectFromMatch(socket) {
-    socket.emit('end')
+  const disconnectFromMatch = useCallback(() => {
     setUser(currentUser => currentUser = {...currentUser, matchId: '', inMatch: false})
-  }
-
-  // testing
-  useEffect(() => console.log('user changed:', user), [user.inMatch])
+  })
 
   const match = <Match user={user} setUser={setUser} logout={logout} surrender={surrender} disconnect={disconnectFromMatch} />
   const menu = <MainMenu user={user} setUser={setUser} logout={logout} />

@@ -156,7 +156,6 @@ export default function Map(props) {
     }, [canvasRef])
 
     // for testing - add every click on canvas to clicks, to render
-    
     useEffect(() => {
         setClicks(arr => [...arr, {x: pos.x, y: pos.y}])  
     }, [pos])
@@ -221,12 +220,11 @@ export default function Map(props) {
                 }
             }
         }
-
         // deselect
         if (deselect) {
             setSelectionIndex(null)
         }   
-    }, [pos, setLocations, setSelectionIndex, selectionIndex, user, units])
+    }, [pos, setLocations, setSelectionIndex, selectionIndex, user, units, matchData])
 
     // if selection index is null, then no selection tiles should appear
     useEffect(() => {
@@ -257,10 +255,10 @@ export default function Map(props) {
             }
 
             if (matchingTile) {
+                let tiles = layers[0]
                 if (!matchingTile.occupied) {
                     // move
                     if (!thisPlayer.units[selectionIndex].moved) {
-                        let tiles = layers[0]
                         for (let i = 0; i < tiles.length; i++) {
                             //destination tile
                             if (tiles[i].posX === matchingTile.x && tiles[i].posY === matchingTile.y) {
@@ -285,28 +283,38 @@ export default function Map(props) {
                             newData.player2 = thisPlayer
                         }
 
-                        console.log('unit ' + selectionIndex + ' moved') // remove
+                        //console.log('unit ' + selectionIndex + ' moved') // remove
                     }
-
-                    // TODO: this doesn't always fire
                 } else if (!isNaN(matchingTile.enemyNumber)) {
-                    console.log('attack!')
                     // attack
                     if (!thisPlayer.units[selectionIndex].attacked) {
                         let index
                         for (let i = 0; i < thatPlayer.units.length; i++) {
                             if (thatPlayer.units[i].x === matchingTile.x && thatPlayer.units[i].y === matchingTile.y) {
                                 index = i
-                                console.log('attacking', thatPlayer.units[i])
                             }
                         }
 
-                        if (index) {
+                        if (!isNaN(index)) {
                             // make changes
                             thisPlayer.units[selectionIndex].attacked = true
-                            thatPlayer.units[index].hp -= thisPlayer.units[selectionIndex].firepower
+                            thatPlayer.units[index].hp = thatPlayer.units[index].hp - thisPlayer.units[selectionIndex].firepower
+
+                            if (thatPlayer.units[index].hp <= 0) {
+                                // reset the occupied on tile
+                                for (let i = 0; i < tiles.length; i++) {
+                                    if (tiles[i].x === matchingTile.x && tiles[i].y === matchingTile.y) {
+                                        // free up tile which was used by now dead unit
+                                        tiles[i].occupied = false
+                                    }
+                                }
+                                // set arbitrary negative value, to avoid errors
+                                thatPlayer.units[index].x = -100
+                                thatPlayer.units[index].y = -100
+                            }
 
                             // set changes
+                            newLayers[0] = tiles
                             if (newData.player1.name === user) {
                                 newData.player1 = thisPlayer
                                 newData.player2 = thatPlayer
