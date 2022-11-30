@@ -6,6 +6,13 @@ html, body {
     font-family: 'Inconsolata', monospace;
 }
 
+a {
+    color: #000;
+    background-color: rgba(0,200,0,1);
+    padding:1px;
+    margin: 1px;
+}
+
 button {
     border-radius: 0;
     border: 2px solid grey;
@@ -26,6 +33,14 @@ button {
     text-decoration: underline;
 }
 
+#documentationToggler {
+    transition: 1s;
+}
+
+#documentation {
+    max-height: 300px;
+    overflow: scroll;
+}
 
 #loggedoutToggler:hover {
     text-decoration: none;

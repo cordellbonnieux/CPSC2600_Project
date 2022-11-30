@@ -11,15 +11,13 @@ export default function MainMenu(props) {
     const { username, inMatch, matchId } = props.user
     const [ searching, setSearching ] = useState(false)
     const [ screenText, setScreenText ] = useState('')
-    const [ loading, setLoading ] = useState(false)
     const socket = useRef()
 
 
     const menu = (
         <div>
             <MenuButton key={1} text={searching ? 'cancel search' : 'search for match'} action={findMatch} />
-            <MenuButton key={2} text={'account'} action={null} />
-            <MenuButton key={3} text={'logout'} action={() => logout(socket.current)} />
+            <MenuButton key={2} text={'logout'} action={() => logout(socket.current)} />
         </div>
     )
 
@@ -37,7 +35,6 @@ export default function MainMenu(props) {
    }
 
     useEffect(() => {
-        //setLoading(true)
         // connect to web socket after component render
         socket.current = io(SERVER_URI)
         // server has found username a match, setUser to update client
@@ -54,19 +51,17 @@ export default function MainMenu(props) {
         })
         return () => {
             // componentWillUnmount
+            socket.current.off(username)
             socket.current.emit('end')
           }
-        //setLoading(false)
     }, [])
 
     useEffect(() => {
-        //setLoading(true)
         axios.get(SERVER_URI + '/que/').then(async function(res) {
             res.data[0].userList.includes(username) ?
                 setSearching(true) :
                 setSearching(false)
         })
-        //setLoading(false)
     }, [])
 
     // text prompts
@@ -80,12 +75,8 @@ export default function MainMenu(props) {
         if (inMatch) {
             console.log('requesting match: ' + matchId)
             socket.current.emit('joinmatch', matchId)
-            //setLoading(true)
         }
     }, [props.user, setUser])
-
-    // remove this
-    //useEffect(() => console.log(props.user))
 
     return (
         <main id='mainMenuWrapper'>

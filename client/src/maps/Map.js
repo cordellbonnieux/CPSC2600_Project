@@ -46,7 +46,7 @@ export default function Map(props) {
                 ctx.beginPath();
                 if (locations[tile].occupied) {
                     if (locations[tile].enemyNumber !== null) {
-                        ctx.fillStyle = 'rgba(255, 25, 255, 0.5)'
+                        ctx.fillStyle = 'rgba(25, 255, 25, 0.5)'
                     } else {
                         ctx.fillStyle = 'rgba(255, 25, 25, 0.5)'
                     }
