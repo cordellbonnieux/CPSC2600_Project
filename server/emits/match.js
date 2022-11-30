@@ -31,21 +31,25 @@ async function joinMatch(socket, io, matchId) {
 }
 
 async function endMatch(io, matchId, victor, updateNo) {
+
+    console.log('ending match')
+
     const m = await Match.findOneAndUpdate(
         {_id: matchId},
         {victor: victor, end: Date.now(), updateNo: updateNo},
         {new: true}
     )
 
-    const updateUsers = await User.updateMany(
+    await User.updateMany(
         {matchId: matchId},
         {matchId: '', inMatch: false}
     )
 
     //const match = await Match.findOne({_id: matchId})
-
-    io.emit(match.player1.name, m)
-    io.emit(match.player2.name, m)
+    io.emit(m.player1.name, m)
+    io.emit(m.player2.name, m)
+    io.emit(m.player1.name+'-end')
+    io.emit(m.player2.name+'-end')
 }
 
 async function updateMatch(io, matchData) {

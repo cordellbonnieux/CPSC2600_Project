@@ -15,7 +15,7 @@ export default function Match(props) {
     const [ locations, setLocations ] = useState([])
     const [ selectionIndex, setSelectionIndex ] = useState(null)
     const [ ready, setReady ] = useState(false)
-    const { setUser, user, logout, surrender, disconnect } = props
+    const { setUser, user, logout } = props
 
     /*
     * determine location of selection tiles 
@@ -65,9 +65,26 @@ export default function Match(props) {
     }
 
     /*
+    * current user surrenders match
+    */
+    function surrender(socket, player1, player2) {
+        socket.emit('endMatch', {
+            id: user.matchId,
+            victor: player1 === user.username ? player2 : player1,
+            updateNo: match.updateNo + 1
+        })
+    }
+
+    // close socket and disconnect from the match
+    const disconnectFromMatch = useCallback(() => {
+        socket.current.off(user.username, consumeMatchData)
+        setUser(currentUser => currentUser = {...currentUser, matchId: '', inMatch: false})
+    }, [setUser])
+
+    /*
     * when data is emitted from the server to the client,
     * parse and store the data in state to render the map and ui
-    * TODO: this is the bottleneck, and what determines if the app works
+    * -this is the bottleneck, and what determines if the app works
     */
     const consumeMatchData = useCallback(data => {
         if (data['_id'] === user.matchId) {
@@ -84,7 +101,7 @@ export default function Match(props) {
         } else {
             console.log('really bad data:', data)
         }
-    }, [match.updateNo, user.matchId, ready])
+    }, [match.updateNo, user.matchId, ready, disconnectFromMatch])
 
     /*
     * Emit new unit changes to server
@@ -193,19 +210,22 @@ export default function Match(props) {
     consumeMatchData(d)
     setReady(true)
     socket.current.off(user.username+'-setup', setupMatch)
-  }, [])
+  }, [consumeMatchData, user.username])
 
    useEffect(() => {
     // componentDidMount
     socket.current = io(SERVER_URI)
     socket.current.on(user.username, consumeMatchData)
     socket.current.on(user.username+'-setup', setupMatch)
+    socket.current.on(user.username+'-end', disconnectFromMatch)
     socket.current.emit('setupMatch', user.matchId)
     //socket.current.emit('match', user.matchId)
     socket.current.emit('')
     return () => {
       // componentWillUnmount
       socket.current.off(user.username, consumeMatchData)
+      socket.current.off(user.username+'-setup', setupMatch)
+      socket.current.off(user.username+'-end', disconnectFromMatch)
       //socket.current.off('match', user.matchId)
       socket.current.emit('end')
     }
@@ -237,6 +257,8 @@ export default function Match(props) {
         }
     }, [match])
     */    
+
+    //
 
     /*
     * When a unit card from the ui is selected, the selectionFromUI state will contain
