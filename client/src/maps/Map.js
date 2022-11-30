@@ -14,9 +14,9 @@ export default function Map(props) {
     /*
     * tracking clicks to help visualize and test
     */
-    const [ clicks, setClicks ] = useState([])
+    //const [ clicks, setClicks ] = useState([])
     //const [ squares, setSquares ] = useState([])
-    
+    /*
     function renderClicks(ctx) {
         for (let i = 0; i < clicks.length; i++) {
             ctx.beginPath()
@@ -25,6 +25,7 @@ export default function Map(props) {
             ctx.fill()
         }
     }
+    */
     /*
     function renderSquares() {
         for (let i = 0; i < squares.length; i++) {
@@ -135,7 +136,7 @@ export default function Map(props) {
             renderUnits(ctx)
             renderSelectionTiles(ctx)
             // for testing only
-            renderClicks(ctx)
+            //renderClicks(ctx)
             //renderSquares(ctx)
             animationFrameId = window.requestAnimationFrame(render)
         }
@@ -156,10 +157,11 @@ export default function Map(props) {
     }, [canvasRef])
 
     // for testing - add every click on canvas to clicks, to render
+    /*
     useEffect(() => {
         setClicks(arr => [...arr, {x: pos.x, y: pos.y}])  
     }, [pos])
-    
+    */
 
     // detect selection from ui and use it to set pos
     useEffect(() => {
