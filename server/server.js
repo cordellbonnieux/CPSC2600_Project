@@ -11,7 +11,6 @@ app.use(express.json())
 app.use('/account', require('./routes/account'))
 app.use('/session', require('./routes/session'))
 app.use('/que', require('./routes/que'))
-app.use('/match', require('./routes/match'))
 
 // make server
 const server = require('http').createServer(app)
