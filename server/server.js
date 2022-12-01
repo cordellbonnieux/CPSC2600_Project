@@ -1,5 +1,5 @@
 require('dotenv').config({ path: './config.env' })
-const port = "$PORT" || process.env.PORT || 5000
+const port = process.env.PORT || 5000
 const express = require('express')
 const app = express()
 
@@ -17,7 +17,7 @@ const server = require('http').createServer(app)
 
 // mongoose conn
 const mongoose = require('mongoose')
-mongoose.connect(process.env.ATLAS_URI) //async
+mongoose.connect($MONGODB_URI) //async process.env.ATLAS_URI
 const connection = mongoose.connection
 connection.once('open', () => console.log('connected to mongodb atlas'))
 
