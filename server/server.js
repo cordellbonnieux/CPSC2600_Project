@@ -4,9 +4,8 @@ const express = require('express')
 const app = express()
 
 const cors = require('cors')
-app.use(cors({
-  origin: ['https://cordellbonnieux.github.io/CPSC2600_Project/']
-}))
+const corsOptions = {origin: ['https://cordellbonnieux.github.io/CPSC2600_Project/']}
+app.use(cors(corsOptions))
 app.use(express.json())
 
 // routes
