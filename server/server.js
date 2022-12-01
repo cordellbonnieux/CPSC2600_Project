@@ -17,7 +17,7 @@ const server = require('http').createServer(app)
 
 // mongoose conn
 const mongoose = require('mongoose')
-mongoose.connect($MONGODB_URI) //async process.env.ATLAS_URI
+mongoose.connect(process.env.MONGODB_URI) //async process.env.ATLAS_URI
 const connection = mongoose.connection
 connection.once('open', () => console.log('connected to mongodb atlas'))
 
