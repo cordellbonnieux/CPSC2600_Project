@@ -1,10 +1,11 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useContext } from 'react'
 import axios from 'axios'
 import { io } from 'socket.io-client'
 import MenuButton from '../components/MenuButton'
+import { ServerContext } from '../App'
 
 // server information
-const SERVER_URI = 'http://localhost:5000'
+//const SERVER_URI = 'http://localhost:5000'
 
 export default function MainMenu(props) {
     const { logout, setUser } = props
@@ -12,6 +13,7 @@ export default function MainMenu(props) {
     const [ searching, setSearching ] = useState(false)
     const [ screenText, setScreenText ] = useState('')
     const socket = useRef()
+    const SERVER_URI = useContext(ServerContext)
 
 
     const menu = (
@@ -23,10 +25,10 @@ export default function MainMenu(props) {
 
    async function findMatch() {
     if (searching) {
-        await axios.delete(SERVER_URI + '/que/' + username)
+        await axios.delete(SERVER_URI + 'que/' + username)
             .then(() => setSearching(false)).catch(err => console.log(err))
     } else {
-        await axios.post(SERVER_URI+'/que/add', {user: username})
+        await axios.post(SERVER_URI+ 'que/add', {user: username})
         .then(() => {
             setSearching(true)
             socket.current.emit('matchmaking')
@@ -57,7 +59,7 @@ export default function MainMenu(props) {
     }, [])
 
     useEffect(() => {
-        axios.get(SERVER_URI + '/que/').then(async function(res) {
+        axios.get(SERVER_URI + 'que/').then(async function(res) {
             res.data[0].userList.includes(username) ?
                 setSearching(true) :
                 setSearching(false)

@@ -1,6 +1,7 @@
 import axios from 'axios'
-import { useState, useEffect } from 'react'
-const server = 'http://localhost:5000/'
+import { useState, useEffect, useContext } from 'react'
+import { ServerContext } from "../App"
+//const server = 'http://localhost:5000/'
 
 const submissionErrorWarnings = [
     'invalid password',
@@ -13,6 +14,7 @@ export default function LoginForm(props) {
     const [ password, setPassword ] = useState('')
     let [ isLoading, setLoading ] = useState(false)
     let [ readyToSubmit, setReadyToSubmit ] = useState(false)
+    const server = useContext(ServerContext)
     const [ warnings, setWarnings ] = useState({
         password: '',
         username: '',

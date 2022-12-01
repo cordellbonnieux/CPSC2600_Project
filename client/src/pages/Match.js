@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { io } from 'socket.io-client'
 import '../css/match.css'
 import MatchOverlay from '../components/MatchOverlay'
 import Map from '../maps/Map'
 import Unit from '../units/Unit'
-const SERVER_URI = 'http://localhost:5000'
+import { ServerContext } from '../App'
+//const SERVER_URI = 'http://localhost:5000'
 
 
 export default function Match(props) {
@@ -16,6 +17,7 @@ export default function Match(props) {
     const [ selectionIndex, setSelectionIndex ] = useState(null)
     const [ ready, setReady ] = useState(false)
     const { setUser, user, logout } = props
+    const SERVER_URI = useContext(ServerContext)
 
     /*
     * determine location of selection tiles 

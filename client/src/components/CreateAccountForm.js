@@ -1,8 +1,7 @@
 import { useState, useEffect, useContext } from "react"
 import { useNavigate } from 'react-router'
 import axios from 'axios'
-
-const serverURL = 'http://localhost:5000/'
+import { ServerContext } from "../App"
 
 const error = {
     user: [
@@ -37,6 +36,7 @@ export default function CreateAccountForm(props) {
     let [ validEmail, setEmailValid ] = useState(false)
     let [ validPassword, setPasswordValid ] = useState(false)
     let [ readyToSubmit, setReadyToSubmit ] = useState(false)
+    const serverURL = useContext(ServerContext)//'http://localhost:5000/'
 
     async function handleSubmit(e) {
         e.preventDefault()

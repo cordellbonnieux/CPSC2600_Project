@@ -38,11 +38,11 @@ export default function LoginScreen(props) {
                 or attack any enemy on that tile. Enemies will appear as green dots on the game map.
             </p>
             <p>
-                Once you'll completed all your possible (or desired) moves, you can end your turn by clicking
+                Once you've completed all your possible (or desired) moves, you can end your turn by clicking
                 on the "complete turn" button in the top-left of the screen.
             </p>
             <p>
-                A game is placed in alternating turns, and will go on forever until one player, submits 
+                A game is played in alternating turns, and will go on until one player submits 
                 and clicks the "surrender" button in the top right of the screen.
             </p>
             <h3>Extra Marks</h3>

@@ -1,5 +1,5 @@
 //import React from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext, createContext } from 'react'
 
 // templates
 import LoggedOutTemplate from './templates/LoggedOut'
@@ -10,12 +10,14 @@ import axios from 'axios'
 import './css/app.css'
 
 // server information
-const SERVER_URI = 'http://localhost:5000'
+const SERVER_URI = 'http://localhost:5000/'
+const ServerContext = createContext()
 // TODO:add a context which holds server uri, session info etc?
 
 const App = () => {
   const [ loggedIn, setLoggedIn ] = useState(false)
   const [ loading, setLoading ] = useState(true)
+  // TODO make user context
   const [ user, setUser ] = useState({
     username: '',
     email: '',
@@ -32,7 +34,7 @@ const App = () => {
       socket.emit('end')
     }
     if (localStorage.getItem('sessionid')) {
-      await axios.delete(SERVER_URI + '/session/' + localStorage.getItem('sessionid'))
+      await axios.delete(SERVER_URI + 'session/' + localStorage.getItem('sessionid'))
     }
     if (user.username.length > 0) {
       setUser({username: '', email: '', inMatch: false, matchId: ''})
@@ -43,7 +45,7 @@ const App = () => {
   // Login via sessionid from local storage
   async function sessionLogin(sessionid) {
     //console.log('searching for user')
-    await axios.get(SERVER_URI + '/session/' + sessionid).then(response => {
+    await axios.get(SERVER_URI + 'session/' + sessionid).then(response => {
       //console.log(response.data)
       if (response.data.status === 'valid') {
         //console.log('valid response')
@@ -85,14 +87,17 @@ const App = () => {
   //{loading ? <span>Loading...</span> : <></>}
 
   return (
-    <div id='wrapper'>
-    {
-      loggedIn ? 
-        <LoggedInTemplate user={user} setUser={setUser} logout={logout}/> : 
-        <LoggedOutTemplate setLoggedIn={setLoggedIn} setUser={setUser} />
-    }
-    </div>
+    <ServerContext.Provider value={SERVER_URI}>
+      <div id='wrapper'>
+        {
+          loggedIn ? 
+            <LoggedInTemplate user={user} setUser={setUser} logout={logout}/> : 
+            <LoggedOutTemplate setLoggedIn={setLoggedIn} setUser={setUser} />
+        }
+      </div>
+    </ServerContext.Provider>
   )
 }
 
 export default App
+export { ServerContext }
