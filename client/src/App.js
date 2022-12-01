@@ -10,7 +10,7 @@ import axios from 'axios'
 import './css/app.css'
 
 // server information
-const SERVER_URI = 'https://cpsc2600project-production.up.railway.app'// 'http://localhost:5000/'
+const SERVER_URI = 'https://cpsc2600project-production.up.railway.app/'// 'http://localhost:5000/'
 const ServerContext = createContext()
 // TODO:add a context which holds session, user info etc?
 
