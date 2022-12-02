@@ -27,7 +27,7 @@ const User = require('./models/userModel')
 const Que = require('./models/queModel')
 
 // web socket
-const io = require('socket.io')(server)
+const io = require('socket.io')(server, {cors:{origin:'https://cordellbonnieux.github.io'}})
 const matchmaking = require('./emits/matchmaking')
 const { getMatch, endMatch, updateMatch, joinMatch, setupMatch } = require('./emits/match')
 
