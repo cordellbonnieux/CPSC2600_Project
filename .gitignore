@@ -27,3 +27,5 @@ yarn-error.log*
 
 # project docs
 /proposal
+
+*.zip
